@@ -13,7 +13,7 @@ Thank you for considering contributing to FitQuest! This document outlines the p
 ## 🚀 Getting Started
 
 1. Fork the repository
-2. Clone your fork: `git clone https://github.com/YOUR_USERNAME/fitquest-app.git`
+2. Clone your fork: `git clone https://github.com/NickiMash17/fitquest-app.git`
 3. Create a branch: `git checkout -b feature/your-feature-name`
 4. Make your changes
 5. Commit: `git commit -m "feat: add amazing feature"`

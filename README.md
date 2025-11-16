@@ -51,7 +51,7 @@ Before you begin, ensure you have the following installed:
 
 1. **Clone the repository**
 ```bash
-   git clone https://github.com/YOUR_USERNAME/fitquest-app.git
+   git clone https://github.com/NickiMash17/fitquest-app.git
    cd fitquest-app
 ```
 
@@ -149,8 +149,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Nicolette Mashaba**
 
-- GitHub: [@YOUR_USERNAME](https://github.com/YOUR_USERNAME)
-- LinkedIn: [Your LinkedIn](https://linkedin.com/in/your-profile)
+- GitHub: [@YOUR_USERNAME](https://github.com/NickiMash17)
+- LinkedIn: [Your LinkedIn](https://linkedin.com/in/nicolette-mashaba)
 
 ## 🙏 Acknowledgments
 
@@ -160,7 +160,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📧 Contact
 
-For questions or support, please open an issue or contact [your.email@example.com](mailto:your.email@example.com)
+For questions or support, please open an issue or contact [your.email@example.com](mailto:nene171408@gmail.com)
 
 ---
 
