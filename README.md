@@ -149,8 +149,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Nicolette Mashaba**
 
-- GitHub: [@YOUR_USERNAME](https://github.com/NickiMash17)
-- LinkedIn: [Your LinkedIn](https://linkedin.com/in/nicolette-mashaba)
+- GitHub: [@NickiMash17](https://github.com/NickiMash17)
+- LinkedIn: [Nicolette Mashaba](https://linkedin.com/in/nicolette-mashaba)
 
 ## 🙏 Acknowledgments
 
@@ -160,7 +160,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📧 Contact
 
-For questions or support, please open an issue or contact [your.email@example.com](mailto:nene171408@gmail.com)
+For questions or support, please open an issue or contact [nene171408@gmail.com](mailto:nene171408@gmail.com)
 
 ---
 
