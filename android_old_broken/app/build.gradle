@@ -1,0 +1,31 @@
+﻿apply from: "../flutter.gradle"
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.5.2'
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+android {
+    ndkVersion null
+    compileSdk 36
+
+    defaultConfig {
+        applicationId "com.example.fitquest"
+        minSdkVersion 21
+        targetSdkVersion 36
+        versionCode 1
+        versionName "1.0"
+    }
+}
