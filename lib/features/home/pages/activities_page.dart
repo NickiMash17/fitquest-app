@@ -153,7 +153,8 @@ class ActivitiesPage extends StatelessWidget {
                                 .headlineMedium
                                 ?.copyWith(
                                   fontWeight: FontWeight.w700,
-                                  color: Theme.of(context).colorScheme.onSurface,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
                                   letterSpacing: -0.3,
                                 ),
                           ),
@@ -188,7 +189,8 @@ class ActivitiesPage extends StatelessWidget {
                                 .headlineMedium
                                 ?.copyWith(
                                   fontWeight: FontWeight.w700,
-                                  color: Theme.of(context).colorScheme.onSurface,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
                                   letterSpacing: -0.3,
                                 ),
                           ),
@@ -368,13 +370,14 @@ class ActivitiesPage extends StatelessWidget {
                     Icon(
                       Icons.access_time_rounded,
                       size: 14,
-                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                     const SizedBox(width: 4),
                     Text(
                       app_date_utils.DateUtils.formatDateTime(activity.date),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                     ),
                   ],
@@ -418,7 +421,7 @@ class ActivitiesPage extends StatelessWidget {
               Text(
                 '${activity.duration} min',
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.w500,
                     ),
               ),

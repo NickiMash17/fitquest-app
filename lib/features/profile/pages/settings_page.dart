@@ -213,7 +213,10 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 Divider(
                   height: 1,
-                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.12),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .outline
+                      .withValues(alpha: 0.12),
                 ),
                 ListTile(
                   leading: Icon(
@@ -237,7 +240,10 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 Divider(
                   height: 1,
-                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.12),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .outline
+                      .withValues(alpha: 0.12),
                 ),
                 ListTile(
                   leading: Icon(
