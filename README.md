@@ -158,6 +158,25 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Firebase for backend infrastructure
 - [Learning path created by Jediah](https://jediah.dev)
 
+## 🐛 Troubleshooting
+
+### Blank Screen Issues
+1. **Check Browser Console** (F12 → Console tab) for errors
+2. **Hard Refresh**: Press Ctrl+Shift+R (Windows) or Cmd+Shift+R (Mac)
+3. **Clear Browser Cache**: Ctrl+Shift+Delete → Clear cached images and files
+4. **Try Incognito Mode**: Open Chrome in incognito and navigate to localhost
+
+### Reset Onboarding
+To see the onboarding screen again:
+1. Press **F12** → **Console** tab
+2. Type: `localStorage.clear()` and press Enter
+3. Refresh the page (F5)
+
+### Common Issues
+- **Firestore Index Errors**: These are warnings. Create indexes in Firebase Console using the provided links
+- **Port Conflicts**: Try `flutter run -d chrome --web-port=8080`
+- **Build Errors**: Check terminal output for compilation errors
+
 ## 📧 Contact
 
 For questions or support, please open an issue or contact [nene171408@gmail.com](mailto:nene171408@gmail.com)
