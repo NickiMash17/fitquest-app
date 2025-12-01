@@ -4,12 +4,16 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
 
-  // Primary colors - Enhanced with modern shades
-  static const Color primaryGreen = Color(0xFF4CAF50);
-  static const Color primaryDark = Color(0xFF2E7D32);
-  static const Color primaryLight = Color(0xFF81C784);
-  static const Color primaryLighter = Color(0xFFC8E6C9);
-  static const Color primaryLightest = Color(0xFFE8F5E9);
+  // Primary colors - Enhanced with modern shades and better contrast
+  static const Color primaryGreen = Color(0xFF4CAF50); // Material Green 500
+  static const Color primaryDark = Color(0xFF2E7D32); // Material Green 800 - darker for better contrast
+  static const Color primaryLight = Color(0xFF81C784); // Material Green 300 - lighter shade
+  static const Color primaryLighter = Color(0xFFC8E6C9); // Material Green 100
+  static const Color primaryLightest = Color(0xFFE8F5E9); // Material Green 50
+  
+  // Primary colors for dark theme
+  static const Color primaryGreenDark = Color(0xFF66BB6A); // Lighter green for dark mode
+  static const Color primaryDarkDark = Color(0xFF388E3C); // Adjusted for dark backgrounds
 
   // Accent colors - Vibrant and modern
   static const Color accentBlue = Color(0xFF2196F3);
@@ -21,20 +25,36 @@ class AppColors {
   static const Color accentTeal = Color(0xFF009688);
   static const Color accentPink = Color(0xFFE91E63);
 
-  // Text colors - Enhanced contrast
-  static const Color textPrimary = Color(0xFF1A1A1A);
-  static const Color textSecondary = Color(0xFF616161);
-  static const Color textTertiary = Color(0xFF9E9E9E);
+  // Text colors - Enhanced contrast for accessibility
+  static const Color textPrimary = Color(0xFF1A1A1A); // High contrast on light backgrounds
+  static const Color textSecondary = Color(0xFF424242); // Better contrast than #616161
+  static const Color textTertiary = Color(0xFF757575); // Improved visibility
   static const Color textOnPrimary = Colors.white;
   static const Color textOnGreen = Colors.white;
-  static const Color textMuted = Color(0xFF9E9E9E);
+  static const Color textMuted = Color(0xFF757575);
+  
+  // Text colors for dark theme
+  static const Color textPrimaryDark = Colors.white;
+  static const Color textSecondaryDark = Color(0xFFB0B0B0); // Better contrast on dark
+  static const Color textTertiaryDark = Color(0xFF9E9E9E);
+  
+  // Text on colored backgrounds - ensures visibility
+  static const Color textOnGradient = Colors.white;
+  static const Color textOnLightBackground = Color(0xFF1A1A1A);
+  static const Color textOnDarkBackground = Colors.white;
 
   // Background colors - Modern and clean
-  static const Color background = Color(0xFFFAFAFA);
+  static const Color background = Color(0xFFFAFAFA); // Material Grey 50
   static const Color backgroundLight = Color(0xFFFFFFFF);
   static const Color surface = Colors.white;
-  static const Color surfaceVariant = Color(0xFFF5F5F5);
-  static const Color divider = Color(0xFFE0E0E0);
+  static const Color surfaceVariant = Color(0xFFF5F5F5); // Material Grey 100
+  static const Color divider = Color(0xFFE0E0E0); // Material Grey 300 - better visibility
+  
+  // Dark theme backgrounds
+  static const Color backgroundDark = Color(0xFF121212); // Material Dark background
+  static const Color surfaceDark = Color(0xFF1E1E1E); // Material Dark surface
+  static const Color surfaceVariantDark = Color(0xFF2C2C2C); // Material Dark surface variant
+  static const Color dividerDark = Color(0xFF424242); // Material Grey 800 - visible on dark
 
   // Status colors - Enhanced
   static const Color success = Color(0xFF4CAF50);

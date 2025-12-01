@@ -134,7 +134,7 @@ class AppTheme {
         letterSpacing: 0.25,
         height: 1.6,
       ),
-      bodySmall: TextStyle(
+      bodySmall: const TextStyle(
         fontSize: 12,
         fontWeight: FontWeight.w400,
         fontFamily: 'Inter',
@@ -158,7 +158,7 @@ class AppTheme {
         letterSpacing: 0.5,
         height: 1.4,
       ),
-      labelSmall: TextStyle(
+      labelSmall: const TextStyle(
         fontSize: 11,
         fontWeight: FontWeight.w500,
         fontFamily: 'Inter',
@@ -270,24 +270,24 @@ class AppTheme {
     useMaterial3: true,
     brightness: Brightness.dark,
     colorScheme: ColorScheme.dark(
-      primary: AppColors.primaryLight,
+      primary: AppColors.primaryGreenDark,
       primaryContainer: const Color(0xFF1B5E20),
       secondary: AppColors.accentOrange,
       secondaryContainer: AppColors.accentOrangeLight,
-      surface: const Color(0xFF1E1E1E),
-      surfaceVariant: const Color(0xFF2C2C2C),
-      background: const Color(0xFF121212),
+      surface: AppColors.surfaceDark,
+      surfaceVariant: AppColors.surfaceVariantDark,
+      background: AppColors.backgroundDark,
       error: AppColors.error,
       errorContainer: AppColors.errorLight,
       onPrimary: Colors.black,
       onSecondary: Colors.black,
-      onSurface: Colors.white,
-      onBackground: Colors.white,
+      onSurface: AppColors.textPrimaryDark,
+      onBackground: AppColors.textPrimaryDark,
       onError: Colors.white,
-      outline: const Color(0xFF424242),
+      outline: AppColors.dividerDark,
       shadow: Colors.black.withOpacity(0.3),
     ),
-    scaffoldBackgroundColor: const Color(0xFF121212),
+    scaffoldBackgroundColor: AppColors.backgroundDark,
     appBarTheme: AppBarTheme(
       elevation: 0,
       centerTitle: false,
@@ -385,19 +385,19 @@ class AppTheme {
         letterSpacing: 0.15,
         height: 1.6,
       ),
-      bodyMedium: TextStyle(
+      bodyMedium: const TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w400,
         fontFamily: 'Inter',
-        color: Colors.white.withOpacity(0.7),
+        color: AppColors.textSecondaryDark,
         letterSpacing: 0.25,
         height: 1.6,
       ),
-      bodySmall: TextStyle(
+      bodySmall: const TextStyle(
         fontSize: 12,
         fontWeight: FontWeight.w400,
         fontFamily: 'Inter',
-        color: Colors.white.withOpacity(0.6),
+        color: AppColors.textTertiaryDark,
         letterSpacing: 0.4,
         height: 1.5,
       ),
@@ -409,19 +409,19 @@ class AppTheme {
         letterSpacing: 0.1,
         height: 1.4,
       ),
-      labelMedium: TextStyle(
+      labelMedium: const TextStyle(
         fontSize: 12,
         fontWeight: FontWeight.w500,
         fontFamily: 'Inter',
-        color: Colors.white.withOpacity(0.7),
+        color: AppColors.textSecondaryDark,
         letterSpacing: 0.5,
         height: 1.4,
       ),
-      labelSmall: TextStyle(
+      labelSmall: const TextStyle(
         fontSize: 11,
         fontWeight: FontWeight.w500,
         fontFamily: 'Inter',
-        color: Colors.white.withOpacity(0.6),
+        color: AppColors.textTertiaryDark,
         letterSpacing: 0.5,
         height: 1.4,
       ),

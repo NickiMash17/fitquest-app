@@ -298,7 +298,9 @@ class _OnboardingPageState extends State<OnboardingPage>
         gradient: isActive ? _slides[_currentPage].gradient : null,
         color: isActive
             ? null
-            : (isDark ? Colors.white.withOpacity(0.3) : Colors.grey[300]),
+            : (isDark 
+                ? Colors.white.withOpacity(0.3) 
+                : AppColors.textTertiary),
       ),
     );
   }

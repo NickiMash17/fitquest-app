@@ -97,3 +97,14 @@ firebase_options.dart
 .env
 .env.local
 .env.*.local
+
+# Build logs and temporary files
+*.log
+build_log.txt
+flutter_*.log
+
+# Zip files
+*.zip
+
+# Old/broken directories
+android_old_broken/
