@@ -161,7 +161,7 @@ class _OnboardingPageState extends State<OnboardingPage>
                     onPressed: _skipOnboarding,
                     style: TextButton.styleFrom(
                       foregroundColor:
-                          isDark ? Colors.white70 : AppColors.textSecondary,
+                          Theme.of(context).colorScheme.onSurfaceVariant,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 8,
@@ -261,7 +261,7 @@ class _OnboardingPageState extends State<OnboardingPage>
                 slide.title,
                 style: Theme.of(context).textTheme.displaySmall?.copyWith(
                       fontWeight: FontWeight.w800,
-                      color: isDark ? Colors.white : AppColors.textPrimary,
+                      color: Theme.of(context).colorScheme.onSurface,
                       letterSpacing: -0.5,
                     ),
                 textAlign: TextAlign.center,
@@ -271,7 +271,7 @@ class _OnboardingPageState extends State<OnboardingPage>
               Text(
                 slide.description,
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: isDark ? Colors.white70 : AppColors.textSecondary,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       height: 1.6,
                       letterSpacing: 0.2,
                     ),
@@ -298,9 +298,7 @@ class _OnboardingPageState extends State<OnboardingPage>
         gradient: isActive ? _slides[_currentPage].gradient : null,
         color: isActive
             ? null
-            : (isDark 
-                ? Colors.white.withOpacity(0.3) 
-                : AppColors.textTertiary),
+            : Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
       ),
     );
   }

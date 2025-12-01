@@ -122,9 +122,16 @@ class _FitQuestAppState extends State<FitQuestApp> {
                 final bloc = getIt<AuthBloc>();
                 bloc.add(const AuthCheckRequested());
                 return bloc;
-              } catch (e) {
+              } catch (e, stackTrace) {
                 debugPrint('Error creating AuthBloc: $e');
-                return AuthBloc(getIt(), getIt());
+                debugPrint('Stack: $stackTrace');
+                // Return a basic AuthBloc if DI fails
+                try {
+                  return AuthBloc(getIt(), getIt());
+                } catch (e2) {
+                  debugPrint('Failed to create fallback AuthBloc: $e2');
+                  rethrow;
+                }
               }
             },
           ),
@@ -132,9 +139,16 @@ class _FitQuestAppState extends State<FitQuestApp> {
             create: (context) {
               try {
                 return getIt<ActivityBloc>();
-              } catch (e) {
+              } catch (e, stackTrace) {
                 debugPrint('Error creating ActivityBloc: $e');
-                return ActivityBloc(getIt(), getIt(), getIt(), getIt());
+                debugPrint('Stack: $stackTrace');
+                // Return a basic ActivityBloc if DI fails
+                try {
+                  return ActivityBloc(getIt(), getIt(), getIt(), getIt());
+                } catch (e2) {
+                  debugPrint('Failed to create fallback ActivityBloc: $e2');
+                  rethrow;
+                }
               }
             },
           ),
@@ -147,21 +161,57 @@ class _FitQuestAppState extends State<FitQuestApp> {
           themeMode: _themeMode,
           onGenerateRoute: AppRouter.generateRoute,
           initialRoute: AppRouter.splash,
+          builder: (context, child) {
+            // Add error boundary
+            return MediaQuery(
+              data: MediaQuery.of(context)
+                  .copyWith(textScaler: TextScaler.linear(1.0)),
+              child: child ?? const SizedBox.shrink(),
+            );
+          },
         ),
       );
     } catch (e, stackTrace) {
       debugPrint('Error building FitQuestApp: $e');
       debugPrint('Stack: $stackTrace');
       return MaterialApp(
+        debugShowCheckedModeBanner: false,
         home: Scaffold(
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error, size: 64, color: Colors.red),
-                const SizedBox(height: 16),
-                Text('Error: $e'),
-              ],
+          backgroundColor: Colors.white,
+          body: SafeArea(
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error_outline,
+                        size: 64, color: Colors.red),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'App Error',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Error: $e',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: () {
+                        // Try to restart the app
+                        runApp(const FitQuestApp());
+                      },
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fitquest/core/constants/app_colors.dart';
-import 'package:fitquest/core/constants/app_spacing.dart';
 import 'package:fitquest/core/constants/app_border_radius.dart';
-import 'package:fitquest/core/constants/app_shadows.dart';
 
 class AppTheme {
   AppTheme._();

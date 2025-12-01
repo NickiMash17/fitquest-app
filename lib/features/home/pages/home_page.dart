@@ -254,7 +254,7 @@ class HomePage extends StatelessWidget {
                                             .headlineMedium
                                             ?.copyWith(
                                               fontWeight: FontWeight.w700,
-                                              color: AppColors.textPrimary,
+                                              color: Theme.of(context).colorScheme.onSurface,
                                               letterSpacing: -0.3,
                                             ),
                                       ),
@@ -294,7 +294,7 @@ class HomePage extends StatelessWidget {
                                           .headlineMedium
                                           ?.copyWith(
                                             fontWeight: FontWeight.w700,
-                                            color: AppColors.textPrimary,
+                                            color: Theme.of(context).colorScheme.onSurface,
                                             letterSpacing: -0.3,
                                           ),
                                     ),

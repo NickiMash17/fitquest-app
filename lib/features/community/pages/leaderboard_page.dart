@@ -136,7 +136,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                                   entry.displayName,
                                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                         fontWeight: FontWeight.w700,
-                                        color: AppColors.textPrimary,
+                                        color: Theme.of(context).colorScheme.onSurface,
                                       ),
                                 ),
                                 const SizedBox(height: 4),
@@ -145,26 +145,26 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                                     Icon(
                                       Icons.emoji_events_rounded,
                                       size: 14,
-                                      color: AppColors.textSecondary,
+                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
                                       'Level ${entry.currentLevel}',
                                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                            color: AppColors.textSecondary,
+                                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                                           ),
                                     ),
                                     const SizedBox(width: 12),
                                     Icon(
                                       Icons.local_fire_department_rounded,
                                       size: 14,
-                                      color: AppColors.textSecondary,
+                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
                                       '${entry.currentStreak} day streak',
                                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                            color: AppColors.textSecondary,
+                                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                                           ),
                                     ),
                                   ],
@@ -197,7 +197,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                               Text(
                                 '#${entry.rank}',
                                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                      color: AppColors.textSecondary,
+                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                                       fontWeight: FontWeight.w600,
                                     ),
                               ),

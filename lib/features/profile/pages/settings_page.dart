@@ -56,8 +56,6 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
@@ -85,7 +83,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 'Appearance',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
+                      color: Theme.of(context).colorScheme.onSurface,
                       letterSpacing: -0.3,
                     ),
               ),
@@ -95,14 +93,17 @@ class _SettingsPageState extends State<SettingsPage> {
           PremiumCard(
             padding: EdgeInsets.zero,
             child: SwitchListTile(
-              title: const Text(
+              title: Text(
                 'Dark Mode',
-                style: TextStyle(fontWeight: FontWeight.w600),
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
               subtitle: Text(
                 'Use dark theme for better viewing in low light',
                 style: TextStyle(
-                  color: isDark ? Colors.white70 : AppColors.textSecondary,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
               value: _darkMode,
@@ -131,7 +132,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 'Notifications',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
+                      color: Theme.of(context).colorScheme.onSurface,
                       letterSpacing: -0.3,
                     ),
               ),
@@ -141,14 +142,17 @@ class _SettingsPageState extends State<SettingsPage> {
           PremiumCard(
             padding: EdgeInsets.zero,
             child: SwitchListTile(
-              title: const Text(
+              title: Text(
                 'Enable Notifications',
-                style: TextStyle(fontWeight: FontWeight.w600),
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
               subtitle: Text(
                 'Receive activity reminders and updates',
                 style: TextStyle(
-                  color: isDark ? Colors.white70 : AppColors.textSecondary,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
               value: _notificationsEnabled,
@@ -177,7 +181,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 'About',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
+                      color: Theme.of(context).colorScheme.onSurface,
                       letterSpacing: -0.3,
                     ),
               ),
@@ -189,33 +193,68 @@ class _SettingsPageState extends State<SettingsPage> {
             child: Column(
               children: [
                 ListTile(
-                  leading: const Icon(Icons.phone_android_rounded),
-                  title: const Text(
+                  leading: Icon(
+                    Icons.phone_android_rounded,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                  title: Text(
                     'App Version',
-                    style: TextStyle(fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
                   ),
-                  subtitle: const Text('1.0.0'),
+                  subtitle: Text(
+                    '1.0.0',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
                 ),
-                const Divider(height: 1),
+                Divider(
+                  height: 1,
+                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.12),
+                ),
                 ListTile(
-                  leading: const Icon(Icons.privacy_tip_rounded),
-                  title: const Text(
-                    'Privacy Policy',
-                    style: TextStyle(fontWeight: FontWeight.w600),
+                  leading: Icon(
+                    Icons.privacy_tip_rounded,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
-                  trailing: const Icon(Icons.chevron_right_rounded),
+                  title: Text(
+                    'Privacy Policy',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                  trailing: Icon(
+                    Icons.chevron_right_rounded,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                   onTap: () {
                     // TODO: Show privacy policy
                   },
                 ),
-                const Divider(height: 1),
+                Divider(
+                  height: 1,
+                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.12),
+                ),
                 ListTile(
-                  leading: const Icon(Icons.description_rounded),
-                  title: const Text(
-                    'Terms of Service',
-                    style: TextStyle(fontWeight: FontWeight.w600),
+                  leading: Icon(
+                    Icons.description_rounded,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
-                  trailing: const Icon(Icons.chevron_right_rounded),
+                  title: Text(
+                    'Terms of Service',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                  trailing: Icon(
+                    Icons.chevron_right_rounded,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                   onTap: () {
                     // TODO: Show terms of service
                   },
