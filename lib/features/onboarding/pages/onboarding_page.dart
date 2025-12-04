@@ -6,6 +6,7 @@ import 'package:fitquest/core/navigation/app_router.dart' as router;
 import 'package:fitquest/core/di/injection.dart';
 import 'package:fitquest/shared/services/local_storage_service.dart';
 import 'package:fitquest/shared/widgets/premium_button.dart';
+import 'package:fitquest/shared/widgets/theme_toggle_button.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
@@ -137,7 +138,7 @@ class _OnboardingPageState extends State<OnboardingPage>
                   end: Alignment.bottomRight,
                   colors: [
                     const Color(0xFF1B1B1B),
-                    const Color(0xFF2E7D32).withOpacity(0.3),
+                    const Color(0xFF2E7D32).withValues(alpha: 0.3),
                   ],
                 )
               : LinearGradient(
@@ -145,36 +146,45 @@ class _OnboardingPageState extends State<OnboardingPage>
                   end: Alignment.bottomRight,
                   colors: [
                     AppColors.primaryLightest,
-                    AppColors.primaryLight.withOpacity(0.3),
+                    AppColors.primaryLight.withValues(alpha: 0.3),
                   ],
                 ),
         ),
         child: SafeArea(
           child: Column(
             children: [
-              // Skip button
+              // Skip button and Theme toggle
               Padding(
                 padding: const EdgeInsets.all(20.0),
-                child: Align(
-                  alignment: Alignment.topRight,
-                  child: TextButton(
-                    onPressed: _skipOnboarding,
-                    style: TextButton.styleFrom(
-                      foregroundColor:
-                          isDark ? Colors.white70 : AppColors.textSecondary,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const SizedBox.shrink(), // Spacer
+                    Row(
+                      children: [
+                        const ThemeToggleButton(),
+                        const SizedBox(width: 8),
+                        TextButton(
+                          onPressed: _skipOnboarding,
+                          style: TextButton.styleFrom(
+                            foregroundColor:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                          ),
+                          child: const Text(
+                            'Skip',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    child: const Text(
-                      'Skip',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
+                  ],
                 ),
               ),
 
@@ -243,7 +253,8 @@ class _OnboardingPageState extends State<OnboardingPage>
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: slide.iconGradient.colors.first.withOpacity(0.4),
+                      color: slide.iconGradient.colors.first
+                          .withValues(alpha: 0.4),
                       blurRadius: 30,
                       spreadRadius: 5,
                     ),
@@ -261,7 +272,7 @@ class _OnboardingPageState extends State<OnboardingPage>
                 slide.title,
                 style: Theme.of(context).textTheme.displaySmall?.copyWith(
                       fontWeight: FontWeight.w800,
-                      color: isDark ? Colors.white : AppColors.textPrimary,
+                      color: Theme.of(context).colorScheme.onSurface,
                       letterSpacing: -0.5,
                     ),
                 textAlign: TextAlign.center,
@@ -271,7 +282,7 @@ class _OnboardingPageState extends State<OnboardingPage>
               Text(
                 slide.description,
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: isDark ? Colors.white70 : AppColors.textSecondary,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       height: 1.6,
                       letterSpacing: 0.2,
                     ),
@@ -298,9 +309,10 @@ class _OnboardingPageState extends State<OnboardingPage>
         gradient: isActive ? _slides[_currentPage].gradient : null,
         color: isActive
             ? null
-            : (isDark 
-                ? Colors.white.withOpacity(0.3) 
-                : AppColors.textTertiary),
+            : Theme.of(context)
+                .colorScheme
+                .onSurfaceVariant
+                .withValues(alpha: 0.4),
       ),
     );
   }

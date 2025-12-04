@@ -8,6 +8,7 @@ import 'package:fitquest/shared/widgets/premium_card.dart';
 import 'package:fitquest/features/authentication/bloc/auth_bloc.dart';
 import 'package:fitquest/features/authentication/bloc/auth_event.dart';
 import 'package:fitquest/features/authentication/bloc/auth_state.dart';
+import 'package:fitquest/shared/models/activity_model.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -51,7 +52,7 @@ class ProfilePage extends StatelessWidget {
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
+                                color: Colors.black.withValues(alpha: 0.2),
                                 blurRadius: 16,
                                 offset: const Offset(0, 4),
                               ),
@@ -110,7 +111,7 @@ class ProfilePage extends StatelessWidget {
                                   .textTheme
                                   .bodyMedium
                                   ?.copyWith(
-                                    color: Colors.white.withOpacity(0.9),
+                                    color: Colors.white.withValues(alpha: 0.9),
                                   ),
                             ),
                           ],
@@ -179,11 +180,43 @@ class ProfilePage extends StatelessWidget {
                   // Menu items
                   _buildMenuItem(
                     context,
-                    icon: Icons.badge_outlined,
-                    title: 'Badges',
+                    icon: Icons.bar_chart_rounded,
+                    title: 'Statistics',
+                    subtitle: 'View your progress',
+                    onTap: () {
+                      AppRouter.navigate(context, AppRouter.statistics);
+                    },
+                  ),
+                  _buildMenuItem(
+                    context,
+                    icon: Icons.workspace_premium_rounded,
+                    title: 'Achievements',
                     subtitle: '${user.unlockedBadges.length} unlocked',
                     onTap: () {
-                      // TODO: Navigate to badges page
+                      AppRouter.navigate(context, AppRouter.achievements);
+                    },
+                  ),
+                  _buildMenuItem(
+                    context,
+                    icon: Icons.flag_rounded,
+                    title: 'Goals',
+                    subtitle: 'Set and track goals',
+                    onTap: () {
+                      AppRouter.navigate(context, AppRouter.goals);
+                    },
+                  ),
+                  _buildMenuItem(
+                    context,
+                    icon: Icons.calendar_today_rounded,
+                    title: 'Calendar',
+                    subtitle: 'View activity history',
+                    onTap: () {
+                      // TODO: Get activities from BLoC
+                      AppRouter.navigate(
+                        context,
+                        AppRouter.calendar,
+                        arguments: <ActivityModel>[],
+                      );
                     },
                   ),
                   _buildMenuItem(
@@ -212,7 +245,9 @@ class ProfilePage extends StatelessWidget {
                           .read<AuthBloc>()
                           .add(const AuthSignOutRequested());
                       AppRouter.navigateAndRemoveUntil(
-                          context, AppRouter.login);
+                        context,
+                        AppRouter.login,
+                      );
                     },
                     icon: const Icon(Icons.logout),
                     label: const Text('Sign Out'),
@@ -245,7 +280,7 @@ class ProfilePage extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.25),
+              color: Colors.white.withValues(alpha: 0.25),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: Colors.white, size: 28),
@@ -290,7 +325,7 @@ class ProfilePage extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.primaryGreen.withOpacity(0.1),
+                color: AppColors.primaryGreen.withValues(alpha: 0.1),
                 borderRadius: AppBorderRadius.allMD,
               ),
               child: Icon(
@@ -308,20 +343,20 @@ class ProfilePage extends StatelessWidget {
                     title,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     subtitle,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.textSecondary,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                   ),
                 ],
               ),
             ),
-            Icon(
+            const Icon(
               Icons.chevron_right_rounded,
               color: AppColors.textTertiary,
             ),

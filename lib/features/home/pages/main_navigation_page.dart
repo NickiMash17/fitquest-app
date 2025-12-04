@@ -4,6 +4,7 @@ import 'package:fitquest/features/home/pages/home_page.dart';
 import 'package:fitquest/features/home/pages/activities_page.dart';
 import 'package:fitquest/features/community/pages/leaderboard_page.dart';
 import 'package:fitquest/features/profile/pages/profile_page.dart';
+import 'package:fitquest/core/utils/haptic_feedback_service.dart';
 
 class MainNavigationPage extends StatefulWidget {
   const MainNavigationPage({super.key});
@@ -12,8 +13,10 @@ class MainNavigationPage extends StatefulWidget {
   State<MainNavigationPage> createState() => _MainNavigationPageState();
 }
 
-class _MainNavigationPageState extends State<MainNavigationPage> {
+class _MainNavigationPageState extends State<MainNavigationPage>
+    with SingleTickerProviderStateMixin {
   int _currentIndex = 0;
+  late AnimationController _animationController;
 
   final List<Widget> _pages = const [
     HomePage(),
@@ -23,7 +26,24 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Scaffold(
       body: IndexedStack(
         index: _currentIndex,
@@ -31,9 +51,12 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: isDark
+                  ? Colors.black.withValues(alpha:0.3)
+                  : Colors.black.withValues(alpha:0.1),
               blurRadius: 20,
               offset: const Offset(0, -5),
             ),
@@ -42,15 +65,21 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
         child: BottomNavigationBar(
           currentIndex: _currentIndex,
           onTap: (index) {
-            setState(() {
-              _currentIndex = index;
-            });
+            if (index != _currentIndex) {
+              HapticFeedbackService.selectionClick();
+              _animationController.forward().then((_) {
+                _animationController.reverse();
+              });
+              setState(() {
+                _currentIndex = index;
+              });
+            }
           },
           type: BottomNavigationBarType.fixed,
           elevation: 0,
-          backgroundColor: Colors.white,
+          backgroundColor: Theme.of(context).colorScheme.surface,
           selectedItemColor: AppColors.primaryGreen,
-          unselectedItemColor: const Color(0xFF616161),
+          unselectedItemColor: Theme.of(context).colorScheme.onSurfaceVariant,
           selectedIconTheme: const IconThemeData(size: 26),
           unselectedIconTheme: const IconThemeData(size: 24),
           selectedLabelStyle: const TextStyle(

@@ -20,6 +20,8 @@ import 'package:fitquest/features/home/widgets/stats_row.dart';
 import 'package:fitquest/features/home/widgets/quick_actions_section.dart';
 import 'package:fitquest/features/home/widgets/daily_challenge_card.dart';
 import 'package:fitquest/shared/services/xp_calculator_service.dart';
+import 'package:fitquest/shared/widgets/skeleton_loader.dart';
+import 'package:fitquest/shared/widgets/premium_card.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -54,11 +56,11 @@ class HomePage extends StatelessWidget {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   context.read<HomeBloc>().add(const HomeDataLoadRequested());
                 });
-                return const Center(child: CircularProgressIndicator());
+                return _buildSkeletonLoader(context);
               }
 
               if (state is HomeLoading) {
-                return const Center(child: CircularProgressIndicator());
+                return _buildSkeletonLoader(context);
               }
 
               if (state is HomeError) {
@@ -68,8 +70,11 @@ class HomePage extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.error_outline,
-                            size: 64, color: Colors.red),
+                        const Icon(
+                          Icons.error_outline,
+                          size: 64,
+                          color: Colors.red,
+                        ),
                         const SizedBox(height: 16),
                         Text(
                           'Failed to Load',
@@ -166,12 +171,12 @@ class HomePage extends StatelessWidget {
                                         ),
                                         Container(
                                           decoration: BoxDecoration(
-                                            color:
-                                                Colors.white.withOpacity(0.2),
+                                            color: Colors.white
+                                                .withValues(alpha: 0.2),
                                             shape: BoxShape.circle,
                                             border: Border.all(
-                                              color:
-                                                  Colors.white.withOpacity(0.3),
+                                              color: Colors.white
+                                                  .withValues(alpha: 0.3),
                                               width: 1.5,
                                             ),
                                           ),
@@ -254,7 +259,9 @@ class HomePage extends StatelessWidget {
                                             .headlineMedium
                                             ?.copyWith(
                                               fontWeight: FontWeight.w700,
-                                              color: AppColors.textPrimary,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurface,
                                               letterSpacing: -0.3,
                                             ),
                                       ),
@@ -294,7 +301,9 @@ class HomePage extends StatelessWidget {
                                           .headlineMedium
                                           ?.copyWith(
                                             fontWeight: FontWeight.w700,
-                                            color: AppColors.textPrimary,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface,
                                             letterSpacing: -0.3,
                                           ),
                                     ),
@@ -304,6 +313,109 @@ class HomePage extends StatelessWidget {
                                 const SizedBox(height: AppSpacing.md),
 
                                 const QuickActionsSection(),
+
+                                const SizedBox(height: AppSpacing.lg),
+
+                                // Quick Links
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        gradient: AppColors.purpleGradient,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: const Icon(
+                                        Icons.dashboard_rounded,
+                                        color: Colors.white,
+                                        size: 20,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Text(
+                                      'Quick Links',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w700,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface,
+                                            letterSpacing: -0.3,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: AppSpacing.md),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: _buildQuickLink(
+                                        context,
+                                        icon: Icons.bar_chart_rounded,
+                                        label: 'Statistics',
+                                        gradient: AppColors.blueGradient,
+                                        onTap: () {
+                                          AppRouter.navigate(
+                                            context,
+                                            AppRouter.statistics,
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: _buildQuickLink(
+                                        context,
+                                        icon: Icons.workspace_premium_rounded,
+                                        label: 'Achievements',
+                                        gradient: AppColors.accentGradient,
+                                        onTap: () {
+                                          AppRouter.navigate(
+                                            context,
+                                            AppRouter.achievements,
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: _buildQuickLink(
+                                        context,
+                                        icon: Icons.flag_rounded,
+                                        label: 'Goals',
+                                        gradient: AppColors.purpleGradient,
+                                        onTap: () {
+                                          AppRouter.navigate(
+                                            context,
+                                            AppRouter.goals,
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: _buildQuickLink(
+                                        context,
+                                        icon: Icons.calendar_today_rounded,
+                                        label: 'Calendar',
+                                        gradient: AppColors.primaryGradient,
+                                        onTap: () {
+                                          AppRouter.navigate(
+                                            context,
+                                            AppRouter.calendar,
+                                            arguments: state.todayActivities,
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
 
                                 const SizedBox(height: 24),
                               ],
@@ -322,8 +434,11 @@ class HomePage extends StatelessWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.error_outline,
-                              size: 64, color: Colors.red),
+                          const Icon(
+                            Icons.error_outline,
+                            size: 64,
+                            color: Colors.red,
+                          ),
                           const SizedBox(height: 16),
                           Text(
                             'Error Rendering Content',
@@ -358,10 +473,121 @@ class HomePage extends StatelessWidget {
                 }
               }
 
-              return const Center(child: CircularProgressIndicator());
+              return _buildSkeletonLoader(context);
             },
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSkeletonLoader(BuildContext context) {
+    return CustomScrollView(
+      slivers: [
+        // Skeleton App Bar
+        SliverAppBar(
+          floating: true,
+          pinned: false,
+          elevation: 0,
+          backgroundColor: AppColors.primaryGreen,
+          expandedHeight: 160,
+          flexibleSpace: FlexibleSpaceBar(
+            background: Container(
+              decoration: const BoxDecoration(
+                gradient: AppColors.primaryGradient,
+              ),
+              child: const SafeArea(
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(20, 16, 16, 20),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SkeletonLoader(width: 120, height: 24),
+                                SizedBox(height: 8),
+                                SkeletonLoader(width: 180, height: 16),
+                              ],
+                            ),
+                          ),
+                          SkeletonLoader(
+                            width: 48,
+                            height: 48,
+                            borderRadius: BorderRadius.all(Radius.circular(24)),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        // Skeleton Content
+        const SliverToBoxAdapter(
+          child: Padding(
+            padding: AppSpacing.screenPadding,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SkeletonStatsRow(),
+                SizedBox(height: AppSpacing.lg),
+                SkeletonCard(height: 200),
+                SizedBox(height: AppSpacing.lg),
+                SkeletonLoader(width: 150, height: 24),
+                SizedBox(height: AppSpacing.md),
+                SkeletonCard(height: 120),
+                SizedBox(height: AppSpacing.lg),
+                SkeletonLoader(width: 120, height: 24),
+                SizedBox(height: AppSpacing.md),
+                SkeletonCard(height: 100),
+                SizedBox(height: 24),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildQuickLink(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required Gradient gradient,
+    required VoidCallback onTap,
+  }) {
+    return PremiumCard(
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              gradient: gradient,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: Colors.white, size: 24),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }

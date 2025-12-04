@@ -29,10 +29,15 @@ class PremiumCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final defaultBackground = isDark 
+        ? Theme.of(context).colorScheme.surface
+        : (backgroundColor ?? AppColors.surface);
+    
     final card = Container(
       margin: margin ?? EdgeInsets.zero,
       decoration: BoxDecoration(
-        color: gradient == null ? (backgroundColor ?? AppColors.surface) : null,
+        color: gradient == null ? defaultBackground : null,
         gradient: gradient,
         borderRadius: AppBorderRadius.allLG,
         border: border,

@@ -1,7 +1,7 @@
 // lib/features/home/widgets/stats_row.dart
 import 'package:flutter/material.dart';
-import 'package:fitquest/core/constants/app_colors.dart';
 import 'package:fitquest/shared/widgets/premium_card.dart';
+import 'package:fitquest/shared/widgets/animated_counter.dart';
 
 class StatsRow extends StatelessWidget {
   final int points;
@@ -91,19 +91,19 @@ class StatsRow extends StatelessWidget {
             child: Icon(icon, color: Colors.white, size: 22),
           ),
           const SizedBox(height: 10),
-          Text(
-            value,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+          AnimatedCounter(
+            value: _extractNumber(value),
+            textStyle: Theme.of(context).textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
-            textAlign: TextAlign.center,
+            prefix: value.startsWith('Lvl') ? 'Lvl ' : null,
           ),
           const SizedBox(height: 4),
           Text(
             label,
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: AppColors.textSecondary,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                   fontWeight: FontWeight.w500,
                 ),
             textAlign: TextAlign.center,
@@ -111,5 +111,11 @@ class StatsRow extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  int _extractNumber(String value) {
+    // Extract number from string (handles "Lvl 5" or "123")
+    final match = RegExp(r'\d+').firstMatch(value);
+    return match != null ? int.parse(match.group(0)!) : 0;
   }
 }

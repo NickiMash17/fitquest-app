@@ -55,7 +55,7 @@ class _PremiumButtonState extends State<PremiumButton>
 
   @override
   Widget build(BuildContext context) {
-    final button = GestureDetector(
+    return GestureDetector(
       onTapDown: (_) => _controller.forward(),
       onTapUp: (_) {
         _controller.reverse();
@@ -84,45 +84,39 @@ class _PremiumButtonState extends State<PremiumButton>
           ),
           child: Material(
             color: Colors.transparent,
-            child: InkWell(
-              onTap: widget.onPressed,
-              borderRadius: AppBorderRadius.allMD,
-              child: Center(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (widget.icon != null) ...[
-                      Icon(
-                        widget.icon,
-                        color: widget.isOutlined
-                            ? (widget.backgroundColor ?? AppColors.primaryGreen)
-                            : Colors.white,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 8),
-                    ],
-                    Text(
-                      widget.label,
-                      style: TextStyle(
-                        color: widget.isOutlined
-                            ? (widget.backgroundColor ?? AppColors.primaryGreen)
-                            : Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'Inter',
-                        letterSpacing: 0.5,
-                      ),
+            child: Center(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (widget.icon != null) ...[
+                    Icon(
+                      widget.icon,
+                      color: widget.isOutlined
+                          ? (widget.backgroundColor ?? AppColors.primaryGreen)
+                          : Colors.white,
+                      size: 20,
                     ),
+                    const SizedBox(width: 8),
                   ],
-                ),
+                  Text(
+                    widget.label,
+                    style: TextStyle(
+                      color: widget.isOutlined
+                          ? (widget.backgroundColor ?? AppColors.primaryGreen)
+                          : Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'Inter',
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
         ),
       ),
     );
-
-    return button;
   }
 }

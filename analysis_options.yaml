@@ -22,14 +22,12 @@ linter:
     - avoid_print
     - avoid_relative_lib_imports
     - avoid_empty_else
-    - avoid_returning_null_for_future
     - cancel_subscriptions
     - close_sinks
     - valid_regexps
     
     # Style
     - always_declare_return_types
-    - always_require_non_null_named_parameters
     - annotate_overrides
     - avoid_init_to_null
     - avoid_unnecessary_containers

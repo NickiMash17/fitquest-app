@@ -72,7 +72,8 @@ class _LoginPageState extends State<LoginPage> {
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.primaryGreen.withOpacity(0.3),
+                            color:
+                                AppColors.primaryGreen.withValues(alpha: 0.3),
                             blurRadius: 20,
                             spreadRadius: 5,
                           ),
@@ -89,7 +90,7 @@ class _LoginPageState extends State<LoginPage> {
                       'Welcome Back',
                       style: Theme.of(context).textTheme.displaySmall?.copyWith(
                             fontWeight: FontWeight.w800,
-                            color: AppColors.textPrimary,
+                            color: Theme.of(context).colorScheme.onSurface,
                             letterSpacing: -0.5,
                           ),
                       textAlign: TextAlign.center,
@@ -98,7 +99,8 @@ class _LoginPageState extends State<LoginPage> {
                     Text(
                       'Sign in to continue your wellness journey',
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: AppColors.textSecondary,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                             height: 1.5,
                           ),
                       textAlign: TextAlign.center,
@@ -129,7 +131,8 @@ class _LoginPageState extends State<LoginPage> {
                             _obscurePassword
                                 ? Icons.visibility_outlined
                                 : Icons.visibility_off_outlined,
-                            color: AppColors.textSecondary,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                           onPressed: () {
                             setState(() {
@@ -189,7 +192,9 @@ class _LoginPageState extends State<LoginPage> {
                           "Don't have an account? ",
                           style:
                               Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: AppColors.textSecondary,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
                                   ),
                         ),
                         TextButton(

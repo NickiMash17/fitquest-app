@@ -34,7 +34,7 @@ class WelcomeHeader extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2),
+                color: Colors.black.withValues(alpha:0.2),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -77,7 +77,7 @@ class WelcomeHeader extends StatelessWidget {
               Text(
                 _getGreeting(),
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Colors.white.withOpacity(0.95),
+                      color: Colors.white.withValues(alpha:0.95),
                       fontWeight: FontWeight.w500,
                       letterSpacing: 0.3,
                     ),

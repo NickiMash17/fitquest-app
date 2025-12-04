@@ -31,7 +31,7 @@ class DailyChallengeCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.25),
+                  color: Colors.white.withValues(alpha:0.25),
                   borderRadius: AppBorderRadius.allMD,
                 ),
                 child: const Icon(
@@ -56,7 +56,7 @@ class DailyChallengeCard extends StatelessWidget {
                     Text(
                       description,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.white.withValues(alpha:0.9),
                           ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -70,10 +70,10 @@ class DailyChallengeCard extends StatelessWidget {
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.25),
+                  color: Colors.white.withValues(alpha:0.25),
                   borderRadius: AppBorderRadius.allMD,
                   border: Border.all(
-                    color: Colors.white.withOpacity(0.3),
+                    color: Colors.white.withValues(alpha:0.3),
                     width: 1,
                   ),
                 ),
@@ -103,7 +103,7 @@ class DailyChallengeCard extends StatelessWidget {
           Container(
             height: 10,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha:0.2),
               borderRadius: AppBorderRadius.allRound,
             ),
             child: FractionallySizedBox(
@@ -115,7 +115,7 @@ class DailyChallengeCard extends StatelessWidget {
                   borderRadius: AppBorderRadius.allRound,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.white.withOpacity(0.5),
+                      color: Colors.white.withValues(alpha:0.5),
                       blurRadius: 6,
                       spreadRadius: 1,
                     ),
@@ -131,7 +131,7 @@ class DailyChallengeCard extends StatelessWidget {
               Text(
                 '${(progress * 100).clamp(0, 100).toInt()}% Complete',
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha:0.9),
                       fontWeight: FontWeight.w600,
                     ),
               ),
@@ -142,7 +142,7 @@ class DailyChallengeCard extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.25),
+                    color: Colors.white.withValues(alpha:0.25),
                     borderRadius: AppBorderRadius.allSM,
                   ),
                   child: Row(
