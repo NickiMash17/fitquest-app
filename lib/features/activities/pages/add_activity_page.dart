@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fitquest/core/constants/app_constants.dart';
-import 'package:fitquest/core/navigation/app_router.dart';
+import 'package:fitquest/core/di/injection.dart';
 import 'package:fitquest/features/activities/bloc/activity_bloc.dart';
 import 'package:fitquest/features/activities/bloc/activity_event.dart';
 import 'package:fitquest/shared/models/activity_model.dart';
+import 'package:fitquest/shared/widgets/enhanced_snackbar.dart';
+import 'package:fitquest/shared/services/xp_calculator_service.dart';
 
 class AddActivityPage extends StatefulWidget {
   final ActivityType? initialType;
@@ -21,11 +23,13 @@ class _AddActivityPageState extends State<AddActivityPage> {
   final _durationController = TextEditingController();
   final _notesController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
+  late final XpCalculatorService _xpCalculator;
 
   @override
   void initState() {
     super.initState();
     _selectedType = widget.initialType ?? ActivityType.exercise;
+    _xpCalculator = getIt<XpCalculatorService>();
   }
 
   @override
@@ -76,12 +80,16 @@ class _AddActivityPageState extends State<AddActivityPage> {
         hours: _selectedType == ActivityType.sleep ? duration : null,
       );
 
-      context.read<ActivityBloc>().add(ActivityCreateRequested(activity: activity));
-      
+      context
+          .read<ActivityBloc>()
+          .add(ActivityCreateRequested(activity: activity));
+
       if (mounted) {
         Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Activity logged successfully!')),
+        // Use enhanced snackbar for better UX
+        EnhancedSnackBar.showSuccess(
+          context,
+          'Activity logged successfully! +${_xpCalculator.calculateXp(activity)} XP',
         );
       }
     }
@@ -225,4 +233,3 @@ class _AddActivityPageState extends State<AddActivityPage> {
     }
   }
 }
-

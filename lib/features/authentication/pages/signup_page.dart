@@ -5,6 +5,7 @@ import 'package:fitquest/core/constants/app_spacing.dart';
 import 'package:fitquest/core/utils/validators.dart';
 import 'package:fitquest/core/navigation/app_router.dart';
 import 'package:fitquest/shared/widgets/premium_button.dart';
+import 'package:fitquest/shared/widgets/theme_toggle_button.dart';
 import 'package:fitquest/features/authentication/bloc/auth_bloc.dart';
 import 'package:fitquest/features/authentication/bloc/auth_event.dart';
 import 'package:fitquest/features/authentication/bloc/auth_state.dart';
@@ -57,6 +58,9 @@ class _SignUpPageState extends State<SignUpPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Create Account'),
+        actions: [
+          ThemeToggleButton(),
+        ],
       ),
       body: SafeArea(
         child: BlocConsumer<AuthBloc, AuthState>(
