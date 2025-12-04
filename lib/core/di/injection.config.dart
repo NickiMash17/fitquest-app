@@ -10,6 +10,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:cloud_firestore/cloud_firestore.dart' as _i974;
 import 'package:firebase_auth/firebase_auth.dart' as _i59;
+import 'package:fitquest/core/services/cache_service.dart' as _i524;
 import 'package:fitquest/features/activities/bloc/activity_bloc.dart' as _i556;
 import 'package:fitquest/features/authentication/bloc/auth_bloc.dart' as _i1051;
 import 'package:fitquest/features/home/bloc/home_bloc.dart' as _i753;
@@ -35,6 +36,7 @@ extension GetItInjectableX on _i174.GetIt {
       environment,
       environmentFilter,
     );
+    gh.lazySingleton<_i524.CacheService>(() => _i524.CacheService());
     gh.lazySingleton<_i405.LocalStorageService>(
         () => _i405.LocalStorageService());
     gh.lazySingleton<_i947.XpCalculatorService>(

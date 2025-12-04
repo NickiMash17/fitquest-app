@@ -8,6 +8,7 @@ import 'package:fitquest/shared/repositories/challenge_repository.dart';
 import 'package:fitquest/shared/repositories/leaderboard_repository.dart';
 import 'package:fitquest/shared/services/xp_calculator_service.dart';
 import 'package:fitquest/shared/services/local_storage_service.dart';
+import 'package:fitquest/core/services/cache_service.dart';
 import 'package:fitquest/features/authentication/bloc/auth_bloc.dart';
 import 'package:fitquest/features/activities/bloc/activity_bloc.dart';
 import 'package:fitquest/features/home/bloc/home_bloc.dart';
@@ -44,6 +45,9 @@ void configureDependencies() {
   // Register services
   getIt.registerLazySingleton<LocalStorageService>(() => LocalStorageService());
   getIt.registerLazySingleton<XpCalculatorService>(() => XpCalculatorService());
+  
+  // Register cache service
+  getIt.registerLazySingleton<CacheService>(() => CacheService());
   
   // Register BLoCs (factories - can be registered multiple times safely)
   getIt.registerFactory<AuthBloc>(
