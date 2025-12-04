@@ -8,43 +8,41 @@ class AppTheme {
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
-    colorScheme: ColorScheme.light(
+    colorScheme: const ColorScheme.light(
       primary: AppColors.primaryGreen,
       primaryContainer: AppColors.primaryLightest,
       secondary: AppColors.accentOrange,
       secondaryContainer: AppColors.accentOrangeLight,
       surface: AppColors.surface,
-      surfaceVariant: AppColors.surfaceVariant,
-      background: AppColors.background,
+      surfaceContainerHighest: AppColors.surfaceVariant,
       error: AppColors.error,
       errorContainer: AppColors.errorLight,
       onPrimary: AppColors.textOnPrimary,
       onSecondary: Colors.black,
       onSurface: AppColors.textPrimary,
-      onBackground: AppColors.textPrimary,
       onError: AppColors.textOnPrimary,
       outline: AppColors.divider,
       shadow: AppColors.shadowLight,
     ),
     scaffoldBackgroundColor: AppColors.background,
-    appBarTheme: AppBarTheme(
+    appBarTheme: const AppBarTheme(
       elevation: 0,
       centerTitle: false,
       backgroundColor: AppColors.primaryGreen,
       foregroundColor: Colors.white,
       surfaceTintColor: Colors.transparent,
       shadowColor: Colors.transparent,
-      titleTextStyle: const TextStyle(
+      titleTextStyle: TextStyle(
         fontSize: 22,
         fontWeight: FontWeight.w700,
         color: Colors.white,
         fontFamily: 'Poppins',
         letterSpacing: -0.5,
       ),
-      iconTheme: const IconThemeData(color: Colors.white, size: 24),
+      iconTheme: IconThemeData(color: Colors.white, size: 24),
     ),
-    textTheme: TextTheme(
-      displayLarge: const TextStyle(
+    textTheme: const TextTheme(
+      displayLarge: TextStyle(
         fontSize: 36,
         fontWeight: FontWeight.w800,
         fontFamily: 'Poppins',
@@ -52,7 +50,7 @@ class AppTheme {
         letterSpacing: -1.0,
         height: 1.2,
       ),
-      displayMedium: const TextStyle(
+      displayMedium: TextStyle(
         fontSize: 30,
         fontWeight: FontWeight.w700,
         fontFamily: 'Poppins',
@@ -60,7 +58,7 @@ class AppTheme {
         letterSpacing: -0.5,
         height: 1.3,
       ),
-      displaySmall: const TextStyle(
+      displaySmall: TextStyle(
         fontSize: 26,
         fontWeight: FontWeight.w700,
         fontFamily: 'Poppins',
@@ -68,7 +66,7 @@ class AppTheme {
         letterSpacing: -0.5,
         height: 1.3,
       ),
-      headlineLarge: const TextStyle(
+      headlineLarge: TextStyle(
         fontSize: 24,
         fontWeight: FontWeight.w700,
         fontFamily: 'Poppins',
@@ -76,7 +74,7 @@ class AppTheme {
         letterSpacing: -0.3,
         height: 1.3,
       ),
-      headlineMedium: const TextStyle(
+      headlineMedium: TextStyle(
         fontSize: 20,
         fontWeight: FontWeight.w600,
         fontFamily: 'Poppins',
@@ -84,7 +82,7 @@ class AppTheme {
         letterSpacing: -0.2,
         height: 1.4,
       ),
-      headlineSmall: const TextStyle(
+      headlineSmall: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.w600,
         fontFamily: 'Poppins',
@@ -92,7 +90,7 @@ class AppTheme {
         letterSpacing: 0,
         height: 1.4,
       ),
-      titleLarge: const TextStyle(
+      titleLarge: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.w600,
         fontFamily: 'Poppins',
@@ -100,7 +98,7 @@ class AppTheme {
         letterSpacing: 0,
         height: 1.4,
       ),
-      titleMedium: const TextStyle(
+      titleMedium: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w600,
         fontFamily: 'Inter',
@@ -108,7 +106,7 @@ class AppTheme {
         letterSpacing: 0.1,
         height: 1.5,
       ),
-      titleSmall: const TextStyle(
+      titleSmall: TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w600,
         fontFamily: 'Inter',
@@ -116,7 +114,7 @@ class AppTheme {
         letterSpacing: 0.1,
         height: 1.5,
       ),
-      bodyLarge: const TextStyle(
+      bodyLarge: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w400,
         fontFamily: 'Inter',
@@ -124,7 +122,7 @@ class AppTheme {
         letterSpacing: 0.15,
         height: 1.6,
       ),
-      bodyMedium: const TextStyle(
+      bodyMedium: TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w400,
         fontFamily: 'Inter',
@@ -132,7 +130,7 @@ class AppTheme {
         letterSpacing: 0.25,
         height: 1.6,
       ),
-      bodySmall: const TextStyle(
+      bodySmall: TextStyle(
         fontSize: 12,
         fontWeight: FontWeight.w400,
         fontFamily: 'Inter',
@@ -140,7 +138,7 @@ class AppTheme {
         letterSpacing: 0.4,
         height: 1.5,
       ),
-      labelLarge: const TextStyle(
+      labelLarge: TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w600,
         fontFamily: 'Inter',
@@ -148,7 +146,7 @@ class AppTheme {
         letterSpacing: 0.1,
         height: 1.4,
       ),
-      labelMedium: const TextStyle(
+      labelMedium: TextStyle(
         fontSize: 12,
         fontWeight: FontWeight.w500,
         fontFamily: 'Inter',
@@ -156,7 +154,7 @@ class AppTheme {
         letterSpacing: 0.5,
         height: 1.4,
       ),
-      labelSmall: const TextStyle(
+      labelSmall: TextStyle(
         fontSize: 11,
         fontWeight: FontWeight.w500,
         fontFamily: 'Inter',
@@ -189,10 +187,10 @@ class AppTheme {
         ),
       ),
     ),
-    inputDecorationTheme: InputDecorationTheme(
+    inputDecorationTheme: const InputDecorationTheme(
       filled: true,
       fillColor: AppColors.surface,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       border: OutlineInputBorder(
         borderRadius: AppBorderRadius.allMD,
         borderSide: BorderSide(color: AppColors.divider, width: 1.5),
@@ -203,17 +201,17 @@ class AppTheme {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: AppBorderRadius.allMD,
-        borderSide: const BorderSide(color: AppColors.primaryGreen, width: 2),
+        borderSide: BorderSide(color: AppColors.primaryGreen, width: 2),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: AppBorderRadius.allMD,
-        borderSide: const BorderSide(color: AppColors.error, width: 1.5),
+        borderSide: BorderSide(color: AppColors.error, width: 1.5),
       ),
       focusedErrorBorder: OutlineInputBorder(
         borderRadius: AppBorderRadius.allMD,
-        borderSide: const BorderSide(color: AppColors.error, width: 2),
+        borderSide: BorderSide(color: AppColors.error, width: 2),
       ),
-      labelStyle: const TextStyle(
+      labelStyle: TextStyle(
         fontFamily: 'Inter',
         fontSize: 14,
         fontWeight: FontWeight.w500,
@@ -230,7 +228,7 @@ class AppTheme {
         color: AppColors.textTertiary,
       ),
     ),
-    cardTheme: CardThemeData(
+    cardTheme: const CardThemeData(
       elevation: 0,
       shadowColor: Colors.transparent,
       shape: RoundedRectangleBorder(
@@ -241,18 +239,18 @@ class AppTheme {
       margin: EdgeInsets.zero,
       clipBehavior: Clip.antiAlias,
     ),
-    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       backgroundColor: Colors.white,
       selectedItemColor: AppColors.primaryGreen,
-      unselectedItemColor: const Color(0xFF616161),
-      selectedIconTheme: const IconThemeData(size: 26),
-      unselectedIconTheme: const IconThemeData(size: 24),
-      selectedLabelStyle: const TextStyle(
+      unselectedItemColor: Color(0xFF616161),
+      selectedIconTheme: IconThemeData(size: 26),
+      unselectedIconTheme: IconThemeData(size: 24),
+      selectedLabelStyle: TextStyle(
         fontSize: 12,
         fontWeight: FontWeight.w600,
         fontFamily: 'Inter',
       ),
-      unselectedLabelStyle: const TextStyle(
+      unselectedLabelStyle: TextStyle(
         fontSize: 12,
         fontWeight: FontWeight.w500,
         fontFamily: 'Inter',
@@ -273,37 +271,35 @@ class AppTheme {
       secondary: AppColors.accentOrange,
       secondaryContainer: AppColors.accentOrangeLight,
       surface: AppColors.surfaceDark,
-      surfaceVariant: AppColors.surfaceVariantDark,
-      background: AppColors.backgroundDark,
+      surfaceContainerHighest: AppColors.surfaceVariantDark,
       error: AppColors.error,
       errorContainer: AppColors.errorLight,
       onPrimary: Colors.black,
       onSecondary: Colors.black,
       onSurface: AppColors.textPrimaryDark,
-      onBackground: AppColors.textPrimaryDark,
       onError: Colors.white,
       outline: AppColors.dividerDark,
-      shadow: Colors.black.withOpacity(0.3),
+      shadow: Colors.black.withValues(alpha: 0.3),
     ),
     scaffoldBackgroundColor: AppColors.backgroundDark,
-    appBarTheme: AppBarTheme(
+    appBarTheme: const AppBarTheme(
       elevation: 0,
       centerTitle: false,
       backgroundColor: AppColors.primaryGreen,
       foregroundColor: Colors.white,
       surfaceTintColor: Colors.transparent,
       shadowColor: Colors.transparent,
-      titleTextStyle: const TextStyle(
+      titleTextStyle: TextStyle(
         fontSize: 22,
         fontWeight: FontWeight.w700,
         color: Colors.white,
         fontFamily: 'Poppins',
         letterSpacing: -0.5,
       ),
-      iconTheme: const IconThemeData(color: Colors.white, size: 24),
+      iconTheme: IconThemeData(color: Colors.white, size: 24),
     ),
-    textTheme: TextTheme(
-      displayLarge: const TextStyle(
+    textTheme: const TextTheme(
+      displayLarge: TextStyle(
         fontSize: 36,
         fontWeight: FontWeight.w800,
         fontFamily: 'Poppins',
@@ -311,7 +307,7 @@ class AppTheme {
         letterSpacing: -1.0,
         height: 1.2,
       ),
-      displayMedium: const TextStyle(
+      displayMedium: TextStyle(
         fontSize: 30,
         fontWeight: FontWeight.w700,
         fontFamily: 'Poppins',
@@ -319,7 +315,7 @@ class AppTheme {
         letterSpacing: -0.5,
         height: 1.3,
       ),
-      displaySmall: const TextStyle(
+      displaySmall: TextStyle(
         fontSize: 26,
         fontWeight: FontWeight.w700,
         fontFamily: 'Poppins',
@@ -327,7 +323,7 @@ class AppTheme {
         letterSpacing: -0.5,
         height: 1.3,
       ),
-      headlineLarge: const TextStyle(
+      headlineLarge: TextStyle(
         fontSize: 24,
         fontWeight: FontWeight.w700,
         fontFamily: 'Poppins',
@@ -335,7 +331,7 @@ class AppTheme {
         letterSpacing: -0.3,
         height: 1.3,
       ),
-      headlineMedium: const TextStyle(
+      headlineMedium: TextStyle(
         fontSize: 20,
         fontWeight: FontWeight.w600,
         fontFamily: 'Poppins',
@@ -343,7 +339,7 @@ class AppTheme {
         letterSpacing: -0.2,
         height: 1.4,
       ),
-      headlineSmall: const TextStyle(
+      headlineSmall: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.w600,
         fontFamily: 'Poppins',
@@ -351,7 +347,7 @@ class AppTheme {
         letterSpacing: 0,
         height: 1.4,
       ),
-      titleLarge: const TextStyle(
+      titleLarge: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.w600,
         fontFamily: 'Poppins',
@@ -359,7 +355,7 @@ class AppTheme {
         letterSpacing: 0,
         height: 1.4,
       ),
-      titleMedium: const TextStyle(
+      titleMedium: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w600,
         fontFamily: 'Inter',
@@ -367,7 +363,7 @@ class AppTheme {
         letterSpacing: 0.1,
         height: 1.5,
       ),
-      titleSmall: const TextStyle(
+      titleSmall: TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w600,
         fontFamily: 'Inter',
@@ -375,7 +371,7 @@ class AppTheme {
         letterSpacing: 0.1,
         height: 1.5,
       ),
-      bodyLarge: const TextStyle(
+      bodyLarge: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w400,
         fontFamily: 'Inter',
@@ -383,7 +379,7 @@ class AppTheme {
         letterSpacing: 0.15,
         height: 1.6,
       ),
-      bodyMedium: const TextStyle(
+      bodyMedium: TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w400,
         fontFamily: 'Inter',
@@ -391,7 +387,7 @@ class AppTheme {
         letterSpacing: 0.25,
         height: 1.6,
       ),
-      bodySmall: const TextStyle(
+      bodySmall: TextStyle(
         fontSize: 12,
         fontWeight: FontWeight.w400,
         fontFamily: 'Inter',
@@ -399,7 +395,7 @@ class AppTheme {
         letterSpacing: 0.4,
         height: 1.5,
       ),
-      labelLarge: const TextStyle(
+      labelLarge: TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w600,
         fontFamily: 'Inter',
@@ -407,7 +403,7 @@ class AppTheme {
         letterSpacing: 0.1,
         height: 1.4,
       ),
-      labelMedium: const TextStyle(
+      labelMedium: TextStyle(
         fontSize: 12,
         fontWeight: FontWeight.w500,
         fontFamily: 'Inter',
@@ -415,7 +411,7 @@ class AppTheme {
         letterSpacing: 0.5,
         height: 1.4,
       ),
-      labelSmall: const TextStyle(
+      labelSmall: TextStyle(
         fontSize: 11,
         fontWeight: FontWeight.w500,
         fontFamily: 'Inter',
@@ -432,7 +428,7 @@ class AppTheme {
         shadowColor: Colors.transparent,
         padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
         minimumSize: const Size(120, 48),
-        shape: RoundedRectangleBorder(
+        shape: const RoundedRectangleBorder(
           borderRadius: AppBorderRadius.allMD,
         ),
         textStyle: const TextStyle(
@@ -442,10 +438,10 @@ class AppTheme {
           letterSpacing: 0.5,
         ),
       ).copyWith(
-        elevation: MaterialStateProperty.resolveWith<double>(
-          (Set<MaterialState> states) {
-            if (states.contains(MaterialState.pressed)) return 0;
-            if (states.contains(MaterialState.disabled)) return 0;
+        elevation: WidgetStateProperty.resolveWith<double>(
+          (Set<WidgetState> states) {
+            if (states.contains(WidgetState.pressed)) return 0;
+            if (states.contains(WidgetState.disabled)) return 0;
             return 0;
           },
         ),
@@ -456,7 +452,7 @@ class AppTheme {
         foregroundColor: AppColors.primaryLight,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         minimumSize: const Size(64, 40),
-        shape: RoundedRectangleBorder(
+        shape: const RoundedRectangleBorder(
           borderRadius: AppBorderRadius.allSM,
         ),
         textStyle: const TextStyle(
@@ -471,66 +467,66 @@ class AppTheme {
       filled: true,
       fillColor: const Color(0xFF2C2C2C),
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      border: OutlineInputBorder(
+      border: const OutlineInputBorder(
         borderRadius: AppBorderRadius.allMD,
-        borderSide: const BorderSide(color: Color(0xFF424242), width: 1.5),
+        borderSide: BorderSide(color: Color(0xFF424242), width: 1.5),
       ),
-      enabledBorder: OutlineInputBorder(
+      enabledBorder: const OutlineInputBorder(
         borderRadius: AppBorderRadius.allMD,
-        borderSide: const BorderSide(color: Color(0xFF424242), width: 1.5),
+        borderSide: BorderSide(color: Color(0xFF424242), width: 1.5),
       ),
-      focusedBorder: OutlineInputBorder(
+      focusedBorder: const OutlineInputBorder(
         borderRadius: AppBorderRadius.allMD,
-        borderSide: const BorderSide(color: AppColors.primaryLight, width: 2),
+        borderSide: BorderSide(color: AppColors.primaryLight, width: 2),
       ),
-      errorBorder: OutlineInputBorder(
+      errorBorder: const OutlineInputBorder(
         borderRadius: AppBorderRadius.allMD,
-        borderSide: const BorderSide(color: AppColors.error, width: 1.5),
+        borderSide: BorderSide(color: AppColors.error, width: 1.5),
       ),
-      focusedErrorBorder: OutlineInputBorder(
+      focusedErrorBorder: const OutlineInputBorder(
         borderRadius: AppBorderRadius.allMD,
-        borderSide: const BorderSide(color: AppColors.error, width: 2),
+        borderSide: BorderSide(color: AppColors.error, width: 2),
       ),
       labelStyle: TextStyle(
         fontFamily: 'Inter',
         fontSize: 14,
         fontWeight: FontWeight.w500,
-        color: Colors.white.withOpacity(0.7),
+        color: Colors.white.withValues(alpha: 0.7),
       ),
       hintStyle: TextStyle(
         fontFamily: 'Inter',
         fontSize: 14,
-        color: Colors.white.withOpacity(0.5),
+        color: Colors.white.withValues(alpha: 0.5),
       ),
       helperStyle: TextStyle(
         fontFamily: 'Inter',
         fontSize: 12,
-        color: Colors.white.withOpacity(0.6),
+        color: Colors.white.withValues(alpha: 0.6),
       ),
     ),
-    cardTheme: CardThemeData(
+    cardTheme: const CardThemeData(
       elevation: 0,
       shadowColor: Colors.transparent,
       shape: RoundedRectangleBorder(
         borderRadius: AppBorderRadius.allLG,
         side: BorderSide.none,
       ),
-      color: const Color(0xFF1E1E1E),
+      color: Color(0xFF1E1E1E),
       margin: EdgeInsets.zero,
       clipBehavior: Clip.antiAlias,
     ),
-    bottomNavigationBarTheme: BottomNavigationBarThemeData(
-      backgroundColor: const Color(0xFF1E1E1E),
+    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      backgroundColor: Color(0xFF1E1E1E),
       selectedItemColor: AppColors.primaryLight,
-      unselectedItemColor: const Color(0xFF9E9E9E),
-      selectedIconTheme: const IconThemeData(size: 26),
-      unselectedIconTheme: const IconThemeData(size: 24),
-      selectedLabelStyle: const TextStyle(
+      unselectedItemColor: Color(0xFF9E9E9E),
+      selectedIconTheme: IconThemeData(size: 26),
+      unselectedIconTheme: IconThemeData(size: 24),
+      selectedLabelStyle: TextStyle(
         fontSize: 12,
         fontWeight: FontWeight.w600,
         fontFamily: 'Inter',
       ),
-      unselectedLabelStyle: const TextStyle(
+      unselectedLabelStyle: TextStyle(
         fontSize: 12,
         fontWeight: FontWeight.w500,
         fontFamily: 'Inter',
