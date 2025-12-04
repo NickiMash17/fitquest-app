@@ -35,13 +35,13 @@ class ActivityRepository {
           .handleError((error) {
         if (error is FirebaseException && error.code == 'failed-precondition') {
           _logger.w(
-              'Firestore index not created yet for stream. Returning empty list.');
+              'Firestore index not created yet for stream. Returning empty list.',);
         } else {
           _logger.e('Error in activities stream', error: error);
         }
       }).map((snapshot) {
         return snapshot.docs.map((doc) {
-          final data = doc.data() as Map<String, dynamic>;
+          final data = doc.data();
           return ActivityModel.fromJson({
             'id': doc.id,
             ..._convertActivityTimestamps(data),
@@ -74,7 +74,7 @@ class ActivityRepository {
 
       final snapshot = await query.orderBy('date', descending: true).get();
       return snapshot.docs.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
+        final data = doc.data();
         return ActivityModel.fromJson({
           'id': doc.id,
           ..._convertActivityTimestamps(data),
@@ -84,7 +84,8 @@ class ActivityRepository {
       // Handle index errors gracefully
       if (e.code == 'failed-precondition') {
         _logger.w(
-            'Firestore index not created yet. Returning empty list. Create index at: ${e.message}');
+          'Firestore index not created yet. Returning empty list. Create index at: ${e.message}',
+        );
         return [];
       }
       _logger.e('Error getting activities', error: e);
@@ -143,8 +144,11 @@ class ActivityRepository {
       final now = DateTime.now();
       final startOfDay = DateUtils.startOfDay(now);
       final endOfDay = DateUtils.endOfDay(now);
-      return await getActivities(userId,
-          startDate: startOfDay, endDate: endOfDay);
+      return await getActivities(
+        userId,
+        startDate: startOfDay,
+        endDate: endOfDay,
+      );
     } catch (e) {
       // If getActivities throws, return empty list
       _logger.w('Error getting today activities, returning empty list: $e');
