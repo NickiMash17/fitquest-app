@@ -53,7 +53,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
     if (rank == 3) return const Color(0xFFCD7F32); // Bronze
     return AppColors.accentBlue;
   }
-  
+
   Gradient? _getRankGradient(int rank) {
     if (rank == 1) {
       return const LinearGradient(
@@ -96,7 +96,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                 itemBuilder: (context, index) {
                   final entry = _entries[index];
                   final rankGradient = _getRankGradient(entry.rank);
-                  
+
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 12),
                     child: PremiumCard(
@@ -110,11 +110,14 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                             height: 56,
                             decoration: BoxDecoration(
                               gradient: rankGradient,
-                              color: rankGradient == null ? _getRankColor(entry.rank) : null,
+                              color: rankGradient == null
+                                  ? _getRankColor(entry.rank)
+                                  : null,
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: _getRankColor(entry.rank).withOpacity(0.3),
+                                  color: _getRankColor(entry.rank)
+                                      .withValues(alpha: 0.3),
                                   blurRadius: 8,
                                   spreadRadius: 1,
                                 ),
@@ -134,9 +137,14 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                               children: [
                                 Text(
                                   entry.displayName,
-                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.copyWith(
                                         fontWeight: FontWeight.w700,
-                                        color: Theme.of(context).colorScheme.onSurface,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
                                       ),
                                 ),
                                 const SizedBox(height: 4),
@@ -145,26 +153,40 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                                     Icon(
                                       Icons.emoji_events_rounded,
                                       size: 14,
-                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
                                       'Level ${entry.currentLevel}',
-                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurfaceVariant,
                                           ),
                                     ),
                                     const SizedBox(width: 12),
                                     Icon(
                                       Icons.local_fire_department_rounded,
                                       size: 14,
-                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
                                       '${entry.currentStreak} day streak',
-                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurfaceVariant,
                                           ),
                                     ),
                                   ],
@@ -181,13 +203,16 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                                   horizontal: 10,
                                   vertical: 6,
                                 ),
-                                decoration: BoxDecoration(
+                                decoration: const BoxDecoration(
                                   gradient: AppColors.primaryGradient,
                                   borderRadius: AppBorderRadius.allSM,
                                 ),
                                 child: Text(
                                   '${entry.totalXp} XP',
-                                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .labelLarge
+                                      ?.copyWith(
                                         color: Colors.white,
                                         fontWeight: FontWeight.w700,
                                       ),
@@ -196,8 +221,13 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                               const SizedBox(height: 6),
                               Text(
                                 '#${entry.rank}',
-                                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelSmall
+                                    ?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
                                       fontWeight: FontWeight.w600,
                                     ),
                               ),
@@ -213,4 +243,3 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
     );
   }
 }
-

@@ -18,9 +18,19 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitquest/shared/widgets/empty_state_widget.dart';
 import 'package:fitquest/core/utils/date_utils.dart' as app_date_utils;
 import 'package:fitquest/shared/models/activity_model.dart';
+import 'package:fitquest/shared/widgets/skeleton_loader.dart';
+import 'package:fitquest/shared/widgets/search_bar_widget.dart';
 
-class ActivitiesPage extends StatelessWidget {
+class ActivitiesPage extends StatefulWidget {
   const ActivitiesPage({super.key});
+
+  @override
+  State<ActivitiesPage> createState() => _ActivitiesPageState();
+}
+
+class _ActivitiesPageState extends State<ActivitiesPage> {
+  String _searchQuery = '';
+  ActivityType? _filterType;
 
   @override
   Widget build(BuildContext context) {
@@ -60,15 +70,11 @@ class ActivitiesPage extends StatelessWidget {
                     .read<ActivityBloc>()
                     .add(const ActivitiesLoadRequested());
               });
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
+              return _buildSkeletonLoader(context);
             }
 
             if (state is ActivityLoading) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
+              return _buildSkeletonLoader(context);
             }
 
             if (state is ActivityError) {
@@ -78,8 +84,11 @@ class ActivitiesPage extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.error_outline,
-                          size: 64, color: Colors.red),
+                      const Icon(
+                        Icons.error_outline,
+                        size: 64,
+                        color: Colors.red,
+                      ),
                       const SizedBox(height: 16),
                       Text(
                         'Error',
@@ -104,7 +113,8 @@ class ActivitiesPage extends StatelessWidget {
 
             if (state is ActivityLoaded) {
               debugPrint(
-                  'ActivitiesPage: Loaded ${state.activities.length} activities');
+                'ActivitiesPage: Loaded ${state.activities.length} activities',
+              );
               try {
                 if (state.activities.isEmpty) {
                   return EmptyStateWidget(
@@ -121,6 +131,13 @@ class ActivitiesPage extends StatelessWidget {
                   );
                 }
 
+                // Filter activities based on search and filter
+                final filteredActivities = _filterActivities(
+                  state.activities,
+                  _searchQuery,
+                  _filterType,
+                );
+
                 return RefreshIndicator(
                   onRefresh: () async {
                     context
@@ -130,7 +147,53 @@ class ActivitiesPage extends StatelessWidget {
                   child: ListView(
                     padding: AppSpacing.screenPadding,
                     children: [
-                      // Recent activities
+                      // Search bar
+                      SearchBarWidget(
+                        hintText: 'Search activities...',
+                        onChanged: (query) {
+                          setState(() {
+                            _searchQuery = query;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      // Filter chips
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            _buildFilterChip(
+                              context,
+                              label: 'All',
+                              isSelected: _filterType == null,
+                              onTap: () {
+                                setState(() {
+                                  _filterType = null;
+                                });
+                              },
+                            ),
+                            const SizedBox(width: 8),
+                            ...ActivityType.values.map(
+                              (type) => Padding(
+                                padding: const EdgeInsets.only(right: 8),
+                                child: _buildFilterChip(
+                                  context,
+                                  label: _getActivityTypeName(type),
+                                  isSelected: _filterType == type,
+                                  onTap: () {
+                                    setState(() {
+                                      _filterType =
+                                          _filterType == type ? null : type;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      // Recent activities header
                       Row(
                         children: [
                           Container(
@@ -158,13 +221,68 @@ class ActivitiesPage extends StatelessWidget {
                                   letterSpacing: -0.3,
                                 ),
                           ),
+                          const Spacer(),
+                          if (_searchQuery.isNotEmpty || _filterType != null)
+                            Text(
+                              '${filteredActivities.length} found',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
+                            ),
                         ],
                       ),
                       const SizedBox(height: AppSpacing.md),
-                      ...state.activities.take(10).map((activity) => Padding(
+                      if (filteredActivities.isEmpty)
+                        Padding(
+                          padding: const EdgeInsets.all(32.0),
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.search_off_rounded,
+                                size: 64,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                'No activities found',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
+                                    ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Try adjusting your search or filter',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        )
+                      else
+                        ...filteredActivities.map(
+                          (activity) => Padding(
                             padding: const EdgeInsets.only(bottom: 12),
                             child: _buildActivityCard(context, activity),
-                          )),
+                          ),
+                        ),
                       const SizedBox(height: AppSpacing.lg),
                       // Activity categories
                       Row(
@@ -248,8 +366,11 @@ class ActivitiesPage extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.error_outline,
-                            size: 64, color: Colors.red),
+                        const Icon(
+                          Icons.error_outline,
+                          size: 64,
+                          color: Colors.red,
+                        ),
                         const SizedBox(height: 16),
                         Text(
                           'Error Rendering Activities',
@@ -279,8 +400,11 @@ class ActivitiesPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.help_outline,
-                      size: 64, color: Color(0xFF616161)),
+                  const Icon(
+                    Icons.help_outline,
+                    size: 64,
+                    color: Color(0xFF616161),
+                  ),
                   const SizedBox(height: 16),
                   Text(
                     'Unknown State',
@@ -320,6 +444,21 @@ class ActivitiesPage extends StatelessWidget {
     );
   }
 
+  Widget _buildSkeletonLoader(BuildContext context) {
+    return ListView(
+      padding: AppSpacing.screenPadding,
+      children: [
+        const SkeletonLoader(width: 150, height: 24),
+        const SizedBox(height: AppSpacing.md),
+        ...List.generate(5, (index) => const SkeletonListItem()),
+        const SizedBox(height: AppSpacing.lg),
+        const SkeletonLoader(width: 120, height: 24),
+        const SizedBox(height: AppSpacing.md),
+        ...List.generate(4, (index) => const SkeletonListItem()),
+      ],
+    );
+  }
+
   Widget _buildActivityCard(BuildContext context, ActivityModel activity) {
     final activityColor = _getActivityColor(activity.type);
     final activityGradient = LinearGradient(
@@ -327,7 +466,7 @@ class ActivitiesPage extends StatelessWidget {
       end: Alignment.bottomRight,
       colors: [
         activityColor,
-        activityColor.withOpacity(0.7),
+        activityColor.withValues(alpha: 0.7),
       ],
     );
 
@@ -394,7 +533,7 @@ class ActivitiesPage extends StatelessWidget {
                   horizontal: 10,
                   vertical: 6,
                 ),
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   gradient: AppColors.primaryGradient,
                   borderRadius: AppBorderRadius.allSM,
                 ),
@@ -442,8 +581,6 @@ class ActivitiesPage extends StatelessWidget {
         return 'Hydration';
       case ActivityType.sleep:
         return 'Sleep';
-      default:
-        return 'Activity';
     }
   }
 
@@ -457,8 +594,6 @@ class ActivitiesPage extends StatelessWidget {
         return Icons.water_drop;
       case ActivityType.sleep:
         return Icons.nightlight_round;
-      default:
-        return Icons.fitness_center;
     }
   }
 
@@ -472,8 +607,6 @@ class ActivitiesPage extends StatelessWidget {
         return Colors.lightBlue;
       case ActivityType.sleep:
         return Colors.indigo;
-      default:
-        return const Color(0xFF616161); // Darker grey for better contrast
     }
   }
 
@@ -532,11 +665,59 @@ class ActivitiesPage extends StatelessWidget {
                 fontWeight: FontWeight.w500,
               ),
         ),
-        trailing: const Icon(Icons.chevron_right,
-            color: Color(0xFF757575)), // Better contrast
+        trailing: const Icon(
+          Icons.chevron_right,
+          color: Color(0xFF757575),
+        ), // Better contrast
         onTap: () {
           Navigator.of(context).pushNamed(AppRouter.addActivity);
         },
+      ),
+    );
+  }
+
+  List<ActivityModel> _filterActivities(
+    List<ActivityModel> activities,
+    String searchQuery,
+    ActivityType? filterType,
+  ) {
+    var filtered = activities;
+
+    // Filter by type
+    if (filterType != null) {
+      filtered = filtered.where((a) => a.type == filterType).toList();
+    }
+
+    // Filter by search query
+    if (searchQuery.isNotEmpty) {
+      final query = searchQuery.toLowerCase();
+      filtered = filtered.where((activity) {
+        final typeName = _getActivityTypeName(activity.type).toLowerCase();
+        final notes = activity.notes?.toLowerCase() ?? '';
+        return typeName.contains(query) || notes.contains(query);
+      }).toList();
+    }
+
+    return filtered;
+  }
+
+  Widget _buildFilterChip(
+    BuildContext context, {
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return FilterChip(
+      label: Text(label),
+      selected: isSelected,
+      onSelected: (_) => onTap(),
+      selectedColor: AppColors.primaryGreen.withValues(alpha: 0.2),
+      checkmarkColor: AppColors.primaryGreen,
+      labelStyle: TextStyle(
+        color: isSelected
+            ? AppColors.primaryGreen
+            : Theme.of(context).colorScheme.onSurfaceVariant,
+        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
       ),
     );
   }
