@@ -51,6 +51,9 @@ dependencies:
   json_annotation: ^4.8.1
   get_it: ^7.7.0
   injectable: ^2.4.0
+  fl_chart: ^0.66.0
+  table_calendar: ^3.0.9
+  confetti: ^0.7.0
 
 dev_dependencies:
   flutter_test:

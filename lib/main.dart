@@ -9,6 +9,7 @@ import 'package:fitquest/core/navigation/app_router.dart';
 import 'package:fitquest/firebase_options.dart';
 import 'package:fitquest/core/di/injection.dart';
 import 'package:fitquest/shared/services/local_storage_service.dart';
+import 'package:fitquest/core/services/cache_service.dart';
 import 'package:fitquest/features/authentication/bloc/auth_bloc.dart';
 import 'package:fitquest/features/authentication/bloc/auth_event.dart';
 import 'package:fitquest/features/activities/bloc/activity_bloc.dart';
@@ -52,6 +53,11 @@ Future<void> _initializeApp() async {
   debugPrint('Initializing local storage...');
   await getIt<LocalStorageService>().init();
   debugPrint('Local storage initialized');
+
+  // Initialize cache service
+  debugPrint('Initializing cache service...');
+  await getIt<CacheService>().init();
+  debugPrint('Cache service initialized');
 }
 
 void main() async {
@@ -77,7 +83,7 @@ class FitQuestApp extends StatefulWidget {
 }
 
 class _FitQuestAppState extends State<FitQuestApp> {
-  ThemeMode _themeMode = ThemeMode.system;
+  ThemeMode _themeMode = ThemeMode.light; // Default to light mode
 
   @override
   void initState() {
@@ -91,24 +97,36 @@ class _FitQuestAppState extends State<FitQuestApp> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final darkMode = prefs.getBool('dark_mode');
-      if (darkMode != null && mounted) {
+      if (mounted) {
         setState(() {
-          _themeMode = darkMode ? ThemeMode.dark : ThemeMode.light;
+          // Default to light mode if no preference is set
+          _themeMode = darkMode == true ? ThemeMode.dark : ThemeMode.light;
         });
       }
     } catch (e) {
       debugPrint('Error loading theme mode: $e');
+      // Default to light mode on error
+      if (mounted) {
+        setState(() {
+          _themeMode = ThemeMode.light;
+        });
+      }
     }
   }
 
   void _listenForThemeChanges() {
-    // Check theme preference every 500ms when app is active
-    Future.delayed(const Duration(milliseconds: 500), () {
+    // Check theme preference every 200ms when app is active for faster updates
+    Future.delayed(const Duration(milliseconds: 200), () {
       if (mounted) {
         _loadThemeMode();
         _listenForThemeChanges();
       }
     });
+  }
+
+  // Method to trigger immediate theme reload (can be called from theme toggle)
+  void reloadTheme() {
+    _loadThemeMode();
   }
 
   @override
