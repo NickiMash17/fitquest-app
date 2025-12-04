@@ -74,7 +74,7 @@ class ActivityRepository {
 
       final snapshot = await query.orderBy('date', descending: true).get();
       return snapshot.docs.map((doc) {
-        final data = doc.data();
+        final data = doc.data() as Map<String, dynamic>;
         return ActivityModel.fromJson({
           'id': doc.id,
           ..._convertActivityTimestamps(data),
