@@ -1,6 +1,5 @@
 // lib/core/navigation/app_router.dart
 import 'package:flutter/material.dart';
-import 'package:fitquest/features/home/pages/home_page.dart';
 import 'package:fitquest/features/home/pages/activities_page.dart';
 import 'package:fitquest/features/onboarding/pages/onboarding_page.dart';
 import 'package:fitquest/features/onboarding/pages/splash_page.dart';
@@ -12,6 +11,11 @@ import 'package:fitquest/features/community/pages/leaderboard_page.dart';
 import 'package:fitquest/features/activities/pages/add_activity_page.dart';
 import 'package:fitquest/features/home/pages/main_navigation_page.dart';
 import 'package:fitquest/shared/models/activity_model.dart';
+import 'package:fitquest/shared/widgets/page_transition.dart';
+import 'package:fitquest/features/statistics/pages/statistics_page.dart';
+import 'package:fitquest/features/achievements/pages/achievements_page.dart';
+import 'package:fitquest/features/goals/pages/goals_page.dart';
+import 'package:fitquest/features/calendar/pages/calendar_page.dart';
 
 class AppRouter {
   // Route names
@@ -25,6 +29,10 @@ class AppRouter {
   static const String settings = '/settings';
   static const String leaderboard = '/leaderboard';
   static const String addActivity = '/add-activity';
+  static const String statistics = '/statistics';
+  static const String achievements = '/achievements';
+  static const String goals = '/goals';
+  static const String calendar = '/calendar';
 
   // Navigation methods
   static void navigateAndReplace(BuildContext context, String routeName) {
@@ -38,35 +46,79 @@ class AppRouter {
     );
   }
 
-  static void navigate(BuildContext context, String routeName) {
-    Navigator.of(context).pushNamed(routeName);
+  static void navigate(BuildContext context, String routeName,
+      {Object? arguments}) {
+    Navigator.of(context).pushNamed(routeName, arguments: arguments);
   }
 
-  // Route generator
+  // Route generator with smooth transitions
   static Route<dynamic> generateRoute(RouteSettings routeSettings) {
     switch (routeSettings.name) {
       case splash:
-        return MaterialPageRoute(builder: (_) => const SplashPage());
+        return FadePageRoute(child: const SplashPage());
       case onboarding:
-        return MaterialPageRoute(builder: (_) => const OnboardingPage());
+        return SlidePageRoute(
+          direction: SlideDirection.right,
+          child: const OnboardingPage(),
+        );
       case login:
-        return MaterialPageRoute(builder: (_) => const LoginPage());
+        return SlidePageRoute(
+          direction: SlideDirection.right,
+          child: const LoginPage(),
+        );
       case signUp:
-        return MaterialPageRoute(builder: (_) => const SignUpPage());
+        return SlidePageRoute(
+          direction: SlideDirection.right,
+          child: const SignUpPage(),
+        );
       case home:
-        return MaterialPageRoute(builder: (_) => const MainNavigationPage());
+        return FadePageRoute(child: const MainNavigationPage());
       case activities:
-        return MaterialPageRoute(builder: (_) => const ActivitiesPage());
+        return SlidePageRoute(
+          direction: SlideDirection.left,
+          child: const ActivitiesPage(),
+        );
       case profile:
-        return MaterialPageRoute(builder: (_) => const ProfilePage());
+        return SlidePageRoute(
+          direction: SlideDirection.left,
+          child: const ProfilePage(),
+        );
       case AppRouter.settings:
-        return MaterialPageRoute(builder: (_) => const SettingsPage());
+        return SlidePageRoute(
+          direction: SlideDirection.left,
+          child: const SettingsPage(),
+        );
       case leaderboard:
-        return MaterialPageRoute(builder: (_) => const LeaderboardPage());
+        return SlidePageRoute(
+          direction: SlideDirection.left,
+          child: const LeaderboardPage(),
+        );
       case addActivity:
         final activityType = routeSettings.arguments as ActivityType?;
-        return MaterialPageRoute(
-          builder: (_) => AddActivityPage(initialType: activityType),
+        return ScalePageRoute(
+          child: AddActivityPage(initialType: activityType),
+        );
+      case statistics:
+        return SlidePageRoute(
+          direction: SlideDirection.left,
+          child: const StatisticsPage(),
+        );
+      case achievements:
+        return SlidePageRoute(
+          direction: SlideDirection.left,
+          child: const AchievementsPage(),
+        );
+      case goals:
+        return SlidePageRoute(
+          direction: SlideDirection.left,
+          child: const GoalsPage(),
+        );
+      case calendar:
+        final activities =
+            routeSettings.arguments as List<ActivityModel>? ?? [];
+        return SlidePageRoute(
+          direction: SlideDirection.left,
+          child: CalendarPage(activities: activities),
         );
       default:
         return MaterialPageRoute(
