@@ -1,186 +1,632 @@
 # 🌱 FitQuest
 
-A gamified wellness application that helps users build healthy habits through a virtual plant companion that evolves with their progress.
+<div align="center">
 
-![Flutter](https://img.shields.io/badge/Flutter-3.16.0-02569B?logo=flutter)
-![Firebase](https://img.shields.io/badge/Firebase-Latest-FFCA28?logo=firebase)
-![License](https://img.shields.io/badge/License-MIT-green.svg)
-![Status](https://img.shields.io/badge/Status-In%20Development-yellow)
+![FitQuest Banner](https://via.placeholder.com/800x200/4CAF50/FFFFFF?text=FitQuest+-+Grow+Your+Wellness+Journey)
+
+**Transform daily wellness activities into an engaging adventure**
+
+[![Flutter](https://img.shields.io/badge/Flutter-3.16.0-02569B?logo=flutter)](https://flutter.dev)
+[![Firebase](https://img.shields.io/badge/Firebase-Latest-FFCA28?logo=firebase)](https://firebase.google.com)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Status](https://img.shields.io/badge/Status-In%20Development-yellow)](https://github.com/NickiMash17/fitquest-app)
+[![Platform](https://img.shields.io/badge/Platform-iOS%20%7C%20Android%20%7C%20Web-blue)]()
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+
+[Features](#-key-features) • [Demo](#-demo) • [Getting Started](#-getting-started) • [Documentation](#-documentation) • [Contributing](#-contributing)
+
+</div>
+
+---
 
 ## 🎯 Project Overview
 
-FitQuest combines wellness tracking with gamification mechanics to create an engaging experience that motivates users to maintain healthy habits. Users complete daily activities (exercise, meditation, hydration, sleep) to earn XP and watch their virtual plant companion evolve from a tiny seed to a majestic ancient tree.
+FitQuest combines wellness tracking with gamification mechanics to create an engaging experience that motivates users to maintain healthy habits. Complete daily activities to earn XP and watch your virtual plant companion evolve from a tiny seed to a majestic ancient tree.
+
+### 💪 How It Works
+
+Earn XP by completing daily wellness activities:
+- 🏃 **Exercise**: 50 XP per session (cardio, strength, yoga)
+- 🧘 **Meditation**: 30 XP per session (5+ minutes)
+- 💧 **Hydration**: 10 XP per glass (track your water intake)
+- 😴 **Sleep**: 40 XP for 7-9 hours of quality rest
+
+### 🌳 Plant Evolution Stages
+
+Watch your companion grow through 5 unique stages:
+1. **Seed** (0-100 XP) - Just beginning your journey
+2. **Sprout** (100-500 XP) - First signs of growth
+3. **Sapling** (500-1500 XP) - Building strong habits
+4. **Tree** (1500-5000 XP) - Thriving wellness routine
+5. **Ancient Tree** (5000+ XP) - Master of healthy living
+
+---
+
+## 📸 Demo
+
+<div align="center">
+
+### Screenshots
+
+<table>
+  <tr>
+    <td align="center">
+      <img src="https://via.placeholder.com/250x500/E8F5E9/4CAF50?text=Onboarding" alt="Onboarding" width="200"/>
+      <br />
+      <sub><b>Onboarding</b></sub>
+    </td>
+    <td align="center">
+      <img src="https://via.placeholder.com/250x500/E3F2FD/2196F3?text=Home+Dashboard" alt="Dashboard" width="200"/>
+      <br />
+      <sub><b>Dashboard</b></sub>
+    </td>
+    <td align="center">
+      <img src="https://via.placeholder.com/250x500/FFF3E0/FF9800?text=Plant+Companion" alt="Plant" width="200"/>
+      <br />
+      <sub><b>Plant Companion</b></sub>
+    </td>
+    <td align="center">
+      <img src="https://via.placeholder.com/250x500/F3E5F5/9C27B0?text=Leaderboard" alt="Leaderboard" width="200"/>
+      <br />
+      <sub><b>Leaderboard</b></sub>
+    </td>
+  </tr>
+</table>
+
+### Demo Video
+
+[![FitQuest Demo](https://via.placeholder.com/600x338/000000/FFFFFF?text=▶️+Watch+Demo)](https://youtube.com/your-demo-video)
+
+*Click to watch the full demo video*
+
+</div>
+
+---
 
 ## ✨ Key Features
 
-- 🌟 **Evolving Plant Companion** - Watch your companion grow through 5 evolution stages
-- 🎮 **Gamification System** - Earn XP, unlock badges, and maintain streaks
-- 🔥 **Activity Tracking** - Log exercise, meditation, hydration, and sleep
-- 📊 **Real-time Leaderboards** - Compete with friends and the community
-- 🏆 **Achievement System** - Unlock 15+ unique badges
-- 🔔 **Smart Notifications** - Timely reminders to maintain your streak
+### 🎮 Core Gameplay
+- 🌟 **Evolving Plant Companion** - Watch your companion grow through 5 evolution stages as you progress
+- 🎯 **XP System** - Earn experience points for completing wellness activities
+- 🔥 **Streak Tracking** - Maintain daily streaks to maximize your growth
+- ⚡ **Combo Multipliers** - Complete multiple activities for bonus XP
+
+### 📊 Tracking & Analytics
+- 📈 **Activity Dashboard** - Visualize your progress with beautiful charts
+- 📅 **Calendar View** - Track your consistency over time
+- 💎 **Weekly Goals** - Set and achieve personalized targets
+- 🎯 **Activity History** - Review all your logged activities
+
+### 🏆 Social & Competition
+- 🥇 **Global Leaderboards** - Compete with users worldwide
+- 👥 **Friends System** - Connect and challenge friends
+- 🏅 **Achievement System** - Unlock 15+ unique badges
+- 🎊 **Milestone Celebrations** - Celebrate your progress with animations
+
+### 🔧 User Experience
 - 🌓 **Dark Mode** - Beautiful UI in light and dark themes
+- 🔔 **Smart Notifications** - Timely reminders to maintain your streak
 - 📱 **Offline-First** - Works seamlessly without internet connection
+- 🌍 **Multi-language Support** - Available in multiple languages (coming soon)
+- ♿ **Accessibility** - Designed with accessibility in mind
+
+---
 
 ## 🛠️ Tech Stack
 
+### Frontend
 - **Framework:** Flutter 3.16.0
 - **Language:** Dart 3.0+
-- **Backend:** Firebase
-  - Authentication
-  - Cloud Firestore
-  - Cloud Storage
-  - Cloud Functions (planned)
-- **State Management:** BLoC + Provider
-- **Animations:** Rive, Lottie
+- **State Management:** BLoC Pattern + Provider
+- **Animations:** Rive (plant animations), Lottie (UI animations)
+- **UI Components:** Custom design system with Material 3
+
+### Backend & Services
+- **Authentication:** Firebase Auth (Email/Password, Google Sign-In)
+- **Database:** Cloud Firestore (NoSQL, real-time sync)
+- **Storage:** Firebase Cloud Storage (user avatars, plant images)
+- **Functions:** Cloud Functions for Firebase (leaderboard calculations)
+- **Analytics:** Firebase Analytics & Crashlytics
+
+### Architecture & Patterns
 - **Architecture:** Clean Architecture with Repository Pattern
+- **Dependency Injection:** GetIt
+- **Local Storage:** Hive (offline data), Shared Preferences (settings)
+- **API Communication:** Dio with interceptors
+- **Testing:** Unit tests (mockito), Widget tests, Integration tests
+
+---
 
 ## 📋 Prerequisites
 
 Before you begin, ensure you have the following installed:
 
-- Flutter SDK (3.16.0 or higher)
-- Dart SDK (3.0.0 or higher)
-- Android Studio / Xcode (for mobile development)
-- VS Code with Flutter extensions (recommended)
-- Git
+- ✅ **Flutter SDK** (3.16.0 or higher) - [Install Flutter](https://docs.flutter.dev/get-started/install)
+- ✅ **Dart SDK** (3.0.0 or higher) - Included with Flutter
+- ✅ **Android Studio** or **Xcode** (for mobile development)
+- ✅ **VS Code** with Flutter extensions (recommended) - [Setup VS Code](https://docs.flutter.dev/tools/vs-code)
+- ✅ **Git** - [Install Git](https://git-scm.com/downloads)
+- ✅ **Firebase Account** - [Create Firebase Account](https://firebase.google.com)
+
+### Verify Installation
+
+```bash
+flutter doctor -v
+```
+
+---
 
 ## 🚀 Getting Started
 
-### Installation
+### 1️⃣ Clone the Repository
 
-1. **Clone the repository**
 ```bash
-   git clone https://github.com/NickiMash17/fitquest-app.git
-   cd fitquest-app
+git clone https://github.com/NickiMash17/fitquest-app.git
+cd fitquest-app
 ```
 
-2. **Install dependencies**
+### 2️⃣ Install Dependencies
+
 ```bash
-   flutter pub get
+flutter pub get
 ```
 
-3. **Set up Firebase**
-   - Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
-   - Add Android and iOS apps
-   - Download and place configuration files:
-     - `google-services.json` in `android/app/`
-     - `GoogleService-Info.plist` in `ios/Runner/`
-   - Run FlutterFire configuration:
+### 3️⃣ Set up Firebase
+
+#### a. Create a Firebase Project
+
+1. Visit [Firebase Console](https://console.firebase.google.com)
+2. Click **"Add project"**
+3. Enter project name: `fitquest-app`
+4. Follow the setup wizard (disable Google Analytics for development)
+
+#### b. Enable Required Services
+
+1. **Authentication**
+   - Go to Authentication → Sign-in method
+   - Enable **Email/Password**
+   - Enable **Google** (optional)
+
+2. **Firestore Database**
+   - Go to Firestore Database
+   - Click **"Create database"**
+   - Start in **Test mode** (for development)
+   - Choose your region
+
+3. **Storage**
+   - Go to Storage
+   - Click **"Get started"**
+   - Start in **Test mode**
+
+#### c. Add Your App to Firebase
+
+**For Android:**
+1. Click the Android icon in Project Overview
+2. Register app with package name: `com.nicolettemashaba.fitquest`
+3. Download `google-services.json`
+4. Place it in `android/app/` directory
+
+**For iOS:**
+1. Click the iOS icon in Project Overview
+2. Register app with bundle ID: `com.nicolettemashaba.fitquest`
+3. Download `GoogleService-Info.plist`
+4. Place it in `ios/Runner/` directory
+
+#### d. Configure FlutterFire CLI
+
 ```bash
-     flutterfire configure
+# Install FlutterFire CLI globally
+dart pub global activate flutterfire_cli
+
+# Configure Firebase for your project
+flutterfire configure
 ```
 
-4. **Run the app**
-```bash
-   flutter run
+Follow the prompts and select your Firebase project.
+
+### 4️⃣ Configure Environment Variables
+
+Create a `.env` file in the root directory:
+
+```env
+# Firebase Configuration (optional - handled by FlutterFire)
+# Add any API keys or secrets here
+ENVIRONMENT=development
 ```
 
-## 📁 Project Structure
-lib/
-├── core/
-│   ├── constants/
-│   ├── theme/
-│   ├── utils/
-│   └── config/
-├── features/
-│   ├── authentication/
-│   │   ├── bloc/
-│   │   ├── models/
-│   │   ├── pages/
-│   │   ├── repositories/
-│   │   └── widgets/
-│   ├── activities/
-│   ├── companion/
-│   ├── community/
-│   └── profile/
-├── shared/
-│   ├── widgets/
-│   └── services/
-└── main.dart
+### 5️⃣ Run the App
 
-## 🧪 Testing
 ```bash
-# Run all tests
-flutter test
+# Run on Chrome (Web)
+flutter run -d chrome
 
-# Run tests with coverage
-flutter test --coverage
+# Run on Android Emulator
+flutter run -d android
 
-# Run integration tests
-flutter test integration_test/
+# Run on iOS Simulator (Mac only)
+flutter run -d ios
+
+# Run on specific device
+flutter devices  # List available devices
+flutter run -d <device-id>
 ```
 
-## 📱 Build for Production
+### 6️⃣ Build for Production
 
-### Android
+**Android (APK)**
 ```bash
 flutter build apk --release
-# or
+```
+
+**Android (App Bundle - for Play Store)**
+```bash
 flutter build appbundle --release
 ```
 
-### iOS
+**iOS (Mac only)**
 ```bash
 flutter build ipa --release
 ```
 
-## 🤝 Contributing
+**Web**
+```bash
+flutter build web --release
+```
 
-Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+---
 
-## 📝 Development Progress
+## 📁 Project Structure
 
+```
+lib/
+├── core/
+│   ├── constants/          # App constants, colors, strings
+│   ├── theme/             # Theme data, text styles
+│   ├── utils/             # Helper functions, validators
+│   ├── config/            # App configuration
+│   └── error/             # Error handling
+├── features/
+│   ├── authentication/    # Login, registration, password reset
+│   │   ├── bloc/         # Business logic
+│   │   ├── models/       # User models
+│   │   ├── pages/        # UI screens
+│   │   ├── repositories/ # Data layer
+│   │   └── widgets/      # Reusable widgets
+│   ├── activities/       # Activity tracking (exercise, meditation, etc.)
+│   ├── companion/        # Plant companion management
+│   ├── community/        # Leaderboards, friends, social features
+│   ├── profile/          # User profile, settings
+│   └── onboarding/       # First-time user experience
+├── shared/
+│   ├── widgets/          # Shared UI components
+│   ├── services/         # Firebase, analytics, notifications
+│   └── models/           # Shared data models
+├── routes/               # Navigation and routing
+└── main.dart            # App entry point
+```
+
+---
+
+## 🧪 Testing
+
+### Run All Tests
+
+```bash
+flutter test
+```
+
+### Run Tests with Coverage
+
+```bash
+flutter test --coverage
+lcov --list coverage/lcov.info  # View coverage summary
+```
+
+### Run Integration Tests
+
+```bash
+flutter test integration_test/
+```
+
+### Run Specific Test File
+
+```bash
+flutter test test/features/authentication/bloc/auth_bloc_test.dart
+```
+
+### Test Categories
+
+- **Unit Tests** - Business logic, utilities, models
+- **Widget Tests** - UI components, interactions
+- **Integration Tests** - End-to-end user flows
+- **Golden Tests** - Visual regression testing (coming soon)
+
+---
+
+## 📚 Documentation
+
+- **[API Documentation](docs/API.md)** - Backend endpoints and data structures
+- **[Architecture Guide](docs/ARCHITECTURE.md)** - Project structure and patterns
+- **[State Management](docs/STATE_MANAGEMENT.md)** - BLoC pattern implementation
+- **[Firebase Setup](docs/FIREBASE.md)** - Detailed Firebase configuration
+- **[Contributing Guide](CONTRIBUTING.md)** - How to contribute to the project
+- **[Code of Conduct](CODE_OF_CONDUCT.md)** - Community guidelines
+- **[Changelog](CHANGELOG.md)** - Version history and updates
+
+---
+
+## 🗺️ Roadmap
+
+### ✅ Completed
 - [x] Project setup and architecture
-- [ ] Phase 1: Flutter Fundamentals
-- [ ] Phase 2: State Management & Architecture
-- [ ] Phase 3: Firebase Integration
-- [ ] Phase 4: Advanced Features
-- [ ] Phase 5: Testing & Quality
-- [ ] Phase 6: Production & Deployment
+- [x] Authentication system
+- [x] Basic activity tracking
+- [x] Plant companion mechanics
+- [x] XP and leveling system
 
-See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
+### 🚧 In Progress (Q1 2025)
+- [ ] Firebase integration completion
+- [ ] Real-time leaderboards
+- [ ] Achievement system
+- [ ] Push notifications
+- [ ] Profile customization
 
-## 📄 License
+### 📅 Planned (Q2 2025)
+- [ ] Social features (friends, challenges)
+- [ ] Custom plant themes and shop
+- [ ] Apple Health / Google Fit integration
+- [ ] Advanced analytics dashboard
+- [ ] Multi-language support
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+### 🔮 Future (Q3 2025+)
+- [ ] AI-powered habit recommendations
+- [ ] Community challenges
+- [ ] Premium subscription tier
+- [ ] Wearable device integration
+- [ ] Desktop applications (Windows, macOS)
 
-## 👤 Author
+[View full roadmap on GitHub Projects](https://github.com/NickiMash17/fitquest-app/projects)
 
-**Nicolette Mashaba**
-
-- GitHub: [@NickiMash17](https://github.com/NickiMash17)
-- LinkedIn: [Nicolette Mashaba](https://linkedin.com/in/nicolette-mashaba)
-
-## 🙏 Acknowledgments
-
-- Flutter team for the amazing framework
-- Firebase for backend infrastructure
-- [Learning path created by Jediah](https://jediah.dev)
+---
 
 ## 🐛 Troubleshooting
 
-### Blank Screen Issues
-1. **Check Browser Console** (F12 → Console tab) for errors
-2. **Hard Refresh**: Press Ctrl+Shift+R (Windows) or Cmd+Shift+R (Mac)
-3. **Clear Browser Cache**: Ctrl+Shift+Delete → Clear cached images and files
-4. **Try Incognito Mode**: Open Chrome in incognito and navigate to localhost
+### Common Issues
+
+#### 1. Blank Screen on Web
+**Symptoms:** White/blank screen when running on web browser
+
+**Solutions:**
+1. Check Browser Console (F12 → Console tab) for errors
+2. Hard Refresh: `Ctrl+Shift+R` (Windows) or `Cmd+Shift+R` (Mac)
+3. Clear Browser Cache: `Ctrl+Shift+Delete` → Clear cached images and files
+4. Try Incognito Mode: Open browser in incognito and navigate to localhost
+
+#### 2. Firebase Configuration Errors
+**Symptoms:** `No Firebase App '[DEFAULT]' has been created`
+
+**Solutions:**
+```bash
+# Re-run FlutterFire configuration
+flutterfire configure
+
+# Ensure google-services.json and GoogleService-Info.plist are in correct locations
+# Clean and rebuild
+flutter clean
+flutter pub get
+flutter run
+```
+
+#### 3. Firestore Index Errors
+**Symptoms:** Console warnings about missing indexes
+
+**Solutions:**
+- These are warnings, not critical errors
+- Click the provided link in the error message
+- Firebase Console will auto-generate the required index
+- Wait 2-5 minutes for index creation
+
+#### 4. Build Errors After Updating Dependencies
+**Solutions:**
+```bash
+flutter clean
+flutter pub get
+flutter pub upgrade
+flutter run
+```
+
+#### 5. Port Already in Use (Web)
+**Symptoms:** `Port 8080 is already in use`
+
+**Solutions:**
+```bash
+# Use a different port
+flutter run -d chrome --web-port=8081
+
+# Or kill the process using the port (Windows)
+netstat -ano | findstr :8080
+taskkill /PID <PID> /F
+
+# Or kill the process (Mac/Linux)
+lsof -ti:8080 | xargs kill -9
+```
 
 ### Reset Onboarding
+
 To see the onboarding screen again:
 1. Press **F12** → **Console** tab
 2. Type: `localStorage.clear()` and press Enter
 3. Refresh the page (F5)
 
-### Common Issues
-- **Firestore Index Errors**: These are warnings. Create indexes in Firebase Console using the provided links
-- **Port Conflicts**: Try `flutter run -d chrome --web-port=8080`
-- **Build Errors**: Check terminal output for compilation errors
+### Need More Help?
 
-## 📧 Contact
-
-For questions or support, please open an issue or contact [nene171408@gmail.com](mailto:nene171408@gmail.com)
+- 📖 Check our [FAQ](docs/FAQ.md)
+- 💬 Join our [Discord Community](https://discord.gg/fitquest)
+- 🐛 [Open an Issue](https://github.com/NickiMash17/fitquest-app/issues/new)
+- 📧 Email: [nene171408@gmail.com](mailto:nene171408@gmail.com)
 
 ---
 
-<p align="center">Made with ❤️ and Flutter</p>
+## 🤝 Contributing
+
+We love contributions! FitQuest is built by developers like you.
+
+### How to Contribute
+
+1. **Fork the repository**
+2. **Create a feature branch** (`git checkout -b feature/AmazingFeature`)
+3. **Commit your changes** (`git commit -m 'Add some AmazingFeature'`)
+4. **Push to the branch** (`git push origin feature/AmazingFeature`)
+5. **Open a Pull Request**
+
+### Contribution Guidelines
+
+- Follow the existing code style and architecture patterns
+- Write tests for new features
+- Update documentation as needed
+- Keep commits atomic and well-described
+- Be respectful and constructive in discussions
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+
+### Areas for Contribution
+
+- 🐛 Bug fixes
+- ✨ New features
+- 📝 Documentation improvements
+- 🌍 Translations
+- 🎨 UI/UX enhancements
+- 🧪 Test coverage
+
+---
+
+## 📊 Development Progress
+
+### Phase 1: Foundation (✅ Complete)
+- [x] Project setup and architecture
+- [x] UI design system
+- [x] Navigation structure
+
+### Phase 2: Core Features (🚧 In Progress - 70%)
+- [x] Authentication flow
+- [x] Activity tracking UI
+- [x] Plant companion visuals
+- [ ] Data persistence
+- [ ] Offline support
+
+### Phase 3: Firebase Integration (📅 Planned)
+- [ ] Firestore integration
+- [ ] Cloud storage setup
+- [ ] Real-time sync
+- [ ] Cloud functions
+
+### Phase 4: Advanced Features (📅 Planned)
+- [ ] Leaderboards
+- [ ] Social features
+- [ ] Notifications
+- [ ] Analytics
+
+### Phase 5: Testing & Quality (📅 Planned)
+- [ ] Unit test coverage (80%+)
+- [ ] Integration tests
+- [ ] Performance optimization
+- [ ] Accessibility audit
+
+### Phase 6: Production (📅 Planned)
+- [ ] Beta testing
+- [ ] App Store submission
+- [ ] Play Store submission
+- [ ] Web deployment
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+```
+MIT License
+
+Copyright (c) 2024 Nicolette Mashaba
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction...
+```
+
+---
+
+## 👤 Author
+
+<div align="center">
+
+### **Nicolette Mashaba**
+
+[![GitHub](https://img.shields.io/badge/GitHub-NickiMash17-181717?logo=github)](https://github.com/NickiMash17)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Nicolette%20Mashaba-0A66C2?logo=linkedin)](https://linkedin.com/in/nicolette-mashaba)
+[![Email](https://img.shields.io/badge/Email-nene171408%40gmail.com-EA4335?logo=gmail)](mailto:nene171408@gmail.com)
+
+*Passionate Flutter developer building engaging mobile experiences*
+
+</div>
+
+---
+
+## 🙏 Acknowledgments
+
+Special thanks to:
+
+- 💙 **Flutter Team** - For the amazing cross-platform framework
+- 🔥 **Firebase Team** - For robust backend infrastructure
+- 🎓 **Jediah Codes** - For the comprehensive learning path at [jediah.dev](https://jediah.dev)
+- 🌟 **Open Source Community** - For invaluable packages and support
+- 🎨 **Design Inspiration** - Duolingo, Habitica, and Forest App
+- 🧪 **Beta Testers** - For early feedback and bug reports
+
+### Key Dependencies
+
+Special thanks to these amazing packages:
+- `firebase_core` & `firebase_auth` - Backend services
+- `flutter_bloc` - State management
+- `rive` - Beautiful animations
+- `fl_chart` - Data visualization
+- `hive` - Local storage
+
+---
+
+## 📞 Support & Community
+
+### Get Help
+- 💬 [Discord Server](https://discord.gg/fitquest) - Chat with the community
+- 📖 [Documentation](docs/) - Comprehensive guides
+- ❓ [Stack Overflow](https://stackoverflow.com/questions/tagged/fitquest) - Technical questions
+- 🐛 [Issue Tracker](https://github.com/NickiMash17/fitquest-app/issues) - Report bugs
+
+### Stay Updated
+- ⭐ Star this repo to show support
+- 👀 Watch for updates
+- 🐦 Follow on Twitter [@FitQuestApp](https://twitter.com/fitquestapp) (coming soon)
+- 📧 Subscribe to our newsletter (coming soon)
+
+---
+
+## 📈 Project Stats
+
+![GitHub stars](https://img.shields.io/github/stars/NickiMash17/fitquest-app?style=social)
+![GitHub forks](https://img.shields.io/github/forks/NickiMash17/fitquest-app?style=social)
+![GitHub watchers](https://img.shields.io/github/watchers/NickiMash17/fitquest-app?style=social)
+![GitHub issues](https://img.shields.io/github/issues/NickiMash17/fitquest-app)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/NickiMash17/fitquest-app)
+![GitHub last commit](https://img.shields.io/github/last-commit/NickiMash17/fitquest-app)
+
+---
+
+<div align="center">
+
+### 🌱 Grow Your Wellness Journey with FitQuest
+
+**Made with ❤️ and Flutter**
+
+[⬆ Back to Top](#-fitquest)
+
+</div>
