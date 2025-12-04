@@ -26,7 +26,7 @@ class EmptyStateWidget extends StatelessWidget {
             Icon(
               icon,
               size: 64,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), // Theme-aware color
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), // Theme-aware color
             ),
             const SizedBox(height: 16),
             Text(
