@@ -1,4 +1,5 @@
 // lib/main.dart
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -63,12 +64,27 @@ Future<void> _initializeApp() async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Add global error handler to prevent blank screens
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+    debugPrint('Flutter Error: ${details.exception}');
+    debugPrint('Stack: ${details.stack}');
+  };
+
+  // Handle platform errors
+  PlatformDispatcher.instance.onError = (error, stack) {
+    debugPrint('Platform Error: $error');
+    debugPrint('Stack: $stack');
+    return true;
+  };
+
   // Initialize first, then show app
   try {
     await _initializeApp();
     debugPrint('Initialization complete');
-  } catch (e) {
+  } catch (e, stackTrace) {
     debugPrint('Initialization error: $e');
+    debugPrint('Stack: $stackTrace');
     // Continue anyway - app will show error if needed
   }
 
@@ -203,8 +219,11 @@ class _FitQuestAppState extends State<FitQuestApp> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error_outline,
-                        size: 64, color: Colors.red,),
+                    const Icon(
+                      Icons.error_outline,
+                      size: 64,
+                      color: Colors.red,
+                    ),
                     const SizedBox(height: 16),
                     const Text(
                       'App Error',
