@@ -166,7 +166,7 @@ class _LoginPageState extends State<LoginPage> {
                                 vertical: 4,
                               ),
                             ),
-                            child: Text(
+                            child: const Text(
                               'Forgot Password?',
                               style: TextStyle(
                                 color: AppColors.primaryGreen,
@@ -221,7 +221,7 @@ class _LoginPageState extends State<LoginPage> {
                                   vertical: 4,
                                 ),
                               ),
-                              child: Text(
+                              child: const Text(
                                 'Sign Up',
                                 style: TextStyle(
                                   color: AppColors.primaryGreen,
@@ -238,7 +238,7 @@ class _LoginPageState extends State<LoginPage> {
               },
             ),
             // Theme toggle button in top-right corner
-            Positioned(
+            const Positioned(
               top: 8,
               right: 8,
               child: ThemeToggleButton(),

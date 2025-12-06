@@ -122,6 +122,7 @@ class _OnboardingPageState extends State<OnboardingPage>
       debugPrint('Error saving onboarding status: $e');
     }
     // Navigate to login
+    if (!mounted) return;
     router.AppRouter.navigateAndRemoveUntil(context, router.AppRouter.login);
   }
 

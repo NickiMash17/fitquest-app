@@ -58,7 +58,7 @@ class _SignUpPageState extends State<SignUpPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Create Account'),
-        actions: [
+        actions: const [
           ThemeToggleButton(),
         ],
       ),
@@ -200,7 +200,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                       ),
                       validator: (value) => Validators.required(value,
-                          fieldName: 'Confirm Password'),
+                          fieldName: 'Confirm Password',),
                     ),
                     const SizedBox(height: 32),
                     // Sign up button
@@ -236,7 +236,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         TextButton(
                           onPressed: () {
                             AppRouter.navigateAndReplace(
-                                context, AppRouter.login);
+                                context, AppRouter.login,);
                           },
                           style: TextButton.styleFrom(
                             padding: const EdgeInsets.symmetric(
@@ -244,7 +244,7 @@ class _SignUpPageState extends State<SignUpPage> {
                               vertical: 4,
                             ),
                           ),
-                          child: Text(
+                          child: const Text(
                             'Sign In',
                             style: TextStyle(
                               color: AppColors.primaryGreen,
