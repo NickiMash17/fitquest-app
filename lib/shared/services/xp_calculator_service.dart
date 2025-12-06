@@ -76,7 +76,7 @@ extension SqrtExtension on num {
   double sqrt() {
     // Simple square root approximation
     if (this <= 0) return 0;
-    double x = this.toDouble();
+    final double x = toDouble();
     double y = (x + 1) / 2;
     while ((y - x / y).abs() > 0.00001) {
       y = (y + x / y) / 2;

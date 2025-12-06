@@ -35,7 +35,7 @@ class UserRepository {
 
   /// Get user by ID with retry logic for offline scenarios
   Future<UserModel?> getUser(String userId) async {
-    int maxRetries = 3;
+    const int maxRetries = 3;
     int retryCount = 0;
     
     while (retryCount < maxRetries) {
