@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fitquest/core/constants/app_constants.dart';
 import 'package:fitquest/core/di/injection.dart';
 import 'package:fitquest/features/activities/bloc/activity_bloc.dart';
 import 'package:fitquest/features/activities/bloc/activity_event.dart';
+import 'package:fitquest/features/activities/bloc/activity_state.dart';
 import 'package:fitquest/shared/models/activity_model.dart';
 import 'package:fitquest/shared/widgets/enhanced_snackbar.dart';
 import 'package:fitquest/shared/services/xp_calculator_service.dart';
@@ -24,6 +26,8 @@ class _AddActivityPageState extends State<AddActivityPage> {
   final _notesController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
   late final XpCalculatorService _xpCalculator;
+  bool _isSubmitting = false;
+  int? _lastXp;
 
   @override
   void initState() {
@@ -53,10 +57,17 @@ class _AddActivityPageState extends State<AddActivityPage> {
     }
   }
 
-  void _handleSubmit() {
-    if (_formKey.currentState!.validate()) {
+  Future<void> _handleSubmit() async {
+    if (_formKey.currentState!.validate() && !_isSubmitting) {
+      setState(() {
+        _isSubmitting = true;
+      });
+
       final duration = int.tryParse(_durationController.text) ?? 0;
       if (duration <= 0) {
+        setState(() {
+          _isSubmitting = false;
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Please enter a valid duration')),
         );
@@ -80,112 +91,196 @@ class _AddActivityPageState extends State<AddActivityPage> {
         hours: _selectedType == ActivityType.sleep ? duration : null,
       );
 
+      _lastXp = _xpCalculator.calculateXp(activity);
+
+      // Dispatch create event
       context
           .read<ActivityBloc>()
           .add(ActivityCreateRequested(activity: activity));
+    }
+  }
 
+  void _handleActivityCreated() {
+    if (!mounted || !_isSubmitting) return;
+    
+    final xp = _lastXp ?? 0;
+
+    setState(() {
+      _isSubmitting = false;
+    });
+
+    // Trigger a reload to ensure activities page sees the update
+    context.read<ActivityBloc>().add(const ActivitiesLoadRequested());
+    
+    // Wait a moment for the reload to start, then navigate
+    Future.delayed(const Duration(milliseconds: 200), () {
       if (mounted) {
         Navigator.of(context).pop();
-        // Use enhanced snackbar for better UX
-        EnhancedSnackBar.showSuccess(
-          context,
-          'Activity logged successfully! +${_xpCalculator.calculateXp(activity)} XP',
-        );
+        
+        // Show success message after navigation
+        Future.delayed(const Duration(milliseconds: 300), () {
+          if (mounted) {
+            EnhancedSnackBar.showSuccess(
+              context,
+              'Activity logged successfully! +$xp XP',
+            );
+          }
+        });
       }
-    }
+    });
+  }
+
+  void _handleActivityError(String message) {
+    if (!mounted) return;
+
+    setState(() {
+      _isSubmitting = false;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Error: $message'),
+        backgroundColor: Colors.red,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Log Activity'),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppConstants.defaultPadding),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Activity type selector
-              Text(
-                'Activity Type',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: ActivityType.values.map((type) {
-                  final isSelected = _selectedType == type;
-                  return ChoiceChip(
-                    label: Text(_getActivityTypeName(type)),
-                    selected: isSelected,
-                    onSelected: (selected) {
-                      setState(() {
-                        _selectedType = type;
-                      });
-                    },
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 24),
-              // Date picker
-              Text(
-                'Date',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 12),
-              OutlinedButton.icon(
-                onPressed: _selectDate,
-                icon: const Icon(Icons.calendar_today),
-                label: Text(
-                  '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
+    return BlocListener<ActivityBloc, ActivityState>(
+      listenWhen: (previous, current) {
+        // Only listen when we're submitting
+        if (!_isSubmitting) return false;
+
+        // Handle any error state
+        if (current is ActivityError) return true;
+
+        // Handle ActivityLoaded - check if this is a new state (different from previous)
+        if (current is ActivityLoaded) {
+          // If previous was also ActivityLoaded, only trigger if count changed
+          if (previous is ActivityLoaded) {
+            return previous.activities.length != current.activities.length;
+          }
+          return true; // First time we see ActivityLoaded after creation
+        }
+
+        return false;
+      },
+      listener: (context, state) {
+        if (!_isSubmitting) return;
+
+        debugPrint('AddActivityPage: State changed to ${state.runtimeType}');
+        
+        if (state is ActivityError) {
+          debugPrint('AddActivityPage: Error - ${state.message}');
+          _handleActivityError(state.message);
+        } else if (state is ActivityLoaded) {
+          debugPrint('AddActivityPage: Activities loaded - ${state.activities.length} activities');
+          // Activity was created and activities reloaded
+          // Use a small delay to ensure the state is stable
+          Future.delayed(const Duration(milliseconds: 150), () {
+            if (mounted && _isSubmitting) {
+              _handleActivityCreated();
+            }
+          });
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Log Activity'),
+        ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppConstants.defaultPadding),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Activity type selector
+                Text(
+                  'Activity Type',
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
-              ),
-              const SizedBox(height: 24),
-              // Duration field
-              TextFormField(
-                controller: _durationController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: _getDurationLabel(),
-                  hintText: _getDurationHint(),
-                  prefixIcon: const Icon(Icons.timer_outlined),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: ActivityType.values.map((type) {
+                    final isSelected = _selectedType == type;
+                    return ChoiceChip(
+                      label: Text(_getActivityTypeName(type)),
+                      selected: isSelected,
+                      onSelected: (selected) {
+                        setState(() {
+                          _selectedType = type;
+                        });
+                      },
+                    );
+                  }).toList(),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Duration is required';
-                  }
-                  final duration = int.tryParse(value);
-                  if (duration == null || duration <= 0) {
-                    return 'Please enter a valid duration';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 24),
-              // Notes field
-              TextFormField(
-                controller: _notesController,
-                maxLines: 3,
-                decoration: const InputDecoration(
-                  labelText: 'Notes (Optional)',
-                  hintText: 'Add any additional notes...',
-                  prefixIcon: Icon(Icons.note_outlined),
+                const SizedBox(height: 24),
+                // Date picker
+                Text(
+                  'Date',
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
-              ),
-              const SizedBox(height: 32),
-              // Submit button
-              ElevatedButton(
-                onPressed: _handleSubmit,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  onPressed: _selectDate,
+                  icon: const Icon(Icons.calendar_today),
+                  label: Text(
+                    '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
+                  ),
                 ),
-                child: const Text('Log Activity'),
-              ),
-            ],
+                const SizedBox(height: 24),
+                // Duration field
+                TextFormField(
+                  controller: _durationController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: _getDurationLabel(),
+                    hintText: _getDurationHint(),
+                    prefixIcon: const Icon(Icons.timer_outlined),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Duration is required';
+                    }
+                    final duration = int.tryParse(value);
+                    if (duration == null || duration <= 0) {
+                      return 'Please enter a valid duration';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 24),
+                // Notes field
+                TextFormField(
+                  controller: _notesController,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    labelText: 'Notes (Optional)',
+                    hintText: 'Add any additional notes...',
+                    prefixIcon: Icon(Icons.note_outlined),
+                  ),
+                ),
+                const SizedBox(height: 32),
+                // Submit button
+                ElevatedButton(
+                  onPressed: _isSubmitting ? null : _handleSubmit,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                  child: _isSubmitting
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text('Log Activity'),
+                ),
+              ],
+            ),
           ),
         ),
       ),

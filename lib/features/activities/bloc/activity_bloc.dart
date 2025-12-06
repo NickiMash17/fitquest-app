@@ -94,19 +94,53 @@ class ActivityBloc extends Bloc<ActivityEvent, ActivityState> {
         createdAt: DateTime.now(),
       );
 
+      _logger.i('Creating activity: ${activity.id}');
+
       // Save activity
       await _activityRepository.createActivity(activity);
+      _logger.i('Activity saved to Firestore: ${activity.id}');
 
       // Update user XP and points
       await _userRepository.addXp(userId, xp);
+      _logger.i('User XP updated');
 
       // Update streak
       await _updateStreak(userId);
+      _logger.i('Streak updated');
 
-      _logger.i('Activity created: ${activity.id}');
+      _logger.i('Activity created successfully: ${activity.id}');
+      
+      // Wait a moment for Firestore to be ready, then reload
+      await Future.delayed(const Duration(milliseconds: 500));
+      
+      // Immediately reload activities to show the new one
+      // Don't use add() here - directly load and emit
+      try {
+        _logger.i('Reloading activities after creation...');
+        final activities = await _activityRepository.getActivities(userId);
+        _logger.i('Reloaded ${activities.length} activities after creation');
+        
+        // Verify the new activity is in the list
+        final foundActivity = activities.any((a) => a.id == activity.id);
+        _logger.i('New activity found in reloaded list: $foundActivity');
+        
+        if (!foundActivity) {
+          _logger.w('WARNING: New activity not found in reloaded list!');
+          _logger.w('Activity ID: ${activity.id}');
+          _logger.w('Activity userId: ${activity.userId}');
+          _logger.w('Current userId: $userId');
+        }
+        
+        emit(ActivityLoaded(activities: activities));
+        _logger.i('Emitted ActivityLoaded with ${activities.length} activities');
+      } catch (e, stackTrace) {
+        _logger.e('Error reloading activities after creation', error: e, stackTrace: stackTrace);
+        // Even if reload fails, trigger a reload event
+        add(const ActivitiesLoadRequested());
+      }
     } catch (e, stackTrace) {
       _logger.e('Error creating activity', error: e, stackTrace: stackTrace);
-      emit(const ActivityError(message: 'Failed to create activity'));
+      emit(ActivityError(message: 'Failed to create activity: ${e.toString()}'));
     }
   }
 
