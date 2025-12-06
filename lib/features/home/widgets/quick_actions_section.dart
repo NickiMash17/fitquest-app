@@ -5,6 +5,9 @@ import 'package:fitquest/core/constants/app_border_radius.dart';
 import 'package:fitquest/core/constants/app_shadows.dart';
 import 'package:fitquest/core/constants/app_colors.dart';
 import 'package:fitquest/shared/models/activity_model.dart';
+import 'package:fitquest/shared/widgets/image_with_fallback.dart';
+import 'package:fitquest/core/utils/activity_image_helper.dart';
+import 'package:fitquest/core/utils/haptic_feedback_service.dart';
 
 class QuickActionsSection extends StatelessWidget {
   const QuickActionsSection({super.key});
@@ -72,6 +75,7 @@ class QuickActionsSection extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
+          HapticFeedbackService.lightImpact();
           Navigator.of(context).pushNamed(
             AppRouter.addActivity,
             arguments: activityType,
@@ -88,16 +92,34 @@ class QuickActionsSection extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                padding: const EdgeInsets.all(14),
+                width: 56,
+                height: 56,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha:0.25),
+                  color: Colors.white.withValues(alpha: 0.25),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: Colors.white.withValues(alpha:0.3),
+                    color: Colors.white.withValues(alpha: 0.3),
                     width: 1.5,
                   ),
                 ),
-                child: Icon(icon, color: Colors.white, size: 28),
+                child: ClipOval(
+                  child: activityType != null
+                      ? ImageWithFallback(
+                          imageUrl: ActivityImageHelper.getQuickActionImageUrl(
+                              activityType),
+                          assetPath:
+                              ActivityImageHelper.getQuickActionImagePath(
+                                  activityType),
+                          fallbackIcon:
+                              ActivityImageHelper.getActivityIcon(activityType),
+                          width: 56,
+                          height: 56,
+                          fit: BoxFit.cover,
+                          backgroundColor: Colors.white.withValues(alpha: 0.2),
+                          iconColor: Colors.white,
+                        )
+                      : Icon(icon, color: Colors.white, size: 28),
+                ),
               ),
               const SizedBox(height: 10),
               Text(

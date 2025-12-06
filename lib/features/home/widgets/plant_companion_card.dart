@@ -4,6 +4,8 @@ import 'package:fitquest/core/constants/app_colors.dart';
 import 'package:fitquest/core/constants/app_border_radius.dart';
 import 'package:fitquest/shared/widgets/premium_card.dart';
 import 'package:fitquest/shared/widgets/animated_counter.dart';
+import 'package:fitquest/shared/widgets/image_with_fallback.dart';
+import 'package:fitquest/core/utils/image_url_helper.dart';
 
 class PlantCompanionCard extends StatefulWidget {
   final String plantName;
@@ -87,26 +89,40 @@ class _PlantCompanionCardState extends State<PlantCompanionCard>
                       child: Transform.rotate(
                         angle: (1 - value) * 0.1,
                         child: Container(
-                          padding: const EdgeInsets.all(16),
+                          width: 80,
+                          height: 80,
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha:0.25),
+                            color: Colors.white.withValues(alpha: 0.25),
                             borderRadius: AppBorderRadius.allMD,
                             border: Border.all(
-                              color: Colors.white.withValues(alpha:0.3),
+                              color: Colors.white.withValues(alpha: 0.3),
                               width: 1.5,
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.white.withValues(alpha: 0.2 * value),
+                                color:
+                                    Colors.white.withValues(alpha: 0.2 * value),
                                 blurRadius: 20,
                                 spreadRadius: 5,
                               ),
                             ],
                           ),
-                          child: const Icon(
-                            Icons.eco_rounded,
-                            color: Colors.white,
-                            size: 36,
+                          child: GestureDetector(
+                            onTap: () => _showPlantDetails(context),
+                            onDoubleTap: () => _celebratePlant(context),
+                            child: ImageWithFallback(
+                              imageUrl: ImageUrlHelper.getPlantImageUrl(
+                                  widget.evolutionStage),
+                              assetPath:
+                                  _getPlantImagePath(widget.evolutionStage),
+                              fallbackIcon: Icons.eco_rounded,
+                              width: 80,
+                              height: 80,
+                              fit: BoxFit.cover,
+                              backgroundColor:
+                                  Colors.white.withValues(alpha: 0.2),
+                              iconColor: Colors.white,
+                            ),
                           ),
                         ),
                       ),
@@ -229,6 +245,144 @@ class _PlantCompanionCardState extends State<PlantCompanionCard>
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  String _getPlantImagePath(int evolutionStage) {
+    // Map evolution stages to plant images
+    // Stage 0-1: Seed, Stage 2-3: Sprout, Stage 4-5: Sapling, Stage 6+: Tree
+    if (evolutionStage <= 1) {
+      return 'assets/images/companion/seed.png';
+    } else if (evolutionStage <= 3) {
+      return 'assets/images/companion/sprout.png';
+    } else if (evolutionStage <= 5) {
+      return 'assets/images/companion/sapling.png';
+    } else {
+      return 'assets/images/companion/tree.png';
+    }
+  }
+
+  void _showPlantDetails(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.6,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          children: [
+            Container(
+              margin: const EdgeInsets.only(top: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurfaceVariant
+                    .withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  ImageWithFallback(
+                    imageUrl:
+                        ImageUrlHelper.getPlantImageUrl(widget.evolutionStage),
+                    assetPath: _getPlantImagePath(widget.evolutionStage),
+                    fallbackIcon: Icons.eco_rounded,
+                    width: 120,
+                    height: 120,
+                    fit: BoxFit.contain,
+                    backgroundColor:
+                        AppColors.primaryGreen.withValues(alpha: 0.1),
+                    iconColor: AppColors.primaryGreen,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    widget.plantName,
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Evolution Stage ${widget.evolutionStage}',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                  ),
+                  const SizedBox(height: 24),
+                  _buildDetailRow(
+                    context,
+                    icon: Icons.stars_rounded,
+                    label: 'Current XP',
+                    value: '${widget.currentXp} / ${widget.requiredXp}',
+                  ),
+                  const SizedBox(height: 12),
+                  _buildDetailRow(
+                    context,
+                    icon: Icons.favorite_rounded,
+                    label: 'Health',
+                    value: '${widget.health}%',
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
+    return Row(
+      children: [
+        Icon(icon, size: 20, color: AppColors.primaryGreen),
+        const SizedBox(width: 12),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        const Spacer(),
+        Text(
+          value,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+        ),
+      ],
+    );
+  }
+
+  void _celebratePlant(BuildContext context) {
+    // Show celebration animation
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.celebration_rounded, color: Colors.white),
+            const SizedBox(width: 12),
+            Text('${widget.plantName} is growing strong! 🌱'),
+          ],
+        ),
+        backgroundColor: AppColors.primaryGreen,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
         ),
       ),
     );
