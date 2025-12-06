@@ -183,7 +183,7 @@ class _FitQuestAppState extends State<FitQuestApp> {
             // Add error boundary
             return MediaQuery(
               data: MediaQuery.of(context)
-                  .copyWith(textScaler: TextScaler.linear(1.0)),
+                  .copyWith(textScaler: const TextScaler.linear(1.0)),
               child: child ?? const SizedBox.shrink(),
             );
           },
@@ -204,7 +204,7 @@ class _FitQuestAppState extends State<FitQuestApp> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Icon(Icons.error_outline,
-                        size: 64, color: Colors.red),
+                        size: 64, color: Colors.red,),
                     const SizedBox(height: 16),
                     const Text(
                       'App Error',
