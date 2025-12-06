@@ -47,7 +47,7 @@ class AppRouter {
   }
 
   static void navigate(BuildContext context, String routeName,
-      {Object? arguments}) {
+      {Object? arguments,}) {
     Navigator.of(context).pushNamed(routeName, arguments: arguments);
   }
 
