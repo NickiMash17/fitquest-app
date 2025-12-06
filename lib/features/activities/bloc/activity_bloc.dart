@@ -1,7 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:logger/logger.dart';
 import 'package:fitquest/features/activities/bloc/activity_event.dart';
 import 'package:fitquest/features/activities/bloc/activity_state.dart';
@@ -66,7 +65,7 @@ class ActivityBloc extends Bloc<ActivityEvent, ActivityState> {
       }
     } catch (e, stackTrace) {
       _logger.e('Unexpected error loading activities',
-          error: e, stackTrace: stackTrace);
+          error: e, stackTrace: stackTrace,);
       emit(const ActivityError(message: 'Failed to load activities'));
     }
   }

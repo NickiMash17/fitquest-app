@@ -74,7 +74,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       if (user == null) {
         _logger.e('User not found after retries: $userId');
         emit(const HomeError(
-            message: 'User not found. Please try signing in again.'));
+            message: 'User not found. Please try signing in again.',),);
         return;
       }
 
@@ -90,10 +90,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         // Load today's activities
         _activityRepository.getTodayActivities(userId).catchError((e) {
           _logger.w(
-              'Error loading today activities, continuing with empty list: $e');
+              'Error loading today activities, continuing with empty list: $e',);
           return <ActivityModel>[];
         }),
-      ], eagerError: false);
+      ], eagerError: false,);
 
       final challenge = results[0] as ChallengeModel?;
       final todayActivities = results[1] as List<ActivityModel>;
