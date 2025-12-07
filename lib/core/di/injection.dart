@@ -9,6 +9,9 @@ import 'package:fitquest/shared/repositories/leaderboard_repository.dart';
 import 'package:fitquest/shared/services/xp_calculator_service.dart';
 import 'package:fitquest/shared/services/local_storage_service.dart';
 import 'package:fitquest/core/services/cache_service.dart';
+import 'package:fitquest/core/services/analytics_service.dart';
+import 'package:fitquest/core/services/connectivity_service.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:fitquest/features/authentication/bloc/auth_bloc.dart';
 import 'package:fitquest/features/activities/bloc/activity_bloc.dart';
 import 'package:fitquest/features/home/bloc/home_bloc.dart';
@@ -27,6 +30,7 @@ void configureDependencies() {
   // Register Firebase services
   getIt.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
   getIt.registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance);
+  getIt.registerLazySingleton<FirebaseAnalytics>(() => FirebaseAnalytics.instance);
   
   // Register repositories
   getIt.registerLazySingleton<UserRepository>(
@@ -48,6 +52,14 @@ void configureDependencies() {
   
   // Register cache service
   getIt.registerLazySingleton<CacheService>(() => CacheService());
+  
+  // Register analytics service
+  getIt.registerLazySingleton<AnalyticsService>(
+    () => AnalyticsService(getIt()),
+  );
+  
+  // Register connectivity service
+  getIt.registerLazySingleton<ConnectivityService>(() => ConnectivityService());
   
   // Register BLoCs (factories - can be registered multiple times safely)
   getIt.registerFactory<AuthBloc>(

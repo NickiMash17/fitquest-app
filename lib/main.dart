@@ -11,6 +11,7 @@ import 'package:fitquest/firebase_options.dart';
 import 'package:fitquest/core/di/injection.dart';
 import 'package:fitquest/shared/services/local_storage_service.dart';
 import 'package:fitquest/core/services/cache_service.dart';
+import 'package:fitquest/core/config/firebase_config.dart';
 import 'package:fitquest/features/authentication/bloc/auth_bloc.dart';
 import 'package:fitquest/features/authentication/bloc/auth_event.dart';
 import 'package:fitquest/features/activities/bloc/activity_bloc.dart';
@@ -26,11 +27,9 @@ Future<void> _initializeApp() async {
     debugPrint('Hive initialization skipped: $e');
   }
 
-  // Initialize Firebase
+  // Initialize Firebase (includes Crashlytics)
   debugPrint('Initializing Firebase...');
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await FirebaseConfig.initialize();
   debugPrint('Firebase initialized');
 
   // Enable Firestore persistence for offline support
@@ -64,19 +63,8 @@ Future<void> _initializeApp() async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Add global error handler to prevent blank screens
-  FlutterError.onError = (FlutterErrorDetails details) {
-    FlutterError.presentError(details);
-    debugPrint('Flutter Error: ${details.exception}');
-    debugPrint('Stack: ${details.stack}');
-  };
-
-  // Handle platform errors
-  PlatformDispatcher.instance.onError = (error, stack) {
-    debugPrint('Platform Error: $error');
-    debugPrint('Stack: $stack');
-    return true;
-  };
+  // Note: Error handlers are set up in FirebaseConfig.initialize()
+  // They will be configured there to use Crashlytics
 
   // Initialize first, then show app
   try {
