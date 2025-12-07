@@ -16,6 +16,9 @@ import 'package:fitquest/features/statistics/pages/statistics_page.dart';
 import 'package:fitquest/features/achievements/pages/achievements_page.dart';
 import 'package:fitquest/features/goals/pages/goals_page.dart';
 import 'package:fitquest/features/calendar/pages/calendar_page.dart';
+import 'package:fitquest/features/profile/pages/privacy_policy_page.dart';
+import 'package:fitquest/features/profile/pages/terms_of_service_page.dart';
+import 'package:fitquest/features/profile/pages/about_page.dart';
 
 class AppRouter {
   // Route names
@@ -33,6 +36,9 @@ class AppRouter {
   static const String achievements = '/achievements';
   static const String goals = '/goals';
   static const String calendar = '/calendar';
+  static const String privacyPolicy = '/privacy-policy';
+  static const String termsOfService = '/terms-of-service';
+  static const String about = '/about';
 
   // Navigation methods
   static void navigateAndReplace(BuildContext context, String routeName) {
@@ -46,8 +52,11 @@ class AppRouter {
     );
   }
 
-  static void navigate(BuildContext context, String routeName,
-      {Object? arguments,}) {
+  static void navigate(
+    BuildContext context,
+    String routeName, {
+    Object? arguments,
+  }) {
     Navigator.of(context).pushNamed(routeName, arguments: arguments);
   }
 
@@ -119,6 +128,21 @@ class AppRouter {
         return SlidePageRoute(
           direction: SlideDirection.left,
           child: CalendarPage(activities: activities),
+        );
+      case privacyPolicy:
+        return SlidePageRoute(
+          direction: SlideDirection.left,
+          child: const PrivacyPolicyPage(),
+        );
+      case termsOfService:
+        return SlidePageRoute(
+          direction: SlideDirection.left,
+          child: const TermsOfServicePage(),
+        );
+      case about:
+        return SlidePageRoute(
+          direction: SlideDirection.left,
+          child: const AboutPage(),
         );
       default:
         return MaterialPageRoute(

@@ -5,6 +5,10 @@ import 'package:fitquest/features/home/pages/activities_page.dart';
 import 'package:fitquest/features/community/pages/leaderboard_page.dart';
 import 'package:fitquest/features/profile/pages/profile_page.dart';
 import 'package:fitquest/core/utils/haptic_feedback_service.dart';
+import 'package:fitquest/core/di/injection.dart';
+import 'package:fitquest/core/services/connectivity_service.dart';
+import 'package:fitquest/shared/widgets/offline_banner.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class MainNavigationPage extends StatefulWidget {
   const MainNavigationPage({super.key});
@@ -17,6 +21,8 @@ class _MainNavigationPageState extends State<MainNavigationPage>
     with SingleTickerProviderStateMixin {
   int _currentIndex = 0;
   late AnimationController _animationController;
+  ConnectivityResult _connectivityStatus = ConnectivityResult.none;
+  late ConnectivityService _connectivityService;
 
   final List<Widget> _pages = const [
     HomePage(),
@@ -32,6 +38,24 @@ class _MainNavigationPageState extends State<MainNavigationPage>
       vsync: this,
       duration: const Duration(milliseconds: 200),
     );
+    _connectivityService = getIt<ConnectivityService>();
+    _initConnectivity();
+  }
+
+  Future<void> _initConnectivity() async {
+    final status = await _connectivityService.getCurrentStatus();
+    if (mounted) {
+      setState(() {
+        _connectivityStatus = status;
+      });
+    }
+    _connectivityService.onConnectivityChanged.listen((result) {
+      if (mounted) {
+        setState(() {
+          _connectivityStatus = result;
+        });
+      }
+    });
   }
 
   @override
@@ -44,10 +68,19 @@ class _MainNavigationPageState extends State<MainNavigationPage>
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
+    final isOffline = _connectivityStatus == ConnectivityResult.none;
+    
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _pages,
+      body: Column(
+        children: [
+          OfflineBanner(isOffline: isOffline),
+          Expanded(
+            child: IndexedStack(
+              index: _currentIndex,
+              children: _pages,
+            ),
+          ),
+        ],
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(

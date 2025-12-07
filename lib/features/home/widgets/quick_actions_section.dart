@@ -82,57 +82,63 @@ class QuickActionsSection extends StatelessWidget {
           );
         },
         borderRadius: AppBorderRadius.allLG,
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: gradient,
-            borderRadius: AppBorderRadius.allLG,
-            boxShadow: AppShadows.soft,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 56,
-                height: 56,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.25),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.3),
-                    width: 1.5,
+        child: Semantics(
+          label: 'Quick action: $label',
+          button: true,
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: gradient,
+              borderRadius: AppBorderRadius.allLG,
+              boxShadow: AppShadows.soft,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.25),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.3),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: ClipOval(
+                    child: activityType != null
+                        ? ImageWithFallback(
+                            imageUrl:
+                                ActivityImageHelper.getQuickActionImageUrl(
+                                    activityType),
+                            assetPath:
+                                ActivityImageHelper.getQuickActionImagePath(
+                                    activityType),
+                            fallbackIcon: ActivityImageHelper.getActivityIcon(
+                                activityType),
+                            width: 56,
+                            height: 56,
+                            fit: BoxFit.cover,
+                            backgroundColor:
+                                Colors.white.withValues(alpha: 0.2),
+                            iconColor: Colors.white,
+                          )
+                        : Icon(icon, color: Colors.white, size: 28),
                   ),
                 ),
-                child: ClipOval(
-                  child: activityType != null
-                      ? ImageWithFallback(
-                          imageUrl: ActivityImageHelper.getQuickActionImageUrl(
-                              activityType),
-                          assetPath:
-                              ActivityImageHelper.getQuickActionImagePath(
-                                  activityType),
-                          fallbackIcon:
-                              ActivityImageHelper.getActivityIcon(activityType),
-                          width: 56,
-                          height: 56,
-                          fit: BoxFit.cover,
-                          backgroundColor: Colors.white.withValues(alpha: 0.2),
-                          iconColor: Colors.white,
-                        )
-                      : Icon(icon, color: Colors.white, size: 28),
+                const SizedBox(height: 10),
+                Text(
+                  label,
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                label,
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

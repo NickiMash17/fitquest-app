@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:fitquest/core/constants/app_colors.dart';
 import 'package:fitquest/core/constants/app_spacing.dart';
 import 'package:fitquest/shared/widgets/premium_card.dart';
@@ -52,6 +53,15 @@ class _SettingsPageState extends State<SettingsPage> {
     setState(() {
       _notificationsEnabled = value;
     });
+  }
+
+  Future<String> _getVersion() async {
+    try {
+      final packageInfo = await PackageInfo.fromPlatform();
+      return '${packageInfo.version} (${packageInfo.buildNumber})';
+    } catch (e) {
+      return '1.0.0';
+    }
   }
 
   @override
@@ -204,11 +214,16 @@ class _SettingsPageState extends State<SettingsPage> {
                       color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
-                  subtitle: Text(
-                    '1.0.0',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                  subtitle: FutureBuilder<String>(
+                    future: _getVersion(),
+                    builder: (context, snapshot) {
+                      return Text(
+                        snapshot.data ?? '1.0.0',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      );
+                    },
                   ),
                 ),
                 Divider(
@@ -235,7 +250,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                   onTap: () {
-                    // TODO: Show privacy policy
+                    Navigator.of(context).pushNamed('/privacy-policy');
                   },
                 ),
                 Divider(
@@ -262,7 +277,34 @@ class _SettingsPageState extends State<SettingsPage> {
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                   onTap: () {
-                    // TODO: Show terms of service
+                    Navigator.of(context).pushNamed('/terms-of-service');
+                  },
+                ),
+                Divider(
+                  height: 1,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .outline
+                      .withValues(alpha: 0.12),
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.info_outline_rounded,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                  title: Text(
+                    'About',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                  trailing: Icon(
+                    Icons.chevron_right_rounded,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pushNamed('/about');
                   },
                 ),
               ],

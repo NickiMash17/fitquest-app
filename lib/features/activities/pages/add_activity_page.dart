@@ -28,6 +28,7 @@ class _AddActivityPageState extends State<AddActivityPage> {
   late final XpCalculatorService _xpCalculator;
   bool _isSubmitting = false;
   int? _lastXp;
+  Timer? _timeoutTimer;
 
   @override
   void initState() {
@@ -38,6 +39,7 @@ class _AddActivityPageState extends State<AddActivityPage> {
 
   @override
   void dispose() {
+    _timeoutTimer?.cancel();
     _durationController.dispose();
     _notesController.dispose();
     super.dispose();
@@ -94,14 +96,29 @@ class _AddActivityPageState extends State<AddActivityPage> {
       _lastXp = _xpCalculator.calculateXp(activity);
 
       // Dispatch create event
-      context
-          .read<ActivityBloc>()
-          .add(ActivityCreateRequested(activity: activity));
+      debugPrint('AddActivityPage: Dispatching ActivityCreateRequested event');
+      debugPrint('AddActivityPage: Activity type: ${activity.type}, duration: ${activity.duration}');
+      final bloc = context.read<ActivityBloc>();
+      debugPrint('AddActivityPage: Current bloc state: ${bloc.state.runtimeType}');
+      bloc.add(ActivityCreateRequested(activity: activity));
+      debugPrint('AddActivityPage: Event dispatched, waiting for state change...');
+      
+      // Set a timeout - if we don't get a response in 10 seconds, show error
+      _timeoutTimer?.cancel();
+      _timeoutTimer = Timer(const Duration(seconds: 10), () {
+        if (mounted && _isSubmitting) {
+          debugPrint('AddActivityPage: TIMEOUT - No response after 10 seconds');
+          _handleActivityError('Request timed out. Please check your connection and try again.');
+        }
+      });
     }
   }
 
   void _handleActivityCreated() {
     if (!mounted || !_isSubmitting) return;
+    
+    _timeoutTimer?.cancel();
+    debugPrint('AddActivityPage: Activity created successfully, navigating back');
     
     final xp = _lastXp ?? 0;
 
@@ -109,23 +126,24 @@ class _AddActivityPageState extends State<AddActivityPage> {
       _isSubmitting = false;
     });
 
-    // Trigger a reload to ensure activities page sees the update
-    context.read<ActivityBloc>().add(const ActivitiesLoadRequested());
+    // Navigate back immediately
+    Navigator.of(context).pop();
     
-    // Wait a moment for the reload to start, then navigate
-    Future.delayed(const Duration(milliseconds: 200), () {
+    // Trigger a reload on the activities page
+    Future.delayed(const Duration(milliseconds: 100), () {
       if (mounted) {
-        Navigator.of(context).pop();
-        
-        // Show success message after navigation
-        Future.delayed(const Duration(milliseconds: 300), () {
-          if (mounted) {
-            EnhancedSnackBar.showSuccess(
-              context,
-              'Activity logged successfully! +$xp XP',
-            );
-          }
-        });
+        debugPrint('AddActivityPage: Triggering reload on activities page');
+        context.read<ActivityBloc>().add(const ActivitiesLoadRequested());
+      }
+    });
+    
+    // Show success message after navigation
+    Future.delayed(const Duration(milliseconds: 400), () {
+      if (mounted) {
+        EnhancedSnackBar.showSuccess(
+          context,
+          'Activity logged successfully! +$xp XP',
+        );
       }
     });
   }
@@ -133,14 +151,23 @@ class _AddActivityPageState extends State<AddActivityPage> {
   void _handleActivityError(String message) {
     if (!mounted) return;
 
+    _timeoutTimer?.cancel();
+    
     setState(() {
       _isSubmitting = false;
     });
 
+    debugPrint('AddActivityPage: Showing error to user: $message');
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Error: $message'),
         backgroundColor: Colors.red,
+        duration: const Duration(seconds: 5),
+        action: SnackBarAction(
+          label: 'Dismiss',
+          textColor: Colors.white,
+          onPressed: () {},
+        ),
       ),
     );
   }
@@ -149,21 +176,34 @@ class _AddActivityPageState extends State<AddActivityPage> {
   Widget build(BuildContext context) {
     return BlocListener<ActivityBloc, ActivityState>(
       listenWhen: (previous, current) {
+        debugPrint('AddActivityPage: listenWhen - previous: ${previous.runtimeType}, current: ${current.runtimeType}, submitting: $_isSubmitting');
+        
         // Only listen when we're submitting
-        if (!_isSubmitting) return false;
-
-        // Handle any error state
-        if (current is ActivityError) return true;
-
-        // Handle ActivityLoaded - check if this is a new state (different from previous)
-        if (current is ActivityLoaded) {
-          // If previous was also ActivityLoaded, only trigger if count changed
-          if (previous is ActivityLoaded) {
-            return previous.activities.length != current.activities.length;
-          }
-          return true; // First time we see ActivityLoaded after creation
+        if (!_isSubmitting) {
+          debugPrint('AddActivityPage: Not submitting, ignoring state change');
+          return false;
         }
 
+        // Handle any error state
+        if (current is ActivityError) {
+          debugPrint('AddActivityPage: Error state detected, will handle');
+          return true;
+        }
+
+        // Handle ActivityLoading - log it
+        if (current is ActivityLoading) {
+          debugPrint('AddActivityPage: Loading state detected');
+          return false; // Don't navigate on loading, just log
+        }
+
+        // Handle ActivityLoaded - always trigger when we see it after submitting
+        if (current is ActivityLoaded) {
+          debugPrint('AddActivityPage: ActivityLoaded detected with ${current.activities.length} activities');
+          // Always trigger if we're submitting - this means creation completed
+          return true;
+        }
+
+        debugPrint('AddActivityPage: State change not handled: ${current.runtimeType}');
         return false;
       },
       listener: (context, state) {
@@ -177,12 +217,13 @@ class _AddActivityPageState extends State<AddActivityPage> {
         } else if (state is ActivityLoaded) {
           debugPrint('AddActivityPage: Activities loaded - ${state.activities.length} activities');
           // Activity was created and activities reloaded
-          // Use a small delay to ensure the state is stable
-          Future.delayed(const Duration(milliseconds: 150), () {
-            if (mounted && _isSubmitting) {
-              _handleActivityCreated();
-            }
-          });
+          // Navigate back immediately - the activities page will show the updated list
+          if (mounted && _isSubmitting) {
+            _handleActivityCreated();
+          }
+        } else if (state is ActivityLoading) {
+          debugPrint('AddActivityPage: Activity creation in progress...');
+          // Keep showing loading state
         }
       },
       child: Scaffold(
