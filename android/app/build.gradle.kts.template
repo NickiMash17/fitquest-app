@@ -1,0 +1,34 @@
+# Instructions for adding signing configuration to build.gradle.kts
+# 
+# 1. Add this at the top of the file (after plugins block):
+#
+# val keystoreProperties = Properties()
+# val keystorePropertiesFile = rootProject.file("key.properties")
+# if (keystorePropertiesFile.exists()) {
+#     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+# }
+#
+# 2. Add signingConfigs block before defaultConfig:
+#
+# signingConfigs {
+#     create("release") {
+#         keyAlias = keystoreProperties["keyAlias"] as String
+#         keyPassword = keystoreProperties["keyPassword"] as String
+#         storeFile = file(keystoreProperties["storeFile"] as String)
+#         storePassword = keystoreProperties["storePassword"] as String
+#     }
+# }
+#
+# 3. Update release buildType to use signing config:
+#
+# buildTypes {
+#     release {
+#         signingConfig = signingConfigs.getByName("release")
+#         isMinifyEnabled = true
+#         proguardFiles(
+#             getDefaultProguardFile("proguard-android-optimize.txt"),
+#             "proguard-rules.pro"
+#         )
+#     }
+# }
+
