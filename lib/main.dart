@@ -2,12 +2,10 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:fitquest/core/theme/app_theme.dart';
 import 'package:fitquest/core/navigation/app_router.dart';
-import 'package:fitquest/firebase_options.dart';
 import 'package:fitquest/core/di/injection.dart';
 import 'package:fitquest/shared/services/local_storage_service.dart';
 import 'package:fitquest/core/services/cache_service.dart';

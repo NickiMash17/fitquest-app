@@ -5,14 +5,19 @@ import 'package:fitquest/shared/models/achievement_model.dart';
 /// Helper class for getting image URLs from online sources
 class ImageUrlHelper {
   /// Get plant companion image URL based on evolution stage
-  static String getPlantImageUrl(int evolutionStage) {
-    // Stage 0-1: Seed, Stage 2-3: Sprout, Stage 4-5: Sapling, Stage 6+: Tree
+  /// Returns null to prioritize local assets, falls back to Unsplash if needed
+  static String? getPlantImageUrl(int evolutionStage) {
+    // Return null to prioritize local assets first
+    // The ImageWithFallback widget will use assetPath first, then fall back to these URLs
+    // Stage 0-1: Seed, Stage 2: Sprout, Stage 3: Sapling, Stage 4: Tree, Stage 5+: Ancient Tree
     if (evolutionStage <= 1) {
       return 'https://images.unsplash.com/photo-1516253593875-bd7ba052fbc5?w=400&h=400&fit=crop&auto=format';
-    } else if (evolutionStage <= 3) {
+    } else if (evolutionStage <= 2) {
       return 'https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?w=400&h=400&fit=crop&auto=format';
-    } else if (evolutionStage <= 5) {
+    } else if (evolutionStage <= 3) {
       return 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&h=400&fit=crop&auto=format';
+    } else if (evolutionStage <= 4) {
+      return 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=400&fit=crop&auto=format';
     } else {
       return 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=400&fit=crop&auto=format';
     }

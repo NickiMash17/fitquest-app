@@ -19,6 +19,8 @@ import 'package:fitquest/features/calendar/pages/calendar_page.dart';
 import 'package:fitquest/features/profile/pages/privacy_policy_page.dart';
 import 'package:fitquest/features/profile/pages/terms_of_service_page.dart';
 import 'package:fitquest/features/profile/pages/about_page.dart';
+import 'package:fitquest/features/home/pages/plant_detail_page.dart';
+import 'package:fitquest/shared/models/user_model.dart';
 
 class AppRouter {
   // Route names
@@ -39,6 +41,7 @@ class AppRouter {
   static const String privacyPolicy = '/privacy-policy';
   static const String termsOfService = '/terms-of-service';
   static const String about = '/about';
+  static const String plantDetail = '/plant-detail';
 
   // Navigation methods
   static void navigateAndReplace(BuildContext context, String routeName) {
@@ -143,6 +146,12 @@ class AppRouter {
         return SlidePageRoute(
           direction: SlideDirection.left,
           child: const AboutPage(),
+        );
+      case plantDetail:
+        final user = routeSettings.arguments as UserModel;
+        return SlidePageRoute(
+          direction: SlideDirection.left,
+          child: PlantDetailPage(user: user),
         );
       default:
         return MaterialPageRoute(
