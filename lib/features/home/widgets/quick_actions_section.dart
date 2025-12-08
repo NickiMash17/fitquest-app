@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:fitquest/core/navigation/app_router.dart';
 import 'package:fitquest/core/constants/app_border_radius.dart';
-import 'package:fitquest/core/constants/app_shadows.dart';
 import 'package:fitquest/core/constants/app_colors.dart';
 import 'package:fitquest/shared/models/activity_model.dart';
 import 'package:fitquest/shared/widgets/image_with_fallback.dart';
@@ -71,73 +70,168 @@ class QuickActionsSection extends StatelessWidget {
     required Gradient gradient,
     ActivityType? activityType,
   }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () {
-          HapticFeedbackService.lightImpact();
-          Navigator.of(context).pushNamed(
-            AppRouter.addActivity,
-            arguments: activityType,
-          );
-        },
-        borderRadius: AppBorderRadius.allLG,
-        child: Semantics(
-          label: 'Quick action: $label',
-          button: true,
-          child: Container(
+    return _AnimatedActionButton(
+      gradient: gradient,
+      onTap: () {
+        HapticFeedbackService.lightImpact();
+        Navigator.of(context).pushNamed(
+          AppRouter.addActivity,
+          arguments: activityType,
+        );
+      },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 56,
+            height: 56,
             decoration: BoxDecoration(
-              gradient: gradient,
-              borderRadius: AppBorderRadius.allLG,
-              boxShadow: AppShadows.soft,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.25),
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.3),
-                      width: 1.5,
-                    ),
-                  ),
-                  child: ClipOval(
-                    child: activityType != null
-                        ? ImageWithFallback(
-                            imageUrl:
-                                ActivityImageHelper.getQuickActionImageUrl(
-                                    activityType),
-                            assetPath:
-                                ActivityImageHelper.getQuickActionImagePath(
-                                    activityType),
-                            fallbackIcon: ActivityImageHelper.getActivityIcon(
-                                activityType),
-                            width: 56,
-                            height: 56,
-                            fit: BoxFit.cover,
-                            backgroundColor:
-                                Colors.white.withValues(alpha: 0.2),
-                            iconColor: Colors.white,
-                          )
-                        : Icon(icon, color: Colors.white, size: 28),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  label,
-                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+              color: Colors.white.withValues(alpha: 0.25),
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.3),
+                width: 1.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
                 ),
               ],
+            ),
+            child: ClipOval(
+              child: activityType != null
+                  ? ImageWithFallback(
+                      imageUrl: ActivityImageHelper.getQuickActionImageUrl(
+                          activityType),
+                      assetPath: ActivityImageHelper.getQuickActionImagePath(
+                          activityType),
+                      fallbackIcon:
+                          ActivityImageHelper.getActivityIcon(activityType),
+                      width: 56,
+                      height: 56,
+                      fit: BoxFit.cover,
+                      backgroundColor: Colors.white.withValues(alpha: 0.2),
+                      iconColor: Colors.white,
+                    )
+                  : Icon(icon, color: Colors.white, size: 28),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.2,
+                ),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AnimatedActionButton extends StatefulWidget {
+  final Gradient gradient;
+  final VoidCallback onTap;
+  final Widget child;
+
+  const _AnimatedActionButton({
+    required this.gradient,
+    required this.onTap,
+    required this.child,
+  });
+
+  @override
+  State<_AnimatedActionButton> createState() => _AnimatedActionButtonState();
+}
+
+class _AnimatedActionButtonState extends State<_AnimatedActionButton>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 150),
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.92).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _handleTapDown(TapDownDetails details) {
+    _controller.forward();
+  }
+
+  void _handleTapUp(TapUpDetails details) {
+    _controller.reverse();
+    widget.onTap();
+  }
+
+  void _handleTapCancel() {
+    _controller.reverse();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: 'Quick action',
+      button: true,
+      child: GestureDetector(
+        onTapDown: _handleTapDown,
+        onTapUp: _handleTapUp,
+        onTapCancel: _handleTapCancel,
+        child: ScaleTransition(
+          scale: _scaleAnimation,
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: widget.gradient,
+              borderRadius: AppBorderRadius.allLG,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.15),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                  spreadRadius: 0,
+                ),
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.08),
+                  blurRadius: 24,
+                  offset: const Offset(0, 8),
+                  spreadRadius: 0,
+                ),
+              ],
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: null, // Handled by GestureDetector
+                borderRadius: AppBorderRadius.allLG,
+                splashColor: Colors.white.withValues(alpha: 0.2),
+                highlightColor: Colors.transparent,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 16,
+                  ),
+                  child: widget.child,
+                ),
+              ),
             ),
           ),
         ),
