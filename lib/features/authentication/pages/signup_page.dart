@@ -210,7 +210,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       icon: Icons.person_add_rounded,
                       gradient: AppColors.primaryGradient,
                       width: double.infinity,
-                      height: 56,
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
                     ),
                     if (state is AuthLoading)
                       const Padding(

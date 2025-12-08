@@ -8,7 +8,12 @@ import 'package:fitquest/features/activities/bloc/activity_event.dart';
 import 'package:fitquest/features/activities/bloc/activity_state.dart';
 import 'package:fitquest/shared/models/activity_model.dart';
 import 'package:fitquest/shared/widgets/enhanced_snackbar.dart';
+import 'package:fitquest/shared/widgets/premium_button.dart';
+import 'package:fitquest/shared/widgets/premium_card.dart';
+import 'package:fitquest/shared/widgets/premium_text_field.dart';
 import 'package:fitquest/shared/services/xp_calculator_service.dart';
+import 'package:fitquest/core/constants/app_colors.dart';
+import 'package:fitquest/core/constants/app_border_radius.dart';
 
 class AddActivityPage extends StatefulWidget {
   final ActivityType? initialType;
@@ -237,52 +242,242 @@ class _AddActivityPageState extends State<AddActivityPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Activity type selector
-                Text(
-                  'Activity Type',
-                  style: Theme.of(context).textTheme.titleMedium,
+                // Enhanced Activity type selector
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        gradient: AppColors.primaryGradient,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primaryGreen.withValues(alpha: 0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.category_rounded,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Activity Type',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.3,
+                          ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 Wrap(
                   spacing: 12,
                   runSpacing: 12,
                   children: ActivityType.values.map((type) {
                     final isSelected = _selectedType == type;
-                    return ChoiceChip(
-                      label: Text(_getActivityTypeName(type)),
-                      selected: isSelected,
-                      onSelected: (selected) {
+                    final color = _getActivityTypeColor(type);
+                    return GestureDetector(
+                      onTap: () {
                         setState(() {
                           _selectedType = type;
                         });
                       },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          gradient: isSelected
+                              ? LinearGradient(
+                                  colors: [
+                                    color,
+                                    color.withValues(alpha: 0.8),
+                                  ],
+                                )
+                              : null,
+                          color: isSelected ? null : Colors.transparent,
+                          borderRadius: AppBorderRadius.allMD,
+                          border: Border.all(
+                            color: isSelected
+                                ? color
+                                : Theme.of(context)
+                                    .colorScheme
+                                    .outline
+                                    .withValues(alpha: 0.3),
+                            width: isSelected ? 0 : 1.5,
+                          ),
+                          boxShadow: isSelected
+                              ? [
+                                  BoxShadow(
+                                    color: color.withValues(alpha: 0.4),
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ]
+                              : null,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              _getActivityTypeIcon(type),
+                              color: isSelected ? Colors.white : color,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              _getActivityTypeName(type),
+                              style: TextStyle(
+                                color: isSelected
+                                    ? Colors.white
+                                    : Theme.of(context)
+                                        .colorScheme
+                                        .onSurface,
+                                fontWeight:
+                                    isSelected ? FontWeight.w700 : FontWeight.w600,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     );
                   }).toList(),
                 ),
                 const SizedBox(height: 24),
-                // Date picker
-                Text(
-                  'Date',
-                  style: Theme.of(context).textTheme.titleMedium,
+                // Enhanced Date picker
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        gradient: AppColors.blueGradient,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.accentBlue.withValues(alpha: 0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.calendar_today_rounded,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Date',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.3,
+                          ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 12),
-                OutlinedButton.icon(
-                  onPressed: _selectDate,
-                  icon: const Icon(Icons.calendar_today),
-                  label: Text(
-                    '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
+                const SizedBox(height: 16),
+                PremiumCard(
+                  padding: const EdgeInsets.all(16),
+                  onTap: _selectDate,
+                  showShadow: true,
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: AppColors.accentBlue.withValues(alpha: 0.1),
+                          borderRadius: AppBorderRadius.allMD,
+                        ),
+                        child: Icon(
+                          Icons.calendar_today_rounded,
+                          color: AppColors.accentBlue,
+                          size: 24,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Tap to change',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Icon(
+                        Icons.chevron_right_rounded,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 24),
-                // Duration field
-                TextFormField(
+                // Enhanced Duration field
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        gradient: AppColors.accentGradient,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.accentOrange.withValues(alpha: 0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.timer_rounded,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      _getDurationLabel(),
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.3,
+                          ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                PremiumTextField(
                   controller: _durationController,
+                  hintText: _getDurationHint(),
+                  prefixIcon: Icons.timer_outlined,
                   keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    labelText: _getDurationLabel(),
-                    hintText: _getDurationHint(),
-                    prefixIcon: const Icon(Icons.timer_outlined),
-                  ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Duration is required';
@@ -295,30 +490,53 @@ class _AddActivityPageState extends State<AddActivityPage> {
                   },
                 ),
                 const SizedBox(height: 24),
-                // Notes field
-                TextFormField(
+                // Enhanced Notes field
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        gradient: AppColors.purpleGradient,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.accentPurple.withValues(alpha: 0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.note_rounded,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Notes (Optional)',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.3,
+                          ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                PremiumTextField(
                   controller: _notesController,
+                  hintText: 'Add any additional notes...',
+                  prefixIcon: Icons.note_outlined,
                   maxLines: 3,
-                  decoration: const InputDecoration(
-                    labelText: 'Notes (Optional)',
-                    hintText: 'Add any additional notes...',
-                    prefixIcon: Icon(Icons.note_outlined),
-                  ),
                 ),
                 const SizedBox(height: 32),
-                // Submit button
-                ElevatedButton(
+                // Premium Submit button
+                PremiumButton(
+                  label: 'Log Activity',
+                  icon: Icons.add_rounded,
                   onPressed: _isSubmitting ? null : _handleSubmit,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  child: _isSubmitting
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Text('Log Activity'),
+                  isLoading: _isSubmitting,
+                  gradient: AppColors.primaryGradient,
                 ),
               ],
             ),
@@ -366,6 +584,32 @@ class _AddActivityPageState extends State<AddActivityPage> {
         return 'e.g., 8';
       case null:
         return 'Enter value';
+    }
+  }
+
+  Color _getActivityTypeColor(ActivityType type) {
+    switch (type) {
+      case ActivityType.exercise:
+        return AppColors.accentPurple;
+      case ActivityType.meditation:
+        return AppColors.accentBlue;
+      case ActivityType.hydration:
+        return const Color(0xFF03A9F4);
+      case ActivityType.sleep:
+        return const Color(0xFF5C6BC0);
+    }
+  }
+
+  IconData _getActivityTypeIcon(ActivityType type) {
+    switch (type) {
+      case ActivityType.exercise:
+        return Icons.directions_run_rounded;
+      case ActivityType.meditation:
+        return Icons.self_improvement_rounded;
+      case ActivityType.hydration:
+        return Icons.water_drop_rounded;
+      case ActivityType.sleep:
+        return Icons.nightlight_round_rounded;
     }
   }
 }

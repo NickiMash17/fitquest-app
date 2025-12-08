@@ -183,7 +183,7 @@ class _LoginPageState extends State<LoginPage> {
                           icon: Icons.login_rounded,
                           gradient: AppColors.primaryGradient,
                           width: double.infinity,
-                          height: 56,
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
                         ),
                         if (state is AuthLoading)
                           const Padding(
