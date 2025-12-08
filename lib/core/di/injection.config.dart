@@ -9,7 +9,11 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:cloud_firestore/cloud_firestore.dart' as _i974;
+import 'package:firebase_analytics/firebase_analytics.dart' as _i398;
 import 'package:firebase_auth/firebase_auth.dart' as _i59;
+import 'package:fitquest/core/services/analytics_service.dart' as _i241;
+import 'package:fitquest/core/services/cache_service.dart' as _i524;
+import 'package:fitquest/core/services/connectivity_service.dart' as _i475;
 import 'package:fitquest/features/activities/bloc/activity_bloc.dart' as _i556;
 import 'package:fitquest/features/authentication/bloc/auth_bloc.dart' as _i1051;
 import 'package:fitquest/features/home/bloc/home_bloc.dart' as _i753;
@@ -20,6 +24,7 @@ import 'package:fitquest/shared/repositories/leaderboard_repository.dart'
     as _i601;
 import 'package:fitquest/shared/repositories/user_repository.dart' as _i595;
 import 'package:fitquest/shared/services/local_storage_service.dart' as _i405;
+import 'package:fitquest/shared/services/plant_service.dart' as _i959;
 import 'package:fitquest/shared/services/xp_calculator_service.dart' as _i947;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
@@ -35,16 +40,23 @@ extension GetItInjectableX on _i174.GetIt {
       environment,
       environmentFilter,
     );
+    gh.lazySingleton<_i524.CacheService>(() => _i524.CacheService());
+    gh.lazySingleton<_i475.ConnectivityService>(
+        () => _i475.ConnectivityService());
     gh.lazySingleton<_i405.LocalStorageService>(
         () => _i405.LocalStorageService());
     gh.lazySingleton<_i947.XpCalculatorService>(
         () => _i947.XpCalculatorService());
+    gh.lazySingleton<_i959.PlantService>(
+        () => _i959.PlantService(gh<_i947.XpCalculatorService>()));
     gh.lazySingleton<_i248.ActivityRepository>(
         () => _i248.ActivityRepository(gh<_i974.FirebaseFirestore>()));
     gh.lazySingleton<_i384.ChallengeRepository>(
         () => _i384.ChallengeRepository(gh<_i974.FirebaseFirestore>()));
     gh.lazySingleton<_i601.LeaderboardRepository>(
         () => _i601.LeaderboardRepository(gh<_i974.FirebaseFirestore>()));
+    gh.lazySingleton<_i241.AnalyticsService>(
+        () => _i241.AnalyticsService(gh<_i398.FirebaseAnalytics>()));
     gh.lazySingleton<_i595.UserRepository>(() => _i595.UserRepository(
           gh<_i974.FirebaseFirestore>(),
           gh<_i59.FirebaseAuth>(),

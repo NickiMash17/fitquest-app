@@ -142,7 +142,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Summary cards
+          // Enhanced Summary cards
           Row(
             children: [
               Expanded(
@@ -201,18 +201,25 @@ class _StatisticsPageState extends State<StatisticsPage> {
                   padding: const EdgeInsets.all(16),
                   child: Row(
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          gradient: AppColors.primaryGradient,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(
-                          Icons.bar_chart_rounded,
-                          color: Colors.white,
-                          size: 20,
-                        ),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        gradient: AppColors.primaryGradient,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primaryGreen.withValues(alpha: 0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
+                      child: const Icon(
+                        Icons.bar_chart_rounded,
+                        color: Colors.white,
+                        size: 22,
+                      ),
+                    ),
                       const SizedBox(width: 12),
                       Text(
                         'Weekly Activity',
@@ -246,15 +253,22 @@ class _StatisticsPageState extends State<StatisticsPage> {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         gradient: AppColors.accentGradient,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.accentOrange.withValues(alpha: 0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
                       child: const Icon(
                         Icons.pie_chart_rounded,
                         color: Colors.white,
-                        size: 20,
+                        size: 22,
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -287,26 +301,40 @@ class _StatisticsPageState extends State<StatisticsPage> {
     required Gradient gradient,
   }) {
     return PremiumCard(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       gradient: gradient,
+      showShadow: true,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: Colors.white, size: 24),
-          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.25),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.3),
+                width: 1,
+              ),
+            ),
+            child: Icon(icon, color: Colors.white, size: 24),
+          ),
+          const SizedBox(height: 16),
           Text(
             value,
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+            style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                   color: Colors.white,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.5,
                 ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
           Text(
             title,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Colors.white.withValues(alpha: 0.9),
-                  fontWeight: FontWeight.w500,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Colors.white.withValues(alpha: 0.95),
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.2,
                 ),
           ),
         ],

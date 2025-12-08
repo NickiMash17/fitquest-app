@@ -38,7 +38,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       },
       onError: (error) {
         _logger.w(
-            'Auth state change error (likely expired token), signing out: $error');
+            'Auth state change error (likely expired token), signing out: $error',);
         // If there's an error (like invalid credentials), sign out gracefully
         if (state is! AuthUnauthenticated) {
           add(const AuthSignOutRequested());

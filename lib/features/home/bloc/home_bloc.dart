@@ -74,30 +74,29 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       if (user == null) {
         _logger.e('User not found after retries: $userId');
         emit(const HomeError(
-            message: 'User not found. Please try signing in again.'));
+            message: 'User not found. Please try signing in again.',),);
         return;
       }
 
       _logger.d('User loaded successfully: ${user.displayName}');
 
-      // Load daily challenge (handle errors gracefully)
-      ChallengeModel? challenge;
-      try {
-        challenge = await _challengeRepository.getDailyChallenge();
-      } catch (e) {
-        _logger.w('Error loading challenge, continuing without it: $e');
-        challenge = null;
-      }
+      // PARALLEL FETCHING: Load challenge and activities concurrently
+      final results = await Future.wait([
+        // Load daily challenge
+        _challengeRepository.getDailyChallenge().catchError((e) {
+          _logger.w('Error loading challenge, continuing without it: $e');
+          return null;
+        }),
+        // Load today's activities
+        _activityRepository.getTodayActivities(userId).catchError((e) {
+          _logger.w(
+              'Error loading today activities, continuing with empty list: $e',);
+          return <ActivityModel>[];
+        }),
+      ], eagerError: false,);
 
-      // Load today's activities (handle errors gracefully)
-      List<ActivityModel> todayActivities = [];
-      try {
-        todayActivities = await _activityRepository.getTodayActivities(userId);
-      } catch (e) {
-        _logger.w(
-            'Error loading today activities, continuing with empty list: $e');
-        todayActivities = [];
-      }
+      final challenge = results[0] as ChallengeModel?;
+      final todayActivities = results[1] as List<ActivityModel>;
 
       final todayXp = todayActivities.fold<int>(
         0,

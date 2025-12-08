@@ -35,7 +35,7 @@ class UserRepository {
 
   /// Get user by ID with retry logic for offline scenarios
   Future<UserModel?> getUser(String userId) async {
-    int maxRetries = 3;
+    const int maxRetries = 3;
     int retryCount = 0;
     
     while (retryCount < maxRetries) {
@@ -158,10 +158,43 @@ class UserRepository {
         'longestStreak':
             streak > currentLongestStreak ? streak : currentLongestStreak,
         'lastActivityDate': FieldValue.serverTimestamp(),
+        'plantHealth': 100, // Reset health to 100 when activity is logged
         'updatedAt': FieldValue.serverTimestamp(),
       });
     } catch (e, stackTrace) {
       _logger.e('Error updating streak', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  /// Update plant health (called periodically to decay health)
+  Future<void> updatePlantHealth(String userId, int health) async {
+    try {
+      await _firestore
+          .collection(AppConstants.usersCollection)
+          .doc(userId)
+          .update({
+        'plantHealth': health.clamp(0, 100),
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    } catch (e, stackTrace) {
+      _logger.e('Error updating plant health', error: e, stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  /// Update plant evolution stage
+  Future<void> updatePlantEvolutionStage(String userId, int stage) async {
+    try {
+      await _firestore
+          .collection(AppConstants.usersCollection)
+          .doc(userId)
+          .update({
+        'plantEvolutionStage': stage,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    } catch (e, stackTrace) {
+      _logger.e('Error updating plant evolution stage', error: e, stackTrace: stackTrace);
       rethrow;
     }
   }

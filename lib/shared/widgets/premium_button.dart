@@ -1,18 +1,19 @@
 // lib/shared/widgets/premium_button.dart
 import 'package:flutter/material.dart';
-import 'package:fitquest/core/constants/app_border_radius.dart';
 import 'package:fitquest/core/constants/app_colors.dart';
+import 'package:fitquest/core/constants/app_border_radius.dart';
 
-/// Premium button with gradient and animations
+/// Premium button with advanced animations and effects
 class PremiumButton extends StatefulWidget {
   final String label;
   final VoidCallback? onPressed;
   final IconData? icon;
   final Gradient? gradient;
   final Color? backgroundColor;
-  final bool isOutlined;
+  final bool isLoading;
+  final bool isFullWidth;
   final double? width;
-  final double height;
+  final EdgeInsets? padding;
 
   const PremiumButton({
     super.key,
@@ -21,9 +22,10 @@ class PremiumButton extends StatefulWidget {
     this.icon,
     this.gradient,
     this.backgroundColor,
-    this.isOutlined = false,
+    this.isLoading = false,
+    this.isFullWidth = true,
     this.width,
-    this.height = 52,
+    this.padding,
   });
 
   @override
@@ -34,16 +36,23 @@ class _PremiumButtonState extends State<PremiumButton>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
+  late Animation<double> _glowAnimation;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 100),
       vsync: this,
+      duration: const Duration(milliseconds: 200),
     );
     _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+    _glowAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOut,
+      ),
     );
   }
 
@@ -53,68 +62,98 @@ class _PremiumButtonState extends State<PremiumButton>
     super.dispose();
   }
 
+  void _handleTapDown(TapDownDetails details) {
+    if (widget.onPressed != null && !widget.isLoading) {
+      _controller.forward();
+    }
+  }
+
+  void _handleTapUp(TapUpDetails details) {
+    _controller.reverse();
+  }
+
+  void _handleTapCancel() {
+    _controller.reverse();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final gradient = widget.gradient ?? AppColors.primaryGradient;
+    final backgroundColor = widget.backgroundColor ?? AppColors.primaryGreen;
+
     return GestureDetector(
-      onTapDown: (_) => _controller.forward(),
-      onTapUp: (_) {
-        _controller.reverse();
-        widget.onPressed?.call();
-      },
-      onTapCancel: () => _controller.reverse(),
+      onTapDown: _handleTapDown,
+      onTapUp: _handleTapUp,
+      onTapCancel: _handleTapCancel,
+      onTap: widget.isLoading ? null : widget.onPressed,
       child: ScaleTransition(
         scale: _scaleAnimation,
-        child: Container(
-          width: widget.width,
-          height: widget.height,
-          decoration: BoxDecoration(
-            gradient: widget.isOutlined
-                ? null
-                : (widget.gradient ?? AppColors.primaryGradient),
-            color: widget.isOutlined
-                ? Colors.transparent
-                : (widget.backgroundColor ?? AppColors.primaryGreen),
-            borderRadius: AppBorderRadius.allMD,
-            border: widget.isOutlined
-                ? Border.all(
-                    color: widget.backgroundColor ?? AppColors.primaryGreen,
-                    width: 2,
-                  )
-                : null,
-          ),
-          child: Material(
-            color: Colors.transparent,
-            child: Center(
+        child: AnimatedBuilder(
+          animation: _glowAnimation,
+          builder: (context, child) {
+            return Container(
+              width: widget.isFullWidth ? double.infinity : widget.width,
+              padding: widget.padding ??
+                  const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              decoration: BoxDecoration(
+                gradient: widget.gradient != null ? gradient : null,
+                color: widget.gradient == null ? backgroundColor : null,
+                borderRadius: AppBorderRadius.allLG,
+                boxShadow: [
+                  BoxShadow(
+                    color: (widget.gradient != null
+                            ? AppColors.primaryGreen
+                            : backgroundColor)
+                        .withValues(alpha: 0.4 * _glowAnimation.value),
+                    blurRadius: 20 * _glowAnimation.value,
+                    offset: Offset(0, 8 * _glowAnimation.value),
+                    spreadRadius: 2 * _glowAnimation.value,
+                  ),
+                  BoxShadow(
+                    color: (widget.gradient != null
+                            ? AppColors.primaryGreen
+                            : backgroundColor)
+                        .withValues(alpha: 0.2),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (widget.icon != null) ...[
+                  if (widget.isLoading)
+                    SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Colors.white,
+                        ),
+                      ),
+                    )
+                  else if (widget.icon != null) ...[
                     Icon(
                       widget.icon,
-                      color: widget.isOutlined
-                          ? (widget.backgroundColor ?? AppColors.primaryGreen)
-                          : Colors.white,
+                      color: Colors.white,
                       size: 20,
                     ),
                     const SizedBox(width: 8),
                   ],
                   Text(
                     widget.label,
-                    style: TextStyle(
-                      color: widget.isOutlined
-                          ? (widget.backgroundColor ?? AppColors.primaryGreen)
-                          : Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: 'Inter',
-                      letterSpacing: 0.5,
-                    ),
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.5,
+                        ),
                   ),
                 ],
               ),
-            ),
-          ),
+            );
+          },
         ),
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math' as math;
 import 'package:fitquest/core/navigation/app_router.dart';
 import 'package:fitquest/core/di/injection.dart';
 import 'package:fitquest/shared/services/local_storage_service.dart';
@@ -86,39 +87,140 @@ class _SplashPageState extends State<SplashPage>
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF4CAF50), Color(0xFF81C784)],
+            colors: [
+              const Color(0xFF4CAF50),
+              const Color(0xFF2E7D32),
+              const Color(0xFF4CAF50),
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
+            stops: const [0.0, 0.5, 1.0],
           ),
         ),
-        child: Center(
-          child: FadeTransition(
-            opacity: _fadeAnimation,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.eco,
-                  size: 80,
-                  color: Colors.white,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'FitQuest',
-                  style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+        child: Stack(
+          children: [
+            // Animated background particles
+            ...List.generate(15, (index) {
+              return Positioned(
+                left: (index * 30.0) % MediaQuery.of(context).size.width,
+                top: (index * 50.0) % MediaQuery.of(context).size.height,
+                child: AnimatedBuilder(
+                  animation: _animationController,
+                  builder: (context, child) {
+                    return Opacity(
+                      opacity: 0.1 +
+                          (math.sin(_animationController.value * 2 * math.pi +
+                                  index) *
+                              0.1),
+                      child: Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.white.withValues(alpha: 0.3),
+                              blurRadius: 20,
+                              spreadRadius: 5,
+                            ),
+                          ],
+                        ),
                       ),
+                    );
+                  },
                 ),
-                const SizedBox(height: 32),
-                const CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              );
+            }),
+            // Main content
+            Center(
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Animated logo
+                    AnimatedBuilder(
+                      animation: _animationController,
+                      builder: (context, child) {
+                        return Transform.scale(
+                          scale: 1.0 +
+                              (math.sin(_animationController.value *
+                                      2 *
+                                      math.pi) *
+                                  0.1),
+                          child: Transform.rotate(
+                            angle:
+                                math.sin(_animationController.value * math.pi) *
+                                    0.1,
+                            child: Container(
+                              padding: const EdgeInsets.all(24),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.white.withValues(alpha: 0.2),
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 3,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.white.withValues(alpha: 0.5),
+                                    blurRadius: 30,
+                                    spreadRadius: 10,
+                                  ),
+                                ],
+                              ),
+                              child: const Icon(
+                                Icons.eco_rounded,
+                                size: 64,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      'FitQuest',
+                      style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -1.0,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black.withValues(alpha: 0.3),
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Grow Your Wellness Journey',
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: Colors.white.withValues(alpha: 0.9),
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 0.5,
+                          ),
+                    ),
+                    const SizedBox(height: 48),
+                    SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        strokeWidth: 3,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );

@@ -9,16 +9,16 @@ void main() async {
   }
 
   final paint = Paint()..color = Colors.blue;
-  final textStyle = TextStyle(color: Colors.white, fontSize: 24);
+  const textStyle = TextStyle(color: Colors.white, fontSize: 24);
 
   for (int i = 1; i <= 3; i++) {
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
-    final size = Size(300, 300);
+    const size = Size(300, 300);
 
     // Draw background
     canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height),
-        paint..color = Colors.blue[300 + (i * 100)]!);
+        paint..color = Colors.blue[300 + (i * 100)]!,);
 
     // Draw text
     final text = TextPainter(

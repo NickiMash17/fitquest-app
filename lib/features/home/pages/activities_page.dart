@@ -4,22 +4,20 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fitquest/core/constants/app_colors.dart';
 import 'package:fitquest/core/constants/app_spacing.dart';
 import 'package:fitquest/core/constants/app_border_radius.dart';
-import 'package:fitquest/core/constants/app_shadows.dart';
 import 'package:fitquest/core/navigation/app_router.dart';
 import 'package:fitquest/shared/widgets/premium_card.dart';
-import 'package:fitquest/core/di/injection.dart';
 import 'package:fitquest/features/activities/bloc/activity_bloc.dart';
 import 'package:fitquest/features/activities/bloc/activity_event.dart';
 import 'package:fitquest/features/activities/bloc/activity_state.dart';
-import 'package:fitquest/shared/repositories/activity_repository.dart';
-import 'package:fitquest/shared/repositories/user_repository.dart';
-import 'package:fitquest/shared/services/xp_calculator_service.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitquest/shared/widgets/empty_state_widget.dart';
 import 'package:fitquest/core/utils/date_utils.dart' as app_date_utils;
 import 'package:fitquest/shared/models/activity_model.dart';
 import 'package:fitquest/shared/widgets/skeleton_loader.dart';
 import 'package:fitquest/shared/widgets/search_bar_widget.dart';
+import 'package:fitquest/shared/widgets/swipeable_card.dart';
+import 'package:fitquest/shared/widgets/image_with_fallback.dart';
+import 'package:fitquest/shared/widgets/floating_action_button_extended_premium.dart';
+import 'package:fitquest/core/utils/activity_image_helper.dart';
 
 class ActivitiesPage extends StatefulWidget {
   const ActivitiesPage({super.key});
@@ -33,51 +31,385 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
   ActivityType? _filterType;
 
   @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) {
-        try {
-          final bloc = getIt<ActivityBloc>();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Reload activities when page becomes visible
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        final bloc = context.read<ActivityBloc>();
+        // Only reload if we're not already loading
+        if (bloc.state is! ActivityLoading) {
+          debugPrint(
+              'ActivitiesPage: Triggering reload in didChangeDependencies');
           bloc.add(const ActivitiesLoadRequested());
-          return bloc;
-        } catch (e) {
-          debugPrint('Error creating ActivityBloc: $e');
-          // Fallback: create manually
-          return ActivityBloc(
-            getIt<ActivityRepository>(),
-            getIt<UserRepository>(),
-            getIt<XpCalculatorService>(),
-            getIt<FirebaseAuth>(),
-          )..add(const ActivitiesLoadRequested());
         }
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            'Activities',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          elevation: 0,
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Also reload when page is first created
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        debugPrint('ActivitiesPage: Triggering reload in initState');
+        context.read<ActivityBloc>().add(const ActivitiesLoadRequested());
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Use the ActivityBloc from the app level (provided in main.dart)
+    // Don't create a new instance - this ensures state is shared
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Activities',
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        body: BlocBuilder<ActivityBloc, ActivityState>(
-          builder: (context, state) {
-            debugPrint('ActivitiesPage state: ${state.runtimeType}');
+        elevation: 0,
+      ),
+      body: BlocConsumer<ActivityBloc, ActivityState>(
+        listener: (context, state) {
+          // Reload activities when returning from add activity page
+          if (state is ActivityLoaded) {
+            debugPrint(
+                'ActivitiesPage: Activities loaded - ${state.activities.length} activities');
+          } else if (state is ActivityError) {
+            debugPrint('ActivitiesPage: Error - ${state.message}');
+          }
+        },
+        buildWhen: (previous, current) {
+          // Always rebuild on state changes to show new activities
+          return true;
+        },
+        builder: (context, state) {
+          debugPrint(
+              'ActivitiesPage: Building with state ${state.runtimeType}');
 
-            // Handle initial state - trigger load
-            if (state is ActivityInitial) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                context
-                    .read<ActivityBloc>()
-                    .add(const ActivitiesLoadRequested());
-              });
-              return _buildSkeletonLoader(context);
+          // Handle initial state - trigger load
+          if (state is ActivityInitial) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              context.read<ActivityBloc>().add(const ActivitiesLoadRequested());
+            });
+            return _buildSkeletonLoader(context);
+          }
+
+          if (state is ActivityLoading) {
+            return _buildSkeletonLoader(context);
+          }
+
+          if (state is ActivityError) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.error_outline,
+                      size: 64,
+                      color: Colors.red,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Error',
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(state.message),
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: () {
+                        context
+                            .read<ActivityBloc>()
+                            .add(const ActivitiesLoadRequested());
+                      },
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
+          if (state is ActivityLoaded) {
+            debugPrint(
+              'ActivitiesPage: Loaded ${state.activities.length} activities',
+            );
+            // Log all activities for debugging
+            for (final activity in state.activities) {
+              debugPrint(
+                  '  Activity: id=${activity.id}, type=${activity.type.name}, date=${activity.date}, userId=${activity.userId}');
             }
+            try {
+              if (state.activities.isEmpty) {
+                return EmptyStateWidget(
+                  title: 'No Activities Yet',
+                  message: 'Start logging your activities to see them here!',
+                  icon: Icons.directions_run_outlined,
+                  action: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(AppRouter.addActivity);
+                    },
+                    icon: const Icon(Icons.add),
+                    label: const Text('Log Your First Activity'),
+                  ),
+                );
+              }
 
-            if (state is ActivityLoading) {
-              return _buildSkeletonLoader(context);
-            }
+              // Filter activities based on search and filter
+              final filteredActivities = _filterActivities(
+                state.activities,
+                _searchQuery,
+                _filterType,
+              );
 
-            if (state is ActivityError) {
+              return RefreshIndicator(
+                onRefresh: () async {
+                  context
+                      .read<ActivityBloc>()
+                      .add(const ActivitiesLoadRequested());
+                },
+                child: ListView(
+                  padding: AppSpacing.screenPadding,
+                  children: [
+                    // Search bar
+                    SearchBarWidget(
+                      hintText: 'Search activities...',
+                      onChanged: (query) {
+                        setState(() {
+                          _searchQuery = query;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    // Filter chips
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          _buildFilterChip(
+                            context,
+                            label: 'All',
+                            isSelected: _filterType == null,
+                            onTap: () {
+                              setState(() {
+                                _filterType = null;
+                              });
+                            },
+                          ),
+                          const SizedBox(width: 8),
+                          ...ActivityType.values.map(
+                            (type) => Padding(
+                              padding: const EdgeInsets.only(right: 8),
+                              child: _buildFilterChip(
+                                context,
+                                label: _getActivityTypeName(type),
+                                isSelected: _filterType == type,
+                                onTap: () {
+                                  setState(() {
+                                    _filterType =
+                                        _filterType == type ? null : type;
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    // Recent activities header
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            gradient: AppColors.primaryGradient,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.primaryGreen
+                                    .withValues(alpha: 0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.history_rounded,
+                            color: Colors.white,
+                            size: 22,
+                          ),
+                        ),
+                        const SizedBox(width: 14),
+                        Text(
+                          'Recent Activities',
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineMedium
+                              ?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: Theme.of(context).colorScheme.onSurface,
+                                letterSpacing: -0.3,
+                              ),
+                        ),
+                        const Spacer(),
+                        if (_searchQuery.isNotEmpty || _filterType != null)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color:
+                                  AppColors.primaryGreen.withValues(alpha: 0.1),
+                              borderRadius: AppBorderRadius.allMD,
+                              border: Border.all(
+                                color: AppColors.primaryGreen
+                                    .withValues(alpha: 0.2),
+                                width: 1,
+                              ),
+                            ),
+                            child: Text(
+                              '${filteredActivities.length} found',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelMedium
+                                  ?.copyWith(
+                                    color: AppColors.primaryGreen,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    if (filteredActivities.isEmpty)
+                      Padding(
+                        padding: const EdgeInsets.all(32.0),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.search_off_rounded,
+                              size: 64,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'No activities found',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Try adjusting your search or filter',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
+                            ),
+                          ],
+                        ),
+                      )
+                    else
+                      ...filteredActivities.map(
+                        (activity) => Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: _buildActivityCard(context, activity),
+                        ),
+                      ),
+                    const SizedBox(height: AppSpacing.lg),
+                    // Activity categories
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            gradient: AppColors.accentGradient,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.flash_on_rounded,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Quick Log',
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineMedium
+                              ?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: Theme.of(context).colorScheme.onSurface,
+                                letterSpacing: -0.3,
+                              ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    _buildActivityCategory(
+                      context,
+                      title: 'Exercise',
+                      icon: Icons.directions_run,
+                      color: Colors.blue,
+                      items: const [
+                        'Running',
+                        'Cycling',
+                        'Swimming',
+                        'Yoga',
+                        'Strength Training',
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    _buildActivityCategory(
+                      context,
+                      title: 'Mindfulness',
+                      icon: Icons.self_improvement,
+                      color: Colors.purple,
+                      items: const [
+                        'Meditation',
+                        'Deep Breathing',
+                        'Gratitude Journal',
+                        'Mindful Walking',
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    _buildActivityCategory(
+                      context,
+                      title: 'Nutrition',
+                      icon: Icons.restaurant,
+                      color: Colors.green,
+                      items: const [
+                        'Water Intake',
+                        'Healthy Meals',
+                        'Meal Prep',
+                        'Nutrition Log',
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            } catch (e, stackTrace) {
+              debugPrint('Error rendering activities: $e');
+              debugPrint('Stack: $stackTrace');
               return Center(
                 child: Padding(
                   padding: const EdgeInsets.all(24.0),
@@ -91,11 +423,11 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Error',
+                        'Error Rendering Activities',
                         style: Theme.of(context).textTheme.headlineSmall,
                       ),
                       const SizedBox(height: 8),
-                      Text(state.message),
+                      Text('Error: $e'),
                       const SizedBox(height: 24),
                       ElevatedButton(
                         onPressed: () {
@@ -110,336 +442,46 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                 ),
               );
             }
+          }
 
-            if (state is ActivityLoaded) {
-              debugPrint(
-                'ActivitiesPage: Loaded ${state.activities.length} activities',
-              );
-              try {
-                if (state.activities.isEmpty) {
-                  return EmptyStateWidget(
-                    title: 'No Activities Yet',
-                    message: 'Start logging your activities to see them here!',
-                    icon: Icons.directions_run_outlined,
-                    action: ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.of(context).pushNamed(AppRouter.addActivity);
-                      },
-                      icon: const Icon(Icons.add),
-                      label: const Text('Log Your First Activity'),
-                    ),
-                  );
-                }
-
-                // Filter activities based on search and filter
-                final filteredActivities = _filterActivities(
-                  state.activities,
-                  _searchQuery,
-                  _filterType,
-                );
-
-                return RefreshIndicator(
-                  onRefresh: () async {
+          // Fallback - should never reach here, but just in case
+          debugPrint('ActivitiesPage: Unknown state ${state.runtimeType}');
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.help_outline,
+                  size: 64,
+                  color: Color(0xFF616161),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Unknown State',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 8),
+                Text('State: ${state.runtimeType}'),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: () {
                     context
                         .read<ActivityBloc>()
                         .add(const ActivitiesLoadRequested());
                   },
-                  child: ListView(
-                    padding: AppSpacing.screenPadding,
-                    children: [
-                      // Search bar
-                      SearchBarWidget(
-                        hintText: 'Search activities...',
-                        onChanged: (query) {
-                          setState(() {
-                            _searchQuery = query;
-                          });
-                        },
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      // Filter chips
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: [
-                            _buildFilterChip(
-                              context,
-                              label: 'All',
-                              isSelected: _filterType == null,
-                              onTap: () {
-                                setState(() {
-                                  _filterType = null;
-                                });
-                              },
-                            ),
-                            const SizedBox(width: 8),
-                            ...ActivityType.values.map(
-                              (type) => Padding(
-                                padding: const EdgeInsets.only(right: 8),
-                                child: _buildFilterChip(
-                                  context,
-                                  label: _getActivityTypeName(type),
-                                  isSelected: _filterType == type,
-                                  onTap: () {
-                                    setState(() {
-                                      _filterType =
-                                          _filterType == type ? null : type;
-                                    });
-                                  },
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      // Recent activities header
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              gradient: AppColors.primaryGradient,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Icon(
-                              Icons.history_rounded,
-                              color: Colors.white,
-                              size: 20,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            'Recent Activities',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineMedium
-                                ?.copyWith(
-                                  fontWeight: FontWeight.w700,
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
-                                  letterSpacing: -0.3,
-                                ),
-                          ),
-                          const Spacer(),
-                          if (_searchQuery.isNotEmpty || _filterType != null)
-                            Text(
-                              '${filteredActivities.length} found',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
-                                  ?.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
-                                  ),
-                            ),
-                        ],
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      if (filteredActivities.isEmpty)
-                        Padding(
-                          padding: const EdgeInsets.all(32.0),
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.search_off_rounded,
-                                size: 64,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurfaceVariant,
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                'No activities found',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium
-                                    ?.copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurfaceVariant,
-                                    ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Try adjusting your search or filter',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall
-                                    ?.copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurfaceVariant,
-                                    ),
-                              ),
-                            ],
-                          ),
-                        )
-                      else
-                        ...filteredActivities.map(
-                          (activity) => Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: _buildActivityCard(context, activity),
-                          ),
-                        ),
-                      const SizedBox(height: AppSpacing.lg),
-                      // Activity categories
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              gradient: AppColors.accentGradient,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Icon(
-                              Icons.flash_on_rounded,
-                              color: Colors.white,
-                              size: 20,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            'Quick Log',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineMedium
-                                ?.copyWith(
-                                  fontWeight: FontWeight.w700,
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
-                                  letterSpacing: -0.3,
-                                ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      _buildActivityCategory(
-                        context,
-                        title: 'Exercise',
-                        icon: Icons.directions_run,
-                        color: Colors.blue,
-                        items: const [
-                          'Running',
-                          'Cycling',
-                          'Swimming',
-                          'Yoga',
-                          'Strength Training',
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                      _buildActivityCategory(
-                        context,
-                        title: 'Mindfulness',
-                        icon: Icons.self_improvement,
-                        color: Colors.purple,
-                        items: const [
-                          'Meditation',
-                          'Deep Breathing',
-                          'Gratitude Journal',
-                          'Mindful Walking',
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                      _buildActivityCategory(
-                        context,
-                        title: 'Nutrition',
-                        icon: Icons.restaurant,
-                        color: Colors.green,
-                        items: const [
-                          'Water Intake',
-                          'Healthy Meals',
-                          'Meal Prep',
-                          'Nutrition Log',
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              } catch (e, stackTrace) {
-                debugPrint('Error rendering activities: $e');
-                debugPrint('Stack: $stackTrace');
-                return Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.error_outline,
-                          size: 64,
-                          color: Colors.red,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Error Rendering Activities',
-                          style: Theme.of(context).textTheme.headlineSmall,
-                        ),
-                        const SizedBox(height: 8),
-                        Text('Error: $e'),
-                        const SizedBox(height: 24),
-                        ElevatedButton(
-                          onPressed: () {
-                            context
-                                .read<ActivityBloc>()
-                                .add(const ActivitiesLoadRequested());
-                          },
-                          child: const Text('Retry'),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }
-            }
-
-            // Fallback - should never reach here, but just in case
-            debugPrint('ActivitiesPage: Unknown state ${state.runtimeType}');
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.help_outline,
-                    size: 64,
-                    color: Color(0xFF616161),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Unknown State',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 8),
-                  Text('State: ${state.runtimeType}'),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: () {
-                      context
-                          .read<ActivityBloc>()
-                          .add(const ActivitiesLoadRequested());
-                    },
-                    child: const Text('Retry'),
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {
-            Navigator.of(context).pushNamed(AppRouter.addActivity);
-          },
-          backgroundColor: AppColors.primaryGreen,
-          icon: const Icon(Icons.add_rounded),
-          label: const Text(
-            'Log Activity',
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.5,
+                  child: const Text('Retry'),
+                ),
+              ],
             ),
-          ),
-        ),
+          );
+        },
+      ),
+      floatingActionButton: PremiumFloatingActionButton(
+        label: 'Log Activity',
+        icon: Icons.add_rounded,
+        onPressed: () {
+          Navigator.of(context).pushNamed(AppRouter.addActivity);
+        },
       ),
     );
   }
@@ -470,101 +512,417 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
       ],
     );
 
-    return PremiumCard(
-      padding: const EdgeInsets.all(16),
-      showShadow: true,
-      child: Row(
-        children: [
-          // Icon with gradient background
-          Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              gradient: activityGradient,
-              borderRadius: AppBorderRadius.allMD,
-              boxShadow: AppShadows.primaryShadow(activityColor),
-            ),
-            child: Icon(
-              _getActivityIcon(activity.type),
-              color: Colors.white,
-              size: 28,
-            ),
-          ),
-          const SizedBox(width: 16),
-          // Activity details
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _getActivityTypeName(activity.type),
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
-                      ),
+    return SwipeableCard(
+      leftAction:
+          const Icon(Icons.delete_outline, color: Colors.white, size: 24),
+      rightAction:
+          const Icon(Icons.edit_outlined, color: Colors.white, size: 24),
+      leftActionColor: Colors.red,
+      rightActionColor: AppColors.primaryGreen,
+      onSwipeLeft: () {
+        // Show delete confirmation
+        _showDeleteConfirmation(context, activity);
+      },
+      onSwipeRight: () {
+        // Navigate to edit activity
+        Navigator.of(context).pushNamed(
+          AppRouter.addActivity,
+          arguments: activity,
+        );
+      },
+      child: PremiumCard(
+        padding: const EdgeInsets.all(20),
+        showShadow: true,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        border: Border.all(
+          color: activityColor.withValues(alpha: 0.1),
+          width: 1,
+        ),
+        child: Row(
+          children: [
+            // Enhanced Activity image with gradient background
+            Container(
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                gradient: activityGradient,
+                borderRadius: AppBorderRadius.allLG,
+                boxShadow: [
+                  BoxShadow(
+                    color: activityColor.withValues(alpha: 0.4),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                    spreadRadius: 1,
+                  ),
+                ],
+              ),
+              child: GestureDetector(
+                onTap: () => _showActivityDetails(context, activity),
+                child: ClipRRect(
+                  borderRadius: AppBorderRadius.allLG,
+                  child: ImageWithFallback(
+                    imageUrl:
+                        ActivityImageHelper.getActivityImageUrl(activity.type),
+                    assetPath:
+                        ActivityImageHelper.getActivityImagePath(activity.type),
+                    fallbackIcon:
+                        ActivityImageHelper.getActivityIcon(activity.type),
+                    width: 72,
+                    height: 72,
+                    fit: BoxFit.cover,
+                    backgroundGradient: activityGradient,
+                    iconColor: Colors.white,
+                  ),
                 ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.access_time_rounded,
-                      size: 14,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                    const SizedBox(width: 4),
+              ),
+            ),
+            const SizedBox(width: 16),
+            // Enhanced Activity details
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          _getActivityTypeName(activity.type),
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: -0.3,
+                                  ),
+                        ),
+                      ),
+                      if (activity.xpEarned > 0)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            gradient: AppColors.primaryGradient,
+                            borderRadius: AppBorderRadius.allSM,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.star_rounded,
+                                color: Colors.white,
+                                size: 14,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '+${activity.xpEarned}',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelSmall
+                                    ?.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: activityColor.withValues(alpha: 0.1),
+                          borderRadius: AppBorderRadius.allSM,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.access_time_rounded,
+                              size: 14,
+                              color: activityColor,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              app_date_utils.DateUtils.formatDateTime(
+                                  activity.date),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelSmall
+                                  ?.copyWith(
+                                    color: activityColor,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (activity.duration > 0) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color:
+                                AppColors.primaryGreen.withValues(alpha: 0.1),
+                            borderRadius: AppBorderRadius.allSM,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.timer_rounded,
+                                size: 14,
+                                color: AppColors.primaryGreen,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '${activity.duration}min',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelSmall
+                                    ?.copyWith(
+                                      color: AppColors.primaryGreen,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                  if (activity.notes != null && activity.notes!.isNotEmpty) ...[
+                    const SizedBox(height: 8),
                     Text(
-                      app_date_utils.DateUtils.formatDateTime(activity.date),
+                      activity.notes!,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color:
                                 Theme.of(context).colorScheme.onSurfaceVariant,
+                            height: 1.4,
                           ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
+                ],
+              ),
+            ),
+            // XP and duration
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  decoration: const BoxDecoration(
+                    gradient: AppColors.primaryGradient,
+                    borderRadius: AppBorderRadius.allSM,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.star_rounded,
+                        color: Colors.white,
+                        size: 14,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '+${activity.xpEarned}',
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                            ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  '${activity.duration} min',
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w500,
+                      ),
                 ),
               ],
             ),
-          ),
-          // XP and duration
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 6,
-                ),
-                decoration: const BoxDecoration(
-                  gradient: AppColors.primaryGradient,
-                  borderRadius: AppBorderRadius.allSM,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showActivityDetails(BuildContext context, ActivityModel activity) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.7,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          children: [
+            Container(
+              margin: const EdgeInsets.only(top: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurfaceVariant
+                    .withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(
-                      Icons.star_rounded,
-                      color: Colors.white,
-                      size: 14,
+                    Center(
+                      child: ImageWithFallback(
+                        imageUrl: ActivityImageHelper.getActivityImageUrl(
+                            activity.type),
+                        assetPath: ActivityImageHelper.getActivityImagePath(
+                            activity.type),
+                        fallbackIcon:
+                            ActivityImageHelper.getActivityIcon(activity.type),
+                        width: 120,
+                        height: 120,
+                        fit: BoxFit.contain,
+                        backgroundColor: _getActivityColor(activity.type)
+                            .withValues(alpha: 0.1),
+                        iconColor: _getActivityColor(activity.type),
+                      ),
                     ),
-                    const SizedBox(width: 4),
+                    const SizedBox(height: 24),
                     Text(
-                      '+${activity.xpEarned}',
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                          ),
+                      _getActivityTypeName(activity.type),
+                      style:
+                          Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
                     ),
+                    const SizedBox(height: 16),
+                    _buildDetailItem(
+                      context,
+                      icon: Icons.access_time_rounded,
+                      label: 'Date & Time',
+                      value: app_date_utils.DateUtils.formatDateTime(
+                          activity.date),
+                    ),
+                    const SizedBox(height: 12),
+                    _buildDetailItem(
+                      context,
+                      icon: Icons.timer_outlined,
+                      label: 'Duration',
+                      value: '${activity.duration} minutes',
+                    ),
+                    if (activity.xpEarned > 0) ...[
+                      const SizedBox(height: 12),
+                      _buildDetailItem(
+                        context,
+                        icon: Icons.star_rounded,
+                        label: 'XP Earned',
+                        value: '+${activity.xpEarned}',
+                      ),
+                    ],
+                    if (activity.notes != null &&
+                        activity.notes!.isNotEmpty) ...[
+                      const SizedBox(height: 12),
+                      _buildDetailItem(
+                        context,
+                        icon: Icons.note_outlined,
+                        label: 'Notes',
+                        value: activity.notes!,
+                      ),
+                    ],
                   ],
                 ),
               ),
-              const SizedBox(height: 6),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailItem(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 20, color: _getActivityColor(ActivityType.exercise)),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               Text(
-                '${activity.duration} min',
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                label,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      fontWeight: FontWeight.w500,
+                    ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                value,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
                     ),
               ),
             ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showDeleteConfirmation(BuildContext context, ActivityModel activity) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Activity?'),
+        content: Text(
+            'Are you sure you want to delete this ${_getActivityTypeName(activity.type).toLowerCase()} activity?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              // TODO: Implement delete functionality
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: Text('Delete functionality coming soon')),
+              );
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+            ),
+            child: const Text('Delete'),
           ),
         ],
       ),
@@ -581,19 +939,6 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
         return 'Hydration';
       case ActivityType.sleep:
         return 'Sleep';
-    }
-  }
-
-  IconData _getActivityIcon(ActivityType type) {
-    switch (type) {
-      case ActivityType.exercise:
-        return Icons.directions_run;
-      case ActivityType.meditation:
-        return Icons.self_improvement;
-      case ActivityType.hydration:
-        return Icons.water_drop;
-      case ActivityType.sleep:
-        return Icons.nightlight_round;
     }
   }
 
@@ -707,17 +1052,57 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
     required bool isSelected,
     required VoidCallback onTap,
   }) {
-    return FilterChip(
-      label: Text(label),
-      selected: isSelected,
-      onSelected: (_) => onTap(),
-      selectedColor: AppColors.primaryGreen.withValues(alpha: 0.2),
-      checkmarkColor: AppColors.primaryGreen,
-      labelStyle: TextStyle(
-        color: isSelected
-            ? AppColors.primaryGreen
-            : Theme.of(context).colorScheme.onSurfaceVariant,
-        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          gradient: isSelected ? AppColors.primaryGradient : null,
+          color: isSelected
+              ? null
+              : Theme.of(context).colorScheme.surfaceContainerHighest,
+          borderRadius: AppBorderRadius.allMD,
+          border: Border.all(
+            color: isSelected
+                ? AppColors.primaryGreen
+                : Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+            width: isSelected ? 0 : 1,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: AppColors.primaryGreen.withValues(alpha: 0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (isSelected)
+              const Icon(
+                Icons.check_circle_rounded,
+                color: Colors.white,
+                size: 18,
+              ),
+            if (isSelected) const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected
+                    ? Colors.white
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                fontSize: 14,
+                letterSpacing: 0.2,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

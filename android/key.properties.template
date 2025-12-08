@@ -1,0 +1,9 @@
+# Template for key.properties
+# Copy this file to android/key.properties and fill in your values
+# DO NOT commit key.properties to version control!
+
+storePassword=YOUR_STORE_PASSWORD
+keyPassword=YOUR_KEY_PASSWORD
+keyAlias=upload
+storeFile=YOUR_KEYSTORE_PATH
+

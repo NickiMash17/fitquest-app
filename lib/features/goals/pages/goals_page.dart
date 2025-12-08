@@ -50,13 +50,13 @@ class _GoalsPageState extends State<GoalsPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Container(
-              padding: EdgeInsets.all(24),
-              decoration: BoxDecoration(
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: const BoxDecoration(
                 gradient: AppColors.primaryGradient,
                 shape: BoxShape.circle,
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.flag_rounded,
                 color: Colors.white,
                 size: 64,

@@ -5,6 +5,7 @@ import 'package:fitquest/core/constants/app_spacing.dart';
 import 'package:fitquest/core/constants/app_border_radius.dart';
 import 'package:fitquest/core/navigation/app_router.dart';
 import 'package:fitquest/shared/widgets/premium_card.dart';
+import 'package:fitquest/shared/widgets/premium_avatar.dart';
 import 'package:fitquest/features/authentication/bloc/auth_bloc.dart';
 import 'package:fitquest/features/authentication/bloc/auth_event.dart';
 import 'package:fitquest/features/authentication/bloc/auth_state.dart';
@@ -41,47 +42,11 @@ class ProfilePage extends StatelessWidget {
                     gradient: AppColors.primaryGradient,
                     child: Column(
                       children: [
-                        Container(
-                          width: 100,
-                          height: 100,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Colors.white,
-                              width: 4,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.2),
-                                blurRadius: 16,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                            image: user.photoUrl != null
-                                ? DecorationImage(
-                                    image: NetworkImage(user.photoUrl!),
-                                    fit: BoxFit.cover,
-                                  )
-                                : null,
-                            gradient: user.photoUrl == null
-                                ? AppColors.primaryGradient
-                                : null,
-                          ),
-                          child: user.photoUrl == null
-                              ? Center(
-                                  child: Text(
-                                    user.displayName
-                                            ?.substring(0, 1)
-                                            .toUpperCase() ??
-                                        'U',
-                                    style: const TextStyle(
-                                      fontSize: 40,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                )
-                              : null,
+                        AnimatedPremiumAvatar(
+                          user: user,
+                          size: 100,
+                          showBadge: true,
+                          showLevelRing: true,
                         ),
                         const SizedBox(height: 20),
                         Text(
@@ -297,7 +262,7 @@ class ProfilePage extends StatelessWidget {
           Text(
             label,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.white.withOpacity(0.9),
+                  color: Colors.white.withValues(alpha: 0.9),
                   fontWeight: FontWeight.w500,
                 ),
             textAlign: TextAlign.center,

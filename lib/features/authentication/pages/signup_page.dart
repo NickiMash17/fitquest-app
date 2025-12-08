@@ -5,6 +5,7 @@ import 'package:fitquest/core/constants/app_spacing.dart';
 import 'package:fitquest/core/utils/validators.dart';
 import 'package:fitquest/core/navigation/app_router.dart';
 import 'package:fitquest/shared/widgets/premium_button.dart';
+import 'package:fitquest/shared/widgets/theme_toggle_button.dart';
 import 'package:fitquest/features/authentication/bloc/auth_bloc.dart';
 import 'package:fitquest/features/authentication/bloc/auth_event.dart';
 import 'package:fitquest/features/authentication/bloc/auth_state.dart';
@@ -57,6 +58,9 @@ class _SignUpPageState extends State<SignUpPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Create Account'),
+        actions: const [
+          ThemeToggleButton(),
+        ],
       ),
       body: SafeArea(
         child: BlocConsumer<AuthBloc, AuthState>(
@@ -196,7 +200,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                       ),
                       validator: (value) => Validators.required(value,
-                          fieldName: 'Confirm Password'),
+                          fieldName: 'Confirm Password',),
                     ),
                     const SizedBox(height: 32),
                     // Sign up button
@@ -206,7 +210,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       icon: Icons.person_add_rounded,
                       gradient: AppColors.primaryGradient,
                       width: double.infinity,
-                      height: 56,
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
                     ),
                     if (state is AuthLoading)
                       const Padding(
@@ -232,7 +236,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         TextButton(
                           onPressed: () {
                             AppRouter.navigateAndReplace(
-                                context, AppRouter.login);
+                                context, AppRouter.login,);
                           },
                           style: TextButton.styleFrom(
                             padding: const EdgeInsets.symmetric(
@@ -240,7 +244,7 @@ class _SignUpPageState extends State<SignUpPage> {
                               vertical: 4,
                             ),
                           ),
-                          child: Text(
+                          child: const Text(
                             'Sign In',
                             style: TextStyle(
                               color: AppColors.primaryGreen,

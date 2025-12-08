@@ -36,7 +36,7 @@ class LeaderboardRepository {
           currentLevel: data['currentLevel'] ?? 1,
           currentStreak: data['currentStreak'] ?? 0,
           rank: rank++,
-        ));
+        ),);
       }
 
       return entries;

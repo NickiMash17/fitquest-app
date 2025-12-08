@@ -5,7 +5,9 @@ import 'package:fitquest/core/constants/app_border_radius.dart';
 import 'package:fitquest/shared/repositories/leaderboard_repository.dart';
 import 'package:fitquest/core/di/injection.dart';
 import 'package:fitquest/shared/models/leaderboard_entry.dart';
+import 'package:fitquest/shared/models/user_model.dart';
 import 'package:fitquest/shared/widgets/premium_card.dart';
+import 'package:fitquest/shared/widgets/premium_avatar.dart';
 
 class LeaderboardPage extends StatefulWidget {
   const LeaderboardPage({super.key});
@@ -97,37 +99,65 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                   final entry = _entries[index];
                   final rankGradient = _getRankGradient(entry.rank);
 
+                  // Create user model for avatar
+                  final userModel = UserModel(
+                    id: entry.userId,
+                    email: '',
+                    displayName: entry.displayName,
+                    photoUrl: entry.photoUrl,
+                    totalXp: entry.totalXp,
+                    currentLevel: entry.currentLevel,
+                    currentStreak: entry.currentStreak,
+                  );
+
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 12),
                     child: PremiumCard(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(20),
                       showShadow: true,
+                      backgroundColor: entry.rank <= 3
+                          ? _getRankColor(entry.rank)
+                              .withValues(alpha: 0.05)
+                          : null,
+                      border: entry.rank <= 3
+                          ? Border.all(
+                              color: _getRankColor(entry.rank)
+                                  .withValues(alpha: 0.3),
+                              width: 2,
+                            )
+                          : null,
                       child: Row(
                         children: [
-                          // Rank icon with gradient
-                          Container(
-                            width: 56,
-                            height: 56,
-                            decoration: BoxDecoration(
-                              gradient: rankGradient,
-                              color: rankGradient == null
-                                  ? _getRankColor(entry.rank)
-                                  : null,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: _getRankColor(entry.rank)
-                                      .withValues(alpha: 0.3),
-                                  blurRadius: 8,
-                                  spreadRadius: 1,
-                                ),
-                              ],
+                          // Rank badge for top 3
+                          if (entry.rank <= 3)
+                            Container(
+                              width: 48,
+                              height: 48,
+                              decoration: BoxDecoration(
+                                gradient: rankGradient,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: _getRankColor(entry.rank)
+                                        .withValues(alpha: 0.4),
+                                    blurRadius: 12,
+                                    spreadRadius: 2,
+                                  ),
+                                ],
+                              ),
+                              child: Icon(
+                                _getRankIcon(entry.rank),
+                                color: Colors.white,
+                                size: 24,
+                              ),
                             ),
-                            child: Icon(
-                              _getRankIcon(entry.rank),
-                              color: Colors.white,
-                              size: 28,
-                            ),
+                          if (entry.rank <= 3) const SizedBox(width: 16),
+                          // Premium Avatar
+                          PremiumAvatar(
+                            user: userModel,
+                            size: 56,
+                            showBadge: true,
+                            showLevelRing: true,
                           ),
                           const SizedBox(width: 16),
                           // User info
@@ -135,103 +165,165 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  entry.displayName,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium
-                                      ?.copyWith(
-                                        fontWeight: FontWeight.w700,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface,
-                                      ),
-                                ),
-                                const SizedBox(height: 4),
                                 Row(
                                   children: [
-                                    Icon(
-                                      Icons.emoji_events_rounded,
-                                      size: 14,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurfaceVariant,
+                                    Flexible(
+                                      child: Text(
+                                        entry.displayName,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.w700,
+                                              letterSpacing: -0.3,
+                                            ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                     ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      'Level ${entry.currentLevel}',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall
-                                          ?.copyWith(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onSurfaceVariant,
+                                    if (entry.rank <= 3) ...[
+                                      const SizedBox(width: 8),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          gradient: rankGradient,
+                                          borderRadius:
+                                              AppBorderRadius.allSM,
+                                        ),
+                                        child: Text(
+                                          '#${entry.rank}',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .labelSmall
+                                              ?.copyWith(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                        ),
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 4,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.primaryGreen
+                                            .withValues(alpha: 0.1),
+                                        borderRadius: AppBorderRadius.allSM,
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            Icons.emoji_events_rounded,
+                                            size: 14,
+                                            color: AppColors.primaryGreen,
                                           ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Icon(
-                                      Icons.local_fire_department_rounded,
-                                      size: 14,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurfaceVariant,
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      '${entry.currentStreak} day streak',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall
-                                          ?.copyWith(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onSurfaceVariant,
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            'Lvl ${entry.currentLevel}',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .labelSmall
+                                                ?.copyWith(
+                                                  color: AppColors.primaryGreen,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
                                           ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 4,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.accentOrange
+                                            .withValues(alpha: 0.1),
+                                        borderRadius: AppBorderRadius.allSM,
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            Icons.local_fire_department_rounded,
+                                            size: 14,
+                                            color: AppColors.accentOrange,
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            '${entry.currentStreak}',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .labelSmall
+                                                ?.copyWith(
+                                                  color: AppColors.accentOrange,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ],
                                 ),
                               ],
                             ),
                           ),
-                          // XP and rank
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 6,
+                          // XP badge
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              gradient: AppColors.primaryGradient,
+                              borderRadius: AppBorderRadius.allMD,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.primaryGreen
+                                      .withValues(alpha: 0.3),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
                                 ),
-                                decoration: const BoxDecoration(
-                                  gradient: AppColors.primaryGradient,
-                                  borderRadius: AppBorderRadius.allSM,
-                                ),
-                                child: Text(
-                                  '${entry.totalXp} XP',
+                              ],
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  '${entry.totalXp}',
                                   style: Theme.of(context)
                                       .textTheme
-                                      .labelLarge
+                                      .titleSmall
                                       ?.copyWith(
                                         color: Colors.white,
-                                        fontWeight: FontWeight.w700,
+                                        fontWeight: FontWeight.w800,
+                                        letterSpacing: -0.5,
                                       ),
                                 ),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                '#${entry.rank}',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .labelSmall
-                                    ?.copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurfaceVariant,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                              ),
-                            ],
+                                Text(
+                                  'XP',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .labelSmall
+                                      ?.copyWith(
+                                        color: Colors.white.withValues(alpha: 0.9),
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),

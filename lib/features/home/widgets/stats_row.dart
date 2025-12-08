@@ -77,34 +77,49 @@ class StatsRow extends StatelessWidget {
     required Color iconColor,
   }) {
     return PremiumCard(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       showShadow: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      border: Border.all(
+        color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+        width: 1,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               gradient: gradient,
               shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: iconColor.withValues(alpha: 0.3),
+                  blurRadius: 12,
+                  spreadRadius: 2,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-            child: Icon(icon, color: Colors.white, size: 22),
+            child: Icon(icon, color: Colors.white, size: 24),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           AnimatedCounter(
             value: _extractNumber(value),
             textStyle: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w800,
                   color: Theme.of(context).colorScheme.onSurface,
+                  letterSpacing: -0.5,
                 ),
             prefix: value.startsWith('Lvl') ? 'Lvl ' : null,
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
           Text(
             label,
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.2,
                 ),
             textAlign: TextAlign.center,
           ),

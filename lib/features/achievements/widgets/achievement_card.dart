@@ -3,6 +3,8 @@ import 'package:fitquest/core/constants/app_colors.dart';
 import 'package:fitquest/core/constants/app_border_radius.dart';
 import 'package:fitquest/shared/widgets/premium_card.dart';
 import 'package:fitquest/shared/models/achievement_model.dart';
+import 'package:fitquest/shared/widgets/image_with_fallback.dart';
+import 'package:fitquest/core/utils/achievement_image_helper.dart';
 import 'package:confetti/confetti.dart';
 
 class AchievementCard extends StatefulWidget {
@@ -50,12 +52,14 @@ class _AchievementCardState extends State<AchievementCard> {
             children: [
               Row(
                 children: [
-                  // Achievement icon
+                  // Achievement badge image
                   Container(
-                    width: 56,
-                    height: 56,
+                    width: 64,
+                    height: 64,
                     decoration: BoxDecoration(
-                      gradient: _getRarityGradient(widget.achievement.rarity),
+                      gradient: isUnlocked
+                          ? _getRarityGradient(widget.achievement.rarity)
+                          : null,
                       borderRadius: AppBorderRadius.allMD,
                       boxShadow: isUnlocked
                           ? [
@@ -69,10 +73,46 @@ class _AchievementCardState extends State<AchievementCard> {
                             ]
                           : null,
                     ),
-                    child: Icon(
-                      _getAchievementIcon(widget.achievement.type),
-                      color: Colors.white,
-                      size: 28,
+                    child: GestureDetector(
+                      onTap: () => _showAchievementDetails(context),
+                      onDoubleTap: isUnlocked
+                          ? () {
+                              _confettiController.play();
+                            }
+                          : null,
+                      child: ImageWithFallback(
+                        imageUrl: isUnlocked
+                            ? AchievementImageHelper.getBadgeImageUrl(
+                                widget.achievement.type,
+                                widget.achievement.rarity,
+                              )
+                            : AchievementImageHelper.getLockedBadgeUrl(
+                                widget.achievement.rarity,
+                              ),
+                        assetPath: isUnlocked
+                            ? AchievementImageHelper.getBadgeImagePath(
+                                widget.achievement.type,
+                                widget.achievement.rarity,
+                              )
+                            : AchievementImageHelper.getLockedBadgePath(
+                                widget.achievement.rarity,
+                              ),
+                        fallbackIcon: AchievementImageHelper.getAchievementIcon(
+                          widget.achievement.type,
+                        ),
+                        width: 64,
+                        height: 64,
+                        fit: BoxFit.cover,
+                        backgroundGradient: isUnlocked
+                            ? _getRarityGradient(widget.achievement.rarity)
+                            : null,
+                        backgroundColor: isUnlocked
+                            ? null
+                            : Theme.of(context)
+                                .colorScheme
+                                .surfaceContainerHighest,
+                        iconColor: Colors.white,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -253,18 +293,157 @@ class _AchievementCardState extends State<AchievementCard> {
     }
   }
 
-  IconData _getAchievementIcon(AchievementType type) {
-    switch (type) {
-      case AchievementType.streak:
-        return Icons.local_fire_department_rounded;
-      case AchievementType.xp:
-        return Icons.star_rounded;
-      case AchievementType.activities:
-        return Icons.directions_run_rounded;
-      case AchievementType.level:
-        return Icons.emoji_events_rounded;
-      case AchievementType.special:
-        return Icons.diamond_rounded;
-    }
+  void _showAchievementDetails(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.6,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          children: [
+            Container(
+              margin: const EdgeInsets.only(top: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurfaceVariant
+                    .withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    ImageWithFallback(
+                      imageUrl: widget.achievement.unlocked
+                          ? AchievementImageHelper.getBadgeImageUrl(
+                              widget.achievement.type,
+                              widget.achievement.rarity,
+                            )
+                          : AchievementImageHelper.getLockedBadgeUrl(
+                              widget.achievement.rarity,
+                            ),
+                      assetPath: widget.achievement.unlocked
+                          ? AchievementImageHelper.getBadgeImagePath(
+                              widget.achievement.type,
+                              widget.achievement.rarity,
+                            )
+                          : AchievementImageHelper.getLockedBadgePath(
+                              widget.achievement.rarity,
+                            ),
+                      fallbackIcon: AchievementImageHelper.getAchievementIcon(
+                        widget.achievement.type,
+                      ),
+                      width: 120,
+                      height: 120,
+                      fit: BoxFit.contain,
+                      backgroundGradient: widget.achievement.unlocked
+                          ? _getRarityGradient(widget.achievement.rarity)
+                          : null,
+                      backgroundColor: widget.achievement.unlocked
+                          ? null
+                          : Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerHighest,
+                      iconColor: _getRarityColor(widget.achievement.rarity),
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      widget.achievement.title,
+                      style:
+                          Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient: _getRarityGradient(widget.achievement.rarity),
+                        borderRadius: AppBorderRadius.allSM,
+                      ),
+                      child: Text(
+                        widget.achievement.rarity.name.toUpperCase(),
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1.2,
+                            ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      widget.achievement.description,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 24),
+                    if (!widget.achievement.unlocked) ...[
+                      Text(
+                        'Progress',
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        '${widget.achievement.currentProgress} / ${widget.achievement.targetValue}',
+                        style:
+                            Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                      ),
+                    ] else ...[
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          gradient: AppColors.primaryGradient,
+                          borderRadius: AppBorderRadius.allMD,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.star_rounded,
+                              color: Colors.white,
+                              size: 24,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              '+${widget.achievement.xpReward} XP Earned',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
