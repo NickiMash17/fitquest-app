@@ -7,6 +7,7 @@ import 'package:fitquest/shared/repositories/activity_repository.dart';
 import 'package:fitquest/shared/repositories/challenge_repository.dart';
 import 'package:fitquest/shared/repositories/leaderboard_repository.dart';
 import 'package:fitquest/shared/services/xp_calculator_service.dart';
+import 'package:fitquest/shared/services/plant_service.dart';
 import 'package:fitquest/shared/services/local_storage_service.dart';
 import 'package:fitquest/core/services/cache_service.dart';
 import 'package:fitquest/core/services/analytics_service.dart';
@@ -49,6 +50,9 @@ void configureDependencies() {
   // Register services
   getIt.registerLazySingleton<LocalStorageService>(() => LocalStorageService());
   getIt.registerLazySingleton<XpCalculatorService>(() => XpCalculatorService());
+  getIt.registerLazySingleton<PlantService>(
+    () => PlantService(getIt<XpCalculatorService>()),
+  );
   
   // Register cache service
   getIt.registerLazySingleton<CacheService>(() => CacheService());
