@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fitquest/core/constants/app_colors.dart';
 import 'package:fitquest/core/constants/app_spacing.dart';
 import 'package:fitquest/core/constants/app_border_radius.dart';
-import 'package:fitquest/core/constants/app_shadows.dart';
 import 'package:fitquest/core/navigation/app_router.dart';
 import 'package:fitquest/shared/widgets/premium_card.dart';
 import 'package:fitquest/features/activities/bloc/activity_bloc.dart';
@@ -17,6 +16,7 @@ import 'package:fitquest/shared/widgets/skeleton_loader.dart';
 import 'package:fitquest/shared/widgets/search_bar_widget.dart';
 import 'package:fitquest/shared/widgets/swipeable_card.dart';
 import 'package:fitquest/shared/widgets/image_with_fallback.dart';
+import 'package:fitquest/shared/widgets/floating_action_button_extended_premium.dart';
 import 'package:fitquest/core/utils/activity_image_helper.dart';
 
 class ActivitiesPage extends StatefulWidget {
@@ -226,18 +226,26 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
                             gradient: AppColors.primaryGradient,
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.primaryGreen
+                                    .withValues(alpha: 0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                           ),
                           child: const Icon(
                             Icons.history_rounded,
                             color: Colors.white,
-                            size: 20,
+                            size: 22,
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: 14),
                         Text(
                           'Recent Activities',
                           style: Theme.of(context)
@@ -251,14 +259,31 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                         ),
                         const Spacer(),
                         if (_searchQuery.isNotEmpty || _filterType != null)
-                          Text(
-                            '${filteredActivities.length} found',
-                            style:
-                                Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurfaceVariant,
-                                    ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color:
+                                  AppColors.primaryGreen.withValues(alpha: 0.1),
+                              borderRadius: AppBorderRadius.allMD,
+                              border: Border.all(
+                                color: AppColors.primaryGreen
+                                    .withValues(alpha: 0.2),
+                                width: 1,
+                              ),
+                            ),
+                            child: Text(
+                              '${filteredActivities.length} found',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelMedium
+                                  ?.copyWith(
+                                    color: AppColors.primaryGreen,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                            ),
                           ),
                       ],
                     ),
@@ -451,19 +476,12 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: PremiumFloatingActionButton(
+        label: 'Log Activity',
+        icon: Icons.add_rounded,
         onPressed: () {
           Navigator.of(context).pushNamed(AppRouter.addActivity);
         },
-        backgroundColor: AppColors.primaryGreen,
-        icon: const Icon(Icons.add_rounded),
-        label: const Text(
-          'Log Activity',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.5,
-          ),
-        ),
       ),
     );
   }
@@ -513,75 +531,183 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
         );
       },
       child: PremiumCard(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         showShadow: true,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        border: Border.all(
+          color: activityColor.withValues(alpha: 0.1),
+          width: 1,
+        ),
         child: Row(
           children: [
-            // Activity image with gradient background
+            // Enhanced Activity image with gradient background
             Container(
-              width: 64,
-              height: 64,
+              width: 72,
+              height: 72,
               decoration: BoxDecoration(
                 gradient: activityGradient,
-                borderRadius: AppBorderRadius.allMD,
-                boxShadow: AppShadows.primaryShadow(activityColor),
+                borderRadius: AppBorderRadius.allLG,
+                boxShadow: [
+                  BoxShadow(
+                    color: activityColor.withValues(alpha: 0.4),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                    spreadRadius: 1,
+                  ),
+                ],
               ),
               child: GestureDetector(
                 onTap: () => _showActivityDetails(context, activity),
-                child: ImageWithFallback(
-                  imageUrl:
-                      ActivityImageHelper.getActivityImageUrl(activity.type),
-                  assetPath:
-                      ActivityImageHelper.getActivityImagePath(activity.type),
-                  fallbackIcon:
-                      ActivityImageHelper.getActivityIcon(activity.type),
-                  width: 64,
-                  height: 64,
-                  fit: BoxFit.cover,
-                  backgroundGradient: activityGradient,
-                  iconColor: Colors.white,
+                child: ClipRRect(
+                  borderRadius: AppBorderRadius.allLG,
+                  child: ImageWithFallback(
+                    imageUrl:
+                        ActivityImageHelper.getActivityImageUrl(activity.type),
+                    assetPath:
+                        ActivityImageHelper.getActivityImagePath(activity.type),
+                    fallbackIcon:
+                        ActivityImageHelper.getActivityIcon(activity.type),
+                    width: 72,
+                    height: 72,
+                    fit: BoxFit.cover,
+                    backgroundGradient: activityGradient,
+                    iconColor: Colors.white,
+                  ),
                 ),
               ),
             ),
             const SizedBox(width: 16),
-            // Activity details
+            // Enhanced Activity details
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    _getActivityTypeName(activity.type),
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
-                        ),
-                  ),
-                  const SizedBox(height: 4),
                   Row(
                     children: [
-                      Icon(
-                        Icons.access_time_rounded,
-                        size: 14,
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      Expanded(
+                        child: Text(
+                          _getActivityTypeName(activity.type),
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: -0.3,
+                                  ),
+                        ),
                       ),
-                      const SizedBox(width: 4),
-                      Text(
-                        app_date_utils.DateUtils.formatDateTime(activity.date),
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurfaceVariant,
+                      if (activity.xpEarned > 0)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            gradient: AppColors.primaryGradient,
+                            borderRadius: AppBorderRadius.allSM,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.star_rounded,
+                                color: Colors.white,
+                                size: 14,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '+${activity.xpEarned}',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelSmall
+                                    ?.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: activityColor.withValues(alpha: 0.1),
+                          borderRadius: AppBorderRadius.allSM,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.access_time_rounded,
+                              size: 14,
+                              color: activityColor,
                             ),
+                            const SizedBox(width: 4),
+                            Text(
+                              app_date_utils.DateUtils.formatDateTime(
+                                  activity.date),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelSmall
+                                  ?.copyWith(
+                                    color: activityColor,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                            ),
+                          ],
+                        ),
                       ),
+                      if (activity.duration > 0) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color:
+                                AppColors.primaryGreen.withValues(alpha: 0.1),
+                            borderRadius: AppBorderRadius.allSM,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.timer_rounded,
+                                size: 14,
+                                color: AppColors.primaryGreen,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '${activity.duration}min',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelSmall
+                                    ?.copyWith(
+                                      color: AppColors.primaryGreen,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                   if (activity.notes != null && activity.notes!.isNotEmpty) ...[
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 8),
                     Text(
                       activity.notes!,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color:
                                 Theme.of(context).colorScheme.onSurfaceVariant,
+                            height: 1.4,
                           ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -926,17 +1052,57 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
     required bool isSelected,
     required VoidCallback onTap,
   }) {
-    return FilterChip(
-      label: Text(label),
-      selected: isSelected,
-      onSelected: (_) => onTap(),
-      selectedColor: AppColors.primaryGreen.withValues(alpha: 0.2),
-      checkmarkColor: AppColors.primaryGreen,
-      labelStyle: TextStyle(
-        color: isSelected
-            ? AppColors.primaryGreen
-            : Theme.of(context).colorScheme.onSurfaceVariant,
-        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          gradient: isSelected ? AppColors.primaryGradient : null,
+          color: isSelected
+              ? null
+              : Theme.of(context).colorScheme.surfaceContainerHighest,
+          borderRadius: AppBorderRadius.allMD,
+          border: Border.all(
+            color: isSelected
+                ? AppColors.primaryGreen
+                : Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+            width: isSelected ? 0 : 1,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: AppColors.primaryGreen.withValues(alpha: 0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (isSelected)
+              const Icon(
+                Icons.check_circle_rounded,
+                color: Colors.white,
+                size: 18,
+              ),
+            if (isSelected) const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected
+                    ? Colors.white
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                fontSize: 14,
+                letterSpacing: 0.2,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

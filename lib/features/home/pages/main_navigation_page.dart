@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fitquest/core/constants/app_colors.dart';
+import 'package:fitquest/core/constants/app_border_radius.dart';
 import 'package:fitquest/features/home/pages/home_page.dart';
 import 'package:fitquest/features/home/pages/activities_page.dart';
 import 'package:fitquest/features/community/pages/leaderboard_page.dart';
@@ -88,65 +89,131 @@ class _MainNavigationPageState extends State<MainNavigationPage>
           boxShadow: [
             BoxShadow(
               color: isDark
-                  ? Colors.black.withValues(alpha:0.3)
-                  : Colors.black.withValues(alpha:0.1),
-              blurRadius: 20,
-              offset: const Offset(0, -5),
+                  ? Colors.black.withValues(alpha: 0.4)
+                  : Colors.black.withValues(alpha: 0.08),
+              blurRadius: 24,
+              offset: const Offset(0, -4),
+              spreadRadius: 0,
+            ),
+            BoxShadow(
+              color: isDark
+                  ? Colors.black.withValues(alpha: 0.2)
+                  : Colors.black.withValues(alpha: 0.04),
+              blurRadius: 12,
+              offset: const Offset(0, -2),
+              spreadRadius: 0,
             ),
           ],
         ),
-        child: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          onTap: (index) {
-            if (index != _currentIndex) {
-              HapticFeedbackService.selectionClick();
-              _animationController.forward().then((_) {
-                _animationController.reverse();
-              });
-              setState(() {
-                _currentIndex = index;
-              });
-            }
-          },
-          type: BottomNavigationBarType.fixed,
-          elevation: 0,
-          backgroundColor: Theme.of(context).colorScheme.surface,
-          selectedItemColor: AppColors.primaryGreen,
-          unselectedItemColor: Theme.of(context).colorScheme.onSurfaceVariant,
-          selectedIconTheme: const IconThemeData(size: 26),
-          unselectedIconTheme: const IconThemeData(size: 24),
-          selectedLabelStyle: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            fontFamily: 'Inter',
+        child: ClipRRect(
+          child: BottomNavigationBar(
+            currentIndex: _currentIndex,
+            onTap: (index) {
+              if (index != _currentIndex) {
+                HapticFeedbackService.selectionClick();
+                _animationController.forward().then((_) {
+                  _animationController.reverse();
+                });
+                setState(() {
+                  _currentIndex = index;
+                });
+              }
+            },
+            type: BottomNavigationBarType.fixed,
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            selectedItemColor: AppColors.primaryGreen,
+            unselectedItemColor: Theme.of(context).colorScheme.onSurfaceVariant,
+            selectedIconTheme: IconThemeData(
+              size: 28,
+              color: AppColors.primaryGreen,
+            ),
+            unselectedIconTheme: IconThemeData(
+              size: 24,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+            selectedLabelStyle: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              fontFamily: 'Inter',
+              letterSpacing: 0.2,
+            ),
+            unselectedLabelStyle: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              fontFamily: 'Inter',
+            ),
+            items: [
+              BottomNavigationBarItem(
+                icon: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    borderRadius: AppBorderRadius.allMD,
+                    color: _currentIndex == 0
+                        ? AppColors.primaryGreen.withValues(alpha: 0.1)
+                        : Colors.transparent,
+                  ),
+                  child: Icon(
+                    _currentIndex == 0
+                        ? Icons.home_rounded
+                        : Icons.home_outlined,
+                  ),
+                ),
+                label: 'Home',
+              ),
+              BottomNavigationBarItem(
+                icon: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    borderRadius: AppBorderRadius.allMD,
+                    color: _currentIndex == 1
+                        ? AppColors.primaryGreen.withValues(alpha: 0.1)
+                        : Colors.transparent,
+                  ),
+                  child: Icon(
+                    _currentIndex == 1
+                        ? Icons.directions_run_rounded
+                        : Icons.directions_run_outlined,
+                  ),
+                ),
+                label: 'Activities',
+              ),
+              BottomNavigationBarItem(
+                icon: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    borderRadius: AppBorderRadius.allMD,
+                    color: _currentIndex == 2
+                        ? AppColors.primaryGreen.withValues(alpha: 0.1)
+                        : Colors.transparent,
+                  ),
+                  child: Icon(
+                    _currentIndex == 2
+                        ? Icons.leaderboard_rounded
+                        : Icons.leaderboard_outlined,
+                  ),
+                ),
+                label: 'Leaderboard',
+              ),
+              BottomNavigationBarItem(
+                icon: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    borderRadius: AppBorderRadius.allMD,
+                    color: _currentIndex == 3
+                        ? AppColors.primaryGreen.withValues(alpha: 0.1)
+                        : Colors.transparent,
+                  ),
+                  child: Icon(
+                    _currentIndex == 3
+                        ? Icons.person_rounded
+                        : Icons.person_outline_rounded,
+                  ),
+                ),
+                label: 'Profile',
+              ),
+            ],
           ),
-          unselectedLabelStyle: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            fontFamily: 'Inter',
-          ),
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
-              activeIcon: Icon(Icons.home_rounded),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.directions_run_outlined),
-              activeIcon: Icon(Icons.directions_run_rounded),
-              label: 'Activities',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.leaderboard_outlined),
-              activeIcon: Icon(Icons.leaderboard_rounded),
-              label: 'Leaderboard',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline_rounded),
-              activeIcon: Icon(Icons.person_rounded),
-              label: 'Profile',
-            ),
-          ],
         ),
       ),
     );

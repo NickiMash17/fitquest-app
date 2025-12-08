@@ -15,11 +15,12 @@ import 'package:fitquest/shared/repositories/challenge_repository.dart';
 import 'package:fitquest/shared/repositories/activity_repository.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitquest/features/home/widgets/welcome_header.dart';
-import 'package:fitquest/features/home/widgets/plant_companion_card.dart';
+import 'package:fitquest/features/home/widgets/enhanced_plant_card.dart';
+import 'package:fitquest/shared/services/plant_service.dart';
 import 'package:fitquest/features/home/widgets/stats_row.dart';
 import 'package:fitquest/features/home/widgets/quick_actions_section.dart';
 import 'package:fitquest/features/home/widgets/daily_challenge_card.dart';
-import 'package:fitquest/shared/services/xp_calculator_service.dart';
+import 'package:fitquest/features/home/widgets/smart_insights_widget.dart';
 import 'package:fitquest/shared/widgets/skeleton_loader.dart';
 import 'package:fitquest/shared/widgets/premium_card.dart';
 
@@ -126,13 +127,13 @@ class HomePage extends StatelessWidget {
               if (state is HomeLoaded) {
                 try {
                   final user = state.user;
-                  final xpCalculator = getIt<XpCalculatorService>();
+                  final plantService = getIt<PlantService>();
                   final evolutionStage =
-                      xpCalculator.calculateEvolutionStage(user.plantCurrentXp);
-                  final stageName =
-                      xpCalculator.getEvolutionStageName(evolutionStage);
-                  final nextLevelXp =
-                      xpCalculator.xpRequiredForNextLevel(user.currentLevel);
+                      plantService.calculateEvolutionStage(user.plantCurrentXp);
+                  final stageName = user.plantName ??
+                      plantService.getEvolutionStageName(evolutionStage);
+                  final nextStageXp =
+                      plantService.xpRequiredForNextStage(user.plantCurrentXp);
                   final challengeProgress = state.dailyChallenge != null &&
                           state.dailyChallenge!.targetValue > 0
                       ? (state.todayXp /
@@ -148,16 +149,25 @@ class HomePage extends StatelessWidget {
                         pinned: false,
                         elevation: 0,
                         backgroundColor: AppColors.primaryGreen,
-                        expandedHeight: 160,
+                        expandedHeight: 180,
                         flexibleSpace: FlexibleSpaceBar(
                           background: Container(
-                            decoration: const BoxDecoration(
-                              gradient: AppColors.primaryGradient,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  AppColors.primaryGreen,
+                                  AppColors.primaryDark,
+                                  AppColors.primaryGreen.withValues(alpha: 0.8),
+                                ],
+                                stops: const [0.0, 0.5, 1.0],
+                              ),
                             ),
                             child: SafeArea(
                               child: Padding(
                                 padding:
-                                    const EdgeInsets.fromLTRB(20, 16, 16, 20),
+                                    const EdgeInsets.fromLTRB(20, 16, 16, 24),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -223,13 +233,28 @@ class HomePage extends StatelessWidget {
 
                                 const SizedBox(height: AppSpacing.lg),
 
-                                // Plant Companion Card
-                                PlantCompanionCard(
-                                  plantName: stageName,
-                                  evolutionStage: evolutionStage,
-                                  currentXp: user.plantCurrentXp,
-                                  requiredXp: nextLevelXp,
-                                  health: user.plantHealth,
+                                // Enhanced Plant Companion Card
+                                Builder(
+                                  builder: (context) {
+                                    debugPrint(
+                                        'Rendering EnhancedPlantCard: stage=$evolutionStage, xp=${user.plantCurrentXp}, health=${user.plantHealth}');
+                                    return EnhancedPlantCard(
+                                      plantName: stageName,
+                                      evolutionStage: evolutionStage,
+                                      currentXp: user.plantCurrentXp,
+                                      requiredXp: nextStageXp,
+                                      health: user.plantHealth,
+                                      streak: user.currentStreak,
+                                      lastActivityDate: user.lastActivityDate,
+                                      onTap: () {
+                                        AppRouter.navigate(
+                                          context,
+                                          AppRouter.plantDetail,
+                                          arguments: user,
+                                        );
+                                      },
+                                    );
+                                  },
                                 ),
 
                                 const SizedBox(height: AppSpacing.lg),
@@ -239,19 +264,27 @@ class HomePage extends StatelessWidget {
                                   Row(
                                     children: [
                                       Container(
-                                        padding: const EdgeInsets.all(8),
+                                        padding: const EdgeInsets.all(10),
                                         decoration: BoxDecoration(
                                           gradient: AppColors.blueGradient,
                                           borderRadius:
-                                              BorderRadius.circular(8),
+                                              BorderRadius.circular(10),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: AppColors.accentBlue
+                                                  .withValues(alpha: 0.3),
+                                              blurRadius: 8,
+                                              offset: const Offset(0, 2),
+                                            ),
+                                          ],
                                         ),
                                         child: const Icon(
                                           Icons.emoji_events_rounded,
                                           color: Colors.white,
-                                          size: 20,
+                                          size: 22,
                                         ),
                                       ),
-                                      const SizedBox(width: 12),
+                                      const SizedBox(width: 14),
                                       Text(
                                         'Today\'s Challenge',
                                         style: Theme.of(context)
@@ -282,18 +315,26 @@ class HomePage extends StatelessWidget {
                                 Row(
                                   children: [
                                     Container(
-                                      padding: const EdgeInsets.all(8),
+                                      padding: const EdgeInsets.all(10),
                                       decoration: BoxDecoration(
                                         gradient: AppColors.accentGradient,
-                                        borderRadius: BorderRadius.circular(8),
+                                        borderRadius: BorderRadius.circular(10),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: AppColors.accentOrange
+                                                .withValues(alpha: 0.3),
+                                            blurRadius: 8,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
                                       ),
                                       child: const Icon(
                                         Icons.flash_on_rounded,
                                         color: Colors.white,
-                                        size: 20,
+                                        size: 22,
                                       ),
                                     ),
-                                    const SizedBox(width: 12),
+                                    const SizedBox(width: 14),
                                     Text(
                                       'Quick Actions',
                                       style: Theme.of(context)
@@ -316,22 +357,35 @@ class HomePage extends StatelessWidget {
 
                                 const SizedBox(height: AppSpacing.lg),
 
+                                // Smart Insights
+                                SmartInsightsWidget(user: user),
+
+                                const SizedBox(height: AppSpacing.lg),
+
                                 // Quick Links
                                 Row(
                                   children: [
                                     Container(
-                                      padding: const EdgeInsets.all(8),
+                                      padding: const EdgeInsets.all(10),
                                       decoration: BoxDecoration(
                                         gradient: AppColors.purpleGradient,
-                                        borderRadius: BorderRadius.circular(8),
+                                        borderRadius: BorderRadius.circular(10),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: AppColors.accentPurple
+                                                .withValues(alpha: 0.3),
+                                            blurRadius: 8,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
                                       ),
                                       child: const Icon(
                                         Icons.dashboard_rounded,
                                         color: Colors.white,
-                                        size: 20,
+                                        size: 22,
                                       ),
                                     ),
-                                    const SizedBox(width: 12),
+                                    const SizedBox(width: 14),
                                     Text(
                                       'Quick Links',
                                       style: Theme.of(context)
