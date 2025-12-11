@@ -17,12 +17,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitquest/features/home/widgets/welcome_header.dart';
 import 'package:fitquest/features/home/widgets/enhanced_plant_card.dart';
 import 'package:fitquest/shared/services/plant_service.dart';
+import 'package:fitquest/shared/services/xp_calculator_service.dart';
 import 'package:fitquest/features/home/widgets/stats_row.dart';
 import 'package:fitquest/features/home/widgets/quick_actions_section.dart';
 import 'package:fitquest/features/home/widgets/daily_challenge_card.dart';
 import 'package:fitquest/features/home/widgets/smart_insights_widget.dart';
 import 'package:fitquest/shared/widgets/skeleton_loader.dart';
 import 'package:fitquest/shared/widgets/premium_card.dart';
+import 'package:fitquest/core/services/error_handler_service.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -43,6 +45,7 @@ class HomePage extends StatelessWidget {
             getIt<ChallengeRepository>(),
             getIt<ActivityRepository>(),
             getIt<FirebaseAuth>(),
+            getIt<ErrorHandlerService>(),
           )..add(const HomeDataLoadRequested());
         }
       },
@@ -128,12 +131,15 @@ class HomePage extends StatelessWidget {
                 try {
                   final user = state.user;
                   final plantService = getIt<PlantService>();
-                  final evolutionStage =
-                      plantService.calculateEvolutionStage(user.plantCurrentXp);
+                  // Use level-based evolution stage calculation
+                  final evolutionStage = plantService
+                      .calculateEvolutionStageFromLevel(user.currentLevel);
                   final stageName = user.plantName ??
                       plantService.getEvolutionStageName(evolutionStage);
+                  // Calculate XP needed for next level
+                  final xpCalculator = getIt<XpCalculatorService>();
                   final nextStageXp =
-                      plantService.xpRequiredForNextStage(user.plantCurrentXp);
+                      xpCalculator.xpRequiredForNextLevel(user.currentLevel);
                   final challengeProgress = state.dailyChallenge != null &&
                           state.dailyChallenge!.targetValue > 0
                       ? (state.todayXp /
@@ -241,10 +247,11 @@ class HomePage extends StatelessWidget {
                                     return EnhancedPlantCard(
                                       plantName: stageName,
                                       evolutionStage: evolutionStage,
-                                      currentXp: user.plantCurrentXp,
+                                      currentXp: user.totalXp,
                                       requiredXp: nextStageXp,
                                       health: user.plantHealth,
                                       streak: user.currentStreak,
+                                      userLevel: user.currentLevel,
                                       lastActivityDate: user.lastActivityDate,
                                       onTap: () {
                                         AppRouter.navigate(
@@ -547,7 +554,7 @@ class HomePage extends StatelessWidget {
           expandedHeight: 160,
           flexibleSpace: FlexibleSpaceBar(
             background: Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: AppColors.primaryGradient,
               ),
               child: const SafeArea(
