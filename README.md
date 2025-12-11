@@ -28,12 +28,19 @@ FitQuest combines wellness tracking with gamification mechanics to create an eng
 - **Language:** Dart 3.0+
 - **Backend:** Firebase
   - Authentication
-  - Cloud Firestore
+  - Cloud Firestore (with 40 MB cache limit)
   - Cloud Storage
-  - Cloud Functions (planned)
-- **State Management:** BLoC + Provider
-- **Animations:** Rive, Lottie
+  - Analytics & Crashlytics
+- **State Management:** BLoC Pattern + Provider (for theme)
+- **Dependency Injection:** GetIt + Injectable
+- **Animations:** Rive, Lottie, Custom Painters
 - **Architecture:** Clean Architecture with Repository Pattern
+- **Local Storage:** Hive + SharedPreferences
+- **Code Generation:** Freezed, Json Serializable, Injectable
+
+📖 **Architecture Details**: See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for comprehensive documentation.
+
+🎯 **Expert Review**: See [EXPERT_REVIEW.md](docs/EXPERT_REVIEW.md) for front-end & mobile engineering best practices and recommendations.
 
 ## 📋 Prerequisites
 
@@ -77,27 +84,25 @@ Before you begin, ensure you have the following installed:
 ```
 
 ## 📁 Project Structure
+
+See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed architecture documentation.
+
+```
 lib/
-├── core/
-│   ├── constants/
-│   ├── theme/
-│   ├── utils/
-│   └── config/
-├── features/
-│   ├── authentication/
-│   │   ├── bloc/
-│   │   ├── models/
-│   │   ├── pages/
-│   │   ├── repositories/
-│   │   └── widgets/
-│   ├── activities/
-│   ├── companion/
-│   ├── community/
-│   └── profile/
-├── shared/
-│   ├── widgets/
-│   └── services/
-└── main.dart
+├── core/                    # Core functionality (config, constants, services, theme)
+├── features/                # Feature modules (feature-based structure)
+│   ├── authentication/     # Auth feature (BLoC, pages, widgets)
+│   ├── activities/         # Activity tracking feature
+│   ├── home/               # Home screen feature
+│   ├── goals/              # Goals feature
+│   └── ...                 # Other features
+├── shared/                  # Shared code across features
+│   ├── models/             # Data models (Freezed)
+│   ├── repositories/       # Data repositories
+│   ├── services/           # Business logic services
+│   └── widgets/            # Reusable widgets
+└── main.dart               # App entry point
+```
 
 ## 🧪 Testing
 ```bash
