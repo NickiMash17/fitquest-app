@@ -1,6 +1,5 @@
 // lib/shared/widgets/glow_container.dart
 import 'package:flutter/material.dart';
-import 'package:fitquest/core/constants/app_colors.dart';
 import 'package:fitquest/core/constants/app_border_radius.dart';
 
 /// Container with animated glow effect
@@ -14,10 +13,10 @@ class GlowContainer extends StatefulWidget {
   final Gradient? gradient;
   final Color? backgroundColor;
 
-  const GlowContainer({
+  GlowContainer({
     super.key,
     required this.child,
-    this.glowColor = AppColors.primaryGreen,
+    this.glowColor = const Color(0xFF288347), // AppColors.primaryGreen equivalent
     this.blurRadius = 20,
     this.padding,
     this.margin,

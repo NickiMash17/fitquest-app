@@ -24,7 +24,7 @@ class _OnboardingPageState extends State<OnboardingPage>
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
 
-  final List<_OnboardingSlide> _slides = const [
+  final List<_OnboardingSlide> _slides = [
     _OnboardingSlide(
       icon: Icons.fitness_center_rounded,
       title: 'Track Your Wellness',

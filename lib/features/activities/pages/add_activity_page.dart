@@ -102,18 +102,22 @@ class _AddActivityPageState extends State<AddActivityPage> {
 
       // Dispatch create event
       debugPrint('AddActivityPage: Dispatching ActivityCreateRequested event');
-      debugPrint('AddActivityPage: Activity type: ${activity.type}, duration: ${activity.duration}');
+      debugPrint(
+          'AddActivityPage: Activity type: ${activity.type}, duration: ${activity.duration}');
       final bloc = context.read<ActivityBloc>();
-      debugPrint('AddActivityPage: Current bloc state: ${bloc.state.runtimeType}');
+      debugPrint(
+          'AddActivityPage: Current bloc state: ${bloc.state.runtimeType}');
       bloc.add(ActivityCreateRequested(activity: activity));
-      debugPrint('AddActivityPage: Event dispatched, waiting for state change...');
-      
+      debugPrint(
+          'AddActivityPage: Event dispatched, waiting for state change...');
+
       // Set a timeout - if we don't get a response in 10 seconds, show error
       _timeoutTimer?.cancel();
       _timeoutTimer = Timer(const Duration(seconds: 10), () {
         if (mounted && _isSubmitting) {
           debugPrint('AddActivityPage: TIMEOUT - No response after 10 seconds');
-          _handleActivityError('Request timed out. Please check your connection and try again.');
+          _handleActivityError(
+              'Request timed out. Please check your connection and try again.');
         }
       });
     }
@@ -121,10 +125,11 @@ class _AddActivityPageState extends State<AddActivityPage> {
 
   void _handleActivityCreated() {
     if (!mounted || !_isSubmitting) return;
-    
+
     _timeoutTimer?.cancel();
-    debugPrint('AddActivityPage: Activity created successfully, navigating back');
-    
+    debugPrint(
+        'AddActivityPage: Activity created successfully, navigating back');
+
     final xp = _lastXp ?? 0;
 
     setState(() {
@@ -133,7 +138,7 @@ class _AddActivityPageState extends State<AddActivityPage> {
 
     // Navigate back immediately
     Navigator.of(context).pop();
-    
+
     // Trigger a reload on the activities page
     Future.delayed(const Duration(milliseconds: 100), () {
       if (mounted) {
@@ -141,7 +146,7 @@ class _AddActivityPageState extends State<AddActivityPage> {
         context.read<ActivityBloc>().add(const ActivitiesLoadRequested());
       }
     });
-    
+
     // Show success message after navigation
     Future.delayed(const Duration(milliseconds: 400), () {
       if (mounted) {
@@ -157,7 +162,7 @@ class _AddActivityPageState extends State<AddActivityPage> {
     if (!mounted) return;
 
     _timeoutTimer?.cancel();
-    
+
     setState(() {
       _isSubmitting = false;
     });
@@ -181,8 +186,9 @@ class _AddActivityPageState extends State<AddActivityPage> {
   Widget build(BuildContext context) {
     return BlocListener<ActivityBloc, ActivityState>(
       listenWhen: (previous, current) {
-        debugPrint('AddActivityPage: listenWhen - previous: ${previous.runtimeType}, current: ${current.runtimeType}, submitting: $_isSubmitting');
-        
+        debugPrint(
+            'AddActivityPage: listenWhen - previous: ${previous.runtimeType}, current: ${current.runtimeType}, submitting: $_isSubmitting');
+
         // Only listen when we're submitting
         if (!_isSubmitting) {
           debugPrint('AddActivityPage: Not submitting, ignoring state change');
@@ -203,24 +209,27 @@ class _AddActivityPageState extends State<AddActivityPage> {
 
         // Handle ActivityLoaded - always trigger when we see it after submitting
         if (current is ActivityLoaded) {
-          debugPrint('AddActivityPage: ActivityLoaded detected with ${current.activities.length} activities');
+          debugPrint(
+              'AddActivityPage: ActivityLoaded detected with ${current.activities.length} activities');
           // Always trigger if we're submitting - this means creation completed
           return true;
         }
 
-        debugPrint('AddActivityPage: State change not handled: ${current.runtimeType}');
+        debugPrint(
+            'AddActivityPage: State change not handled: ${current.runtimeType}');
         return false;
       },
       listener: (context, state) {
         if (!_isSubmitting) return;
 
         debugPrint('AddActivityPage: State changed to ${state.runtimeType}');
-        
+
         if (state is ActivityError) {
           debugPrint('AddActivityPage: Error - ${state.message}');
           _handleActivityError(state.message);
         } else if (state is ActivityLoaded) {
-          debugPrint('AddActivityPage: Activities loaded - ${state.activities.length} activities');
+          debugPrint(
+              'AddActivityPage: Activities loaded - ${state.activities.length} activities');
           // Activity was created and activities reloaded
           // Navigate back immediately - the activities page will show the updated list
           if (mounted && _isSubmitting) {
@@ -252,7 +261,8 @@ class _AddActivityPageState extends State<AddActivityPage> {
                         borderRadius: BorderRadius.circular(8),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.primaryGreen.withValues(alpha: 0.3),
+                            color:
+                                AppColors.primaryGreen.withValues(alpha: 0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
@@ -334,16 +344,20 @@ class _AddActivityPageState extends State<AddActivityPage> {
                             const SizedBox(width: 8),
                             Text(
                               _getActivityTypeName(type),
-                              style: TextStyle(
-                                color: isSelected
-                                    ? Colors.white
-                                    : Theme.of(context)
-                                        .colorScheme
-                                        .onSurface,
-                                fontWeight:
-                                    isSelected ? FontWeight.w700 : FontWeight.w600,
-                                fontSize: 14,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelLarge
+                                  ?.copyWith(
+                                    color: isSelected
+                                        ? Colors.white
+                                        : Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
+                                    fontWeight: isSelected
+                                        ? FontWeight.w700
+                                        : FontWeight.w600,
+                                    fontSize: 14,
+                                  ),
                             ),
                           ],
                         ),
@@ -450,7 +464,8 @@ class _AddActivityPageState extends State<AddActivityPage> {
                         borderRadius: BorderRadius.circular(8),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.accentOrange.withValues(alpha: 0.3),
+                            color:
+                                AppColors.accentOrange.withValues(alpha: 0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
@@ -500,7 +515,8 @@ class _AddActivityPageState extends State<AddActivityPage> {
                         borderRadius: BorderRadius.circular(8),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.accentPurple.withValues(alpha: 0.3),
+                            color:
+                                AppColors.accentPurple.withValues(alpha: 0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),

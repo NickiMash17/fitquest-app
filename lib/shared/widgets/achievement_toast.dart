@@ -14,12 +14,12 @@ class AchievementToast extends StatefulWidget {
   final int? points;
   final VoidCallback? onDismiss;
 
-  const AchievementToast({
+  AchievementToast({
     super.key,
     required this.title,
     required this.message,
     required this.icon,
-    this.color = AppColors.primaryGreen,
+    this.color = const Color(0xFF288347), // AppColors.primaryGreen equivalent
     this.gradient,
     this.points,
     this.onDismiss,
@@ -248,7 +248,7 @@ class _AchievementToastState extends State<AchievementToast>
                     emissionFrequency: 0.05,
                     numberOfParticles: 20,
                     gravity: 0.1,
-                    colors: const [
+                    colors: [
                       Colors.white,
                       AppColors.primaryGreen,
                       AppColors.accentOrange,
@@ -490,7 +490,7 @@ class _ToastOverlayState extends State<_ToastOverlay>
                             emissionFrequency: 0.05,
                             numberOfParticles: 20,
                             gravity: 0.1,
-                            colors: const [
+                            colors: [
                               Colors.white,
                               AppColors.primaryGreen,
                               AppColors.accentOrange,

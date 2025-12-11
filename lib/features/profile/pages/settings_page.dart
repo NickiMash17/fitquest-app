@@ -3,6 +3,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:fitquest/core/constants/app_colors.dart';
 import 'package:fitquest/core/constants/app_spacing.dart';
+import 'package:fitquest/core/di/injection.dart';
+import 'package:fitquest/core/services/theme_service.dart';
 import 'package:fitquest/shared/widgets/premium_card.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -13,38 +15,38 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  bool _darkMode = false;
+  late ThemeService _themeService;
   bool _notificationsEnabled = true;
 
   @override
   void initState() {
     super.initState();
+    _themeService = getIt<ThemeService>();
+    _themeService.addListener(_onThemeChanged);
     _loadSettings();
+  }
+
+  @override
+  void dispose() {
+    _themeService.removeListener(_onThemeChanged);
+    super.dispose();
+  }
+
+  void _onThemeChanged() {
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _darkMode = prefs.getBool('dark_mode') ?? false;
       _notificationsEnabled = prefs.getBool('notifications_enabled') ?? true;
     });
   }
 
   Future<void> _saveDarkMode(bool value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('dark_mode', value);
-    setState(() {
-      _darkMode = value;
-    });
-    // Trigger app rebuild to apply theme change
-    // This will be handled by the main app state
-    if (mounted) {
-      Navigator.of(context).pop();
-      // Small delay to ensure state is saved
-      await Future.delayed(const Duration(milliseconds: 100));
-      // Restart app to apply theme - in production, use a state management solution
-      // For now, user needs to restart manually or we can use a callback
-    }
+    await _themeService.setDarkMode(value);
   }
 
   Future<void> _saveNotifications(bool value) async {
@@ -105,18 +107,18 @@ class _SettingsPageState extends State<SettingsPage> {
             child: SwitchListTile(
               title: Text(
                 'Dark Mode',
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
               ),
               subtitle: Text(
                 'Use dark theme for better viewing in low light',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
               ),
-              value: _darkMode,
+              value: _themeService.isDarkMode,
               onChanged: _saveDarkMode,
               activeThumbColor: AppColors.primaryGreen,
             ),
@@ -154,16 +156,16 @@ class _SettingsPageState extends State<SettingsPage> {
             child: SwitchListTile(
               title: Text(
                 'Enable Notifications',
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
               ),
               subtitle: Text(
                 'Receive activity reminders and updates',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
               ),
               value: _notificationsEnabled,
               onChanged: _saveNotifications,

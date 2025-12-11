@@ -95,7 +95,7 @@ class _CalendarPageState extends State<CalendarPage> {
                 weekendTextStyle: TextStyle(
                   color: Theme.of(context).colorScheme.onSurface,
                 ),
-                selectedDecoration: const BoxDecoration(
+                selectedDecoration: BoxDecoration(
                   gradient: AppColors.primaryGradient,
                   shape: BoxShape.circle,
                 ),
@@ -107,7 +107,7 @@ class _CalendarPageState extends State<CalendarPage> {
                     width: 2,
                   ),
                 ),
-                markerDecoration: const BoxDecoration(
+                markerDecoration: BoxDecoration(
                   color: AppColors.primaryGreen,
                   shape: BoxShape.circle,
                 ),
