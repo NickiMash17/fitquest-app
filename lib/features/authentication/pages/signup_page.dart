@@ -190,7 +190,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             ),
                           ),
                         ),
-                        validator: Validators.password,
+                        validator: Validators.passwordStrength,
                       ),
                     ),
                     const SizedBox(height: 20),

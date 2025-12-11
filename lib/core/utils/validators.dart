@@ -19,24 +19,37 @@ class Validators {
       return 'Email is required';
     }
     
-    // Sanitize input first
-    final sanitized = sanitizeInput(value);
-    if (sanitized != value) {
-      return 'Email contains invalid characters';
-    }
+    // Trim whitespace
+    final trimmed = value.trim();
     
+    // Basic email format validation (don't sanitize emails as they may contain valid special chars)
     final emailRegex = RegExp(
       r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
     );
-    if (!emailRegex.hasMatch(value)) {
+    if (!emailRegex.hasMatch(trimmed)) {
       return 'Please enter a valid email';
+    }
+    
+    // Only check for obviously dangerous characters
+    if (trimmed.contains('<') || trimmed.contains('>') || trimmed.contains('"')) {
+      return 'Email contains invalid characters';
+    }
+    
+    return null;
+  }
+
+  /// Validate password for login (only checks if not empty)
+  /// For signup, use passwordStrength instead
+  static String? password(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Password is required';
     }
     return null;
   }
 
-  /// Validate password strength
+  /// Validate password strength for signup
   /// Requirements: At least 8 characters, 1 uppercase, 1 lowercase, 1 number
-  static String? password(String? value) {
+  static String? passwordStrength(String? value) {
     if (value == null || value.isEmpty) {
       return 'Password is required';
     }
