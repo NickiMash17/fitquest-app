@@ -328,16 +328,26 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                         ),
                       )
                     else
-                      ...filteredActivities.map(
-                        (activity) => Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: _buildActivityCard(context, activity),
-                        ),
+                      // Use ListView.builder for better performance
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: filteredActivities.length,
+                        cacheExtent: 500,
+                        itemBuilder: (context, index) {
+                          final activity = filteredActivities[index];
+                          return RepaintBoundary(
+                            child: Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: _buildActivityCard(context, activity),
+                            ),
+                          );
+                        },
                       ),
                     const SizedBox(height: AppSpacing.lg),
                     // Activity categories
                     Row(
-                      children: [
+        children: [
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
@@ -365,47 +375,47 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                       ],
                     ),
                     const SizedBox(height: AppSpacing.md),
-                    _buildActivityCategory(
-                      context,
-                      title: 'Exercise',
-                      icon: Icons.directions_run,
-                      color: Colors.blue,
-                      items: const [
-                        'Running',
-                        'Cycling',
-                        'Swimming',
-                        'Yoga',
-                        'Strength Training',
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    _buildActivityCategory(
-                      context,
-                      title: 'Mindfulness',
-                      icon: Icons.self_improvement,
-                      color: Colors.purple,
-                      items: const [
-                        'Meditation',
-                        'Deep Breathing',
-                        'Gratitude Journal',
-                        'Mindful Walking',
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    _buildActivityCategory(
-                      context,
-                      title: 'Nutrition',
-                      icon: Icons.restaurant,
-                      color: Colors.green,
-                      items: const [
-                        'Water Intake',
-                        'Healthy Meals',
-                        'Meal Prep',
-                        'Nutrition Log',
-                      ],
-                    ),
-                  ],
-                ),
+          _buildActivityCategory(
+            context,
+            title: 'Exercise',
+            icon: Icons.directions_run,
+            color: Colors.blue,
+            items: const [
+              'Running',
+              'Cycling',
+              'Swimming',
+              'Yoga',
+              'Strength Training',
+            ],
+          ),
+          const SizedBox(height: 24),
+          _buildActivityCategory(
+            context,
+            title: 'Mindfulness',
+            icon: Icons.self_improvement,
+            color: Colors.purple,
+            items: const [
+              'Meditation',
+              'Deep Breathing',
+              'Gratitude Journal',
+              'Mindful Walking',
+            ],
+          ),
+          const SizedBox(height: 24),
+          _buildActivityCategory(
+            context,
+            title: 'Nutrition',
+            icon: Icons.restaurant,
+            color: Colors.green,
+            items: const [
+              'Water Intake',
+              'Healthy Meals',
+              'Meal Prep',
+              'Nutrition Log',
+            ],
+          ),
+        ],
+      ),
               );
             } catch (e, stackTrace) {
               debugPrint('Error rendering activities: $e');
@@ -725,7 +735,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                     horizontal: 10,
                     vertical: 6,
                   ),
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     gradient: AppColors.primaryGradient,
                     borderRadius: AppBorderRadius.allSM,
                   ),
@@ -911,7 +921,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () {
+        onPressed: () {
               Navigator.of(context).pop();
               // TODO: Implement delete functionality
               ScaffoldMessenger.of(context).showSnackBar(
