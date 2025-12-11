@@ -1,7 +1,9 @@
 // lib/shared/widgets/premium_avatar.dart
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fitquest/core/constants/app_colors.dart';
 import 'package:fitquest/shared/models/user_model.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 /// Premium avatar widget with level-based styling and achievements
 class PremiumAvatar extends StatelessWidget {
@@ -148,7 +150,7 @@ class PremiumAvatar extends StatelessWidget {
               ],
               image: user.photoUrl != null
                   ? DecorationImage(
-                      image: NetworkImage(user.photoUrl!),
+                      image: CachedNetworkImageProvider(user.photoUrl!),
                       fit: BoxFit.cover,
                     )
                   : null,
@@ -158,7 +160,7 @@ class PremiumAvatar extends StatelessWidget {
                 ? Center(
                     child: Text(
                       user.displayName?.substring(0, 1).toUpperCase() ?? 'U',
-                      style: TextStyle(
+                      style: GoogleFonts.fredoka(
                         color: Colors.white,
                         fontSize: size * 0.4,
                         fontWeight: FontWeight.w800,
@@ -272,4 +274,3 @@ class _AnimatedPremiumAvatarState extends State<AnimatedPremiumAvatar>
     );
   }
 }
-
