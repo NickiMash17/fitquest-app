@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fitquest/core/constants/app_colors.dart';
 import 'package:fitquest/core/constants/app_border_radius.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   AppTheme._();
@@ -8,156 +9,140 @@ class AppTheme {
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
-    colorScheme: const ColorScheme.light(
-      primary: AppColors.primaryGreen,
-      primaryContainer: AppColors.primaryLightest,
-      secondary: AppColors.accentOrange,
-      secondaryContainer: AppColors.accentOrangeLight,
+    colorScheme: ColorScheme.light(
+      primary: AppColors.primary,
+      primaryContainer: AppColors.primaryLight,
+      secondary: AppColors.secondary,
+      secondaryContainer: AppColors.secondary,
       surface: AppColors.surface,
       surfaceContainerHighest: AppColors.surfaceVariant,
       error: AppColors.error,
       errorContainer: AppColors.errorLight,
-      onPrimary: AppColors.textOnPrimary,
-      onSecondary: Colors.black,
-      onSurface: AppColors.textPrimary,
-      onError: AppColors.textOnPrimary,
-      outline: AppColors.divider,
+      onPrimary: AppColors.primaryForeground,
+      onSecondary: AppColors.secondaryForeground,
+      onSurface: AppColors.foreground,
+      onError: Colors.white,
+      outline: AppColors.border,
       shadow: AppColors.shadowLight,
     ),
     scaffoldBackgroundColor: AppColors.background,
-    appBarTheme: const AppBarTheme(
+    appBarTheme: AppBarTheme(
       elevation: 0,
       centerTitle: false,
-      backgroundColor: AppColors.primaryGreen,
+      backgroundColor: AppColors.primary,
       foregroundColor: Colors.white,
       surfaceTintColor: Colors.transparent,
       shadowColor: Colors.transparent,
-      titleTextStyle: TextStyle(
+      titleTextStyle: GoogleFonts.fredoka(
         fontSize: 22,
         fontWeight: FontWeight.w700,
         color: Colors.white,
-        fontFamily: 'Poppins',
         letterSpacing: -0.5,
       ),
-      iconTheme: IconThemeData(color: Colors.white, size: 24),
+      iconTheme: const IconThemeData(color: Colors.white, size: 24),
     ),
-    textTheme: const TextTheme(
-      displayLarge: TextStyle(
+    textTheme: TextTheme(
+      displayLarge: GoogleFonts.fredoka(
         fontSize: 36,
         fontWeight: FontWeight.w800,
-        fontFamily: 'Poppins',
         color: AppColors.textPrimary,
         letterSpacing: -1.0,
         height: 1.2,
       ),
-      displayMedium: TextStyle(
+      displayMedium: GoogleFonts.fredoka(
         fontSize: 30,
         fontWeight: FontWeight.w700,
-        fontFamily: 'Poppins',
         color: AppColors.textPrimary,
         letterSpacing: -0.5,
         height: 1.3,
       ),
-      displaySmall: TextStyle(
+      displaySmall: GoogleFonts.fredoka(
         fontSize: 26,
         fontWeight: FontWeight.w700,
-        fontFamily: 'Poppins',
         color: AppColors.textPrimary,
         letterSpacing: -0.5,
         height: 1.3,
       ),
-      headlineLarge: TextStyle(
+      headlineLarge: GoogleFonts.fredoka(
         fontSize: 24,
         fontWeight: FontWeight.w700,
-        fontFamily: 'Poppins',
         color: AppColors.textPrimary,
         letterSpacing: -0.3,
         height: 1.3,
       ),
-      headlineMedium: TextStyle(
+      headlineMedium: GoogleFonts.fredoka(
         fontSize: 20,
         fontWeight: FontWeight.w600,
-        fontFamily: 'Poppins',
         color: AppColors.textPrimary,
         letterSpacing: -0.2,
         height: 1.4,
       ),
-      headlineSmall: TextStyle(
+      headlineSmall: GoogleFonts.fredoka(
         fontSize: 18,
         fontWeight: FontWeight.w600,
-        fontFamily: 'Poppins',
         color: AppColors.textPrimary,
         letterSpacing: 0,
         height: 1.4,
       ),
-      titleLarge: TextStyle(
+      titleLarge: GoogleFonts.fredoka(
         fontSize: 18,
         fontWeight: FontWeight.w600,
-        fontFamily: 'Poppins',
         color: AppColors.textPrimary,
         letterSpacing: 0,
         height: 1.4,
       ),
-      titleMedium: TextStyle(
+      titleMedium: GoogleFonts.nunito(
         fontSize: 16,
         fontWeight: FontWeight.w600,
-        fontFamily: 'Inter',
         color: AppColors.textPrimary,
         letterSpacing: 0.1,
         height: 1.5,
       ),
-      titleSmall: TextStyle(
+      titleSmall: GoogleFonts.nunito(
         fontSize: 14,
         fontWeight: FontWeight.w600,
-        fontFamily: 'Inter',
         color: AppColors.textPrimary,
         letterSpacing: 0.1,
         height: 1.5,
       ),
-      bodyLarge: TextStyle(
+      bodyLarge: GoogleFonts.nunito(
         fontSize: 16,
         fontWeight: FontWeight.w400,
-        fontFamily: 'Inter',
         color: AppColors.textPrimary,
         letterSpacing: 0.15,
         height: 1.6,
       ),
-      bodyMedium: TextStyle(
+      bodyMedium: GoogleFonts.nunito(
         fontSize: 14,
         fontWeight: FontWeight.w400,
-        fontFamily: 'Inter',
         color: AppColors.textSecondary,
         letterSpacing: 0.25,
         height: 1.6,
       ),
-      bodySmall: TextStyle(
+      bodySmall: GoogleFonts.nunito(
         fontSize: 12,
         fontWeight: FontWeight.w400,
-        fontFamily: 'Inter',
         color: AppColors.textTertiary,
         letterSpacing: 0.4,
         height: 1.5,
       ),
-      labelLarge: TextStyle(
+      labelLarge: GoogleFonts.nunito(
         fontSize: 14,
         fontWeight: FontWeight.w600,
-        fontFamily: 'Inter',
         color: AppColors.textPrimary,
         letterSpacing: 0.1,
         height: 1.4,
       ),
-      labelMedium: TextStyle(
+      labelMedium: GoogleFonts.nunito(
         fontSize: 12,
         fontWeight: FontWeight.w500,
-        fontFamily: 'Inter',
         color: AppColors.textSecondary,
         letterSpacing: 0.5,
         height: 1.4,
       ),
-      labelSmall: TextStyle(
+      labelSmall: GoogleFonts.nunito(
         fontSize: 11,
         fontWeight: FontWeight.w500,
-        fontFamily: 'Inter',
         color: AppColors.textTertiary,
         letterSpacing: 0.5,
         height: 1.4,
@@ -165,32 +150,30 @@ class AppTheme {
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primaryGreen,
+        backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         elevation: 2,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        textStyle: const TextStyle(
+        textStyle: GoogleFonts.fredoka(
           fontSize: 16,
           fontWeight: FontWeight.w600,
-          fontFamily: 'Poppins',
         ),
       ),
     ),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
         foregroundColor: AppColors.primaryGreen,
-        textStyle: const TextStyle(
+        textStyle: GoogleFonts.nunito(
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          fontFamily: 'Inter',
         ),
       ),
     ),
-    inputDecorationTheme: const InputDecorationTheme(
+    inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: AppColors.surface,
-      contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       border: OutlineInputBorder(
         borderRadius: AppBorderRadius.allMD,
         borderSide: BorderSide(color: AppColors.divider, width: 1.5),
@@ -211,24 +194,21 @@ class AppTheme {
         borderRadius: AppBorderRadius.allMD,
         borderSide: BorderSide(color: AppColors.error, width: 2),
       ),
-      labelStyle: TextStyle(
-        fontFamily: 'Inter',
+      labelStyle: GoogleFonts.nunito(
         fontSize: 14,
         fontWeight: FontWeight.w500,
         color: AppColors.textSecondary,
       ),
-      hintStyle: TextStyle(
-        fontFamily: 'Inter',
+      hintStyle: GoogleFonts.nunito(
         fontSize: 14,
         color: AppColors.textTertiary,
       ),
-      helperStyle: TextStyle(
-        fontFamily: 'Inter',
+      helperStyle: GoogleFonts.nunito(
         fontSize: 12,
         color: AppColors.textTertiary,
       ),
     ),
-    cardTheme: const CardThemeData(
+    cardTheme: CardThemeData(
       elevation: 0,
       shadowColor: Colors.transparent,
       shape: RoundedRectangleBorder(
@@ -239,21 +219,19 @@ class AppTheme {
       margin: EdgeInsets.zero,
       clipBehavior: Clip.antiAlias,
     ),
-    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(
       backgroundColor: Colors.white,
       selectedItemColor: AppColors.primaryGreen,
-      unselectedItemColor: Color(0xFF616161),
-      selectedIconTheme: IconThemeData(size: 26),
-      unselectedIconTheme: IconThemeData(size: 24),
-      selectedLabelStyle: TextStyle(
+      unselectedItemColor: const Color(0xFF616161),
+      selectedIconTheme: const IconThemeData(size: 26),
+      unselectedIconTheme: const IconThemeData(size: 24),
+      selectedLabelStyle: GoogleFonts.nunito(
         fontSize: 12,
         fontWeight: FontWeight.w600,
-        fontFamily: 'Inter',
       ),
-      unselectedLabelStyle: TextStyle(
+      unselectedLabelStyle: GoogleFonts.nunito(
         fontSize: 12,
         fontWeight: FontWeight.w500,
-        fontFamily: 'Inter',
       ),
       type: BottomNavigationBarType.fixed,
       elevation: 12,
@@ -266,155 +244,139 @@ class AppTheme {
     useMaterial3: true,
     brightness: Brightness.dark,
     colorScheme: ColorScheme.dark(
-      primary: AppColors.primaryGreenDark,
-      primaryContainer: const Color(0xFF1B5E20),
-      secondary: AppColors.accentOrange,
-      secondaryContainer: AppColors.accentOrangeLight,
+      primary: AppColors.primaryDarkTheme,
+      primaryContainer: AppColors.primaryDark,
+      secondary: AppColors.secondary,
+      secondaryContainer: AppColors.secondary,
       surface: AppColors.surfaceDark,
       surfaceContainerHighest: AppColors.surfaceVariantDark,
       error: AppColors.error,
       errorContainer: AppColors.errorLight,
-      onPrimary: Colors.black,
-      onSecondary: Colors.black,
-      onSurface: AppColors.textPrimaryDark,
+      onPrimary: AppColors.primaryForeground,
+      onSecondary: AppColors.secondaryForeground,
+      onSurface: AppColors.foregroundDark,
       onError: Colors.white,
-      outline: AppColors.dividerDark,
+      outline: AppColors.border,
       shadow: Colors.black.withValues(alpha: 0.3),
     ),
     scaffoldBackgroundColor: AppColors.backgroundDark,
-    appBarTheme: const AppBarTheme(
+    appBarTheme: AppBarTheme(
       elevation: 0,
       centerTitle: false,
-      backgroundColor: AppColors.primaryGreen,
+      backgroundColor: AppColors.primary,
       foregroundColor: Colors.white,
       surfaceTintColor: Colors.transparent,
       shadowColor: Colors.transparent,
-      titleTextStyle: TextStyle(
+      titleTextStyle: GoogleFonts.fredoka(
         fontSize: 22,
         fontWeight: FontWeight.w700,
         color: Colors.white,
-        fontFamily: 'Poppins',
         letterSpacing: -0.5,
       ),
-      iconTheme: IconThemeData(color: Colors.white, size: 24),
+      iconTheme: const IconThemeData(color: Colors.white, size: 24),
     ),
-    textTheme: const TextTheme(
-      displayLarge: TextStyle(
+    textTheme: TextTheme(
+      displayLarge: GoogleFonts.fredoka(
         fontSize: 36,
         fontWeight: FontWeight.w800,
-        fontFamily: 'Poppins',
         color: Colors.white,
         letterSpacing: -1.0,
         height: 1.2,
       ),
-      displayMedium: TextStyle(
+      displayMedium: GoogleFonts.fredoka(
         fontSize: 30,
         fontWeight: FontWeight.w700,
-        fontFamily: 'Poppins',
         color: Colors.white,
         letterSpacing: -0.5,
         height: 1.3,
       ),
-      displaySmall: TextStyle(
+      displaySmall: GoogleFonts.fredoka(
         fontSize: 26,
         fontWeight: FontWeight.w700,
-        fontFamily: 'Poppins',
         color: Colors.white,
         letterSpacing: -0.5,
         height: 1.3,
       ),
-      headlineLarge: TextStyle(
+      headlineLarge: GoogleFonts.fredoka(
         fontSize: 24,
         fontWeight: FontWeight.w700,
-        fontFamily: 'Poppins',
         color: Colors.white,
         letterSpacing: -0.3,
         height: 1.3,
       ),
-      headlineMedium: TextStyle(
+      headlineMedium: GoogleFonts.fredoka(
         fontSize: 20,
         fontWeight: FontWeight.w600,
-        fontFamily: 'Poppins',
         color: Colors.white,
         letterSpacing: -0.2,
         height: 1.4,
       ),
-      headlineSmall: TextStyle(
+      headlineSmall: GoogleFonts.fredoka(
         fontSize: 18,
         fontWeight: FontWeight.w600,
-        fontFamily: 'Poppins',
         color: Colors.white,
         letterSpacing: 0,
         height: 1.4,
       ),
-      titleLarge: TextStyle(
+      titleLarge: GoogleFonts.fredoka(
         fontSize: 18,
         fontWeight: FontWeight.w600,
-        fontFamily: 'Poppins',
         color: Colors.white,
         letterSpacing: 0,
         height: 1.4,
       ),
-      titleMedium: TextStyle(
+      titleMedium: GoogleFonts.nunito(
         fontSize: 16,
         fontWeight: FontWeight.w600,
-        fontFamily: 'Inter',
         color: Colors.white,
         letterSpacing: 0.1,
         height: 1.5,
       ),
-      titleSmall: TextStyle(
+      titleSmall: GoogleFonts.nunito(
         fontSize: 14,
         fontWeight: FontWeight.w600,
-        fontFamily: 'Inter',
         color: Colors.white,
         letterSpacing: 0.1,
         height: 1.5,
       ),
-      bodyLarge: TextStyle(
+      bodyLarge: GoogleFonts.nunito(
         fontSize: 16,
         fontWeight: FontWeight.w400,
-        fontFamily: 'Inter',
         color: Colors.white,
         letterSpacing: 0.15,
         height: 1.6,
       ),
-      bodyMedium: TextStyle(
+      bodyMedium: GoogleFonts.nunito(
         fontSize: 14,
         fontWeight: FontWeight.w400,
-        fontFamily: 'Inter',
         color: AppColors.textSecondaryDark,
         letterSpacing: 0.25,
         height: 1.6,
       ),
-      bodySmall: TextStyle(
+      bodySmall: GoogleFonts.nunito(
         fontSize: 12,
         fontWeight: FontWeight.w400,
-        fontFamily: 'Inter',
         color: AppColors.textTertiaryDark,
         letterSpacing: 0.4,
         height: 1.5,
       ),
-      labelLarge: TextStyle(
+      labelLarge: GoogleFonts.nunito(
         fontSize: 14,
         fontWeight: FontWeight.w600,
-        fontFamily: 'Inter',
         color: Colors.white,
         letterSpacing: 0.1,
         height: 1.4,
       ),
-      labelMedium: TextStyle(
+      labelMedium: GoogleFonts.nunito(
         fontSize: 12,
         fontWeight: FontWeight.w500,
-        fontFamily: 'Inter',
         color: AppColors.textSecondaryDark,
         letterSpacing: 0.5,
         height: 1.4,
       ),
-      labelSmall: TextStyle(
+      labelSmall: GoogleFonts.nunito(
         fontSize: 11,
         fontWeight: FontWeight.w500,
-        fontFamily: 'Inter',
         color: AppColors.textTertiaryDark,
         letterSpacing: 0.5,
         height: 1.4,
@@ -422,7 +384,7 @@ class AppTheme {
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primaryGreen,
+        backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         elevation: 0,
         shadowColor: Colors.transparent,
@@ -431,10 +393,9 @@ class AppTheme {
         shape: const RoundedRectangleBorder(
           borderRadius: AppBorderRadius.allMD,
         ),
-        textStyle: const TextStyle(
+        textStyle: GoogleFonts.nunito(
           fontSize: 16,
           fontWeight: FontWeight.w600,
-          fontFamily: 'Inter',
           letterSpacing: 0.5,
         ),
       ).copyWith(
@@ -455,10 +416,9 @@ class AppTheme {
         shape: const RoundedRectangleBorder(
           borderRadius: AppBorderRadius.allSM,
         ),
-        textStyle: const TextStyle(
+        textStyle: GoogleFonts.nunito(
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          fontFamily: 'Inter',
           letterSpacing: 0.25,
         ),
       ),
@@ -475,31 +435,28 @@ class AppTheme {
         borderRadius: AppBorderRadius.allMD,
         borderSide: BorderSide(color: Color(0xFF424242), width: 1.5),
       ),
-      focusedBorder: const OutlineInputBorder(
+      focusedBorder: OutlineInputBorder(
         borderRadius: AppBorderRadius.allMD,
         borderSide: BorderSide(color: AppColors.primaryLight, width: 2),
       ),
-      errorBorder: const OutlineInputBorder(
+      errorBorder: OutlineInputBorder(
         borderRadius: AppBorderRadius.allMD,
         borderSide: BorderSide(color: AppColors.error, width: 1.5),
       ),
-      focusedErrorBorder: const OutlineInputBorder(
+      focusedErrorBorder: OutlineInputBorder(
         borderRadius: AppBorderRadius.allMD,
         borderSide: BorderSide(color: AppColors.error, width: 2),
       ),
-      labelStyle: TextStyle(
-        fontFamily: 'Inter',
+      labelStyle: GoogleFonts.nunito(
         fontSize: 14,
         fontWeight: FontWeight.w500,
         color: Colors.white.withValues(alpha: 0.7),
       ),
-      hintStyle: TextStyle(
-        fontFamily: 'Inter',
+      hintStyle: GoogleFonts.nunito(
         fontSize: 14,
         color: Colors.white.withValues(alpha: 0.5),
       ),
-      helperStyle: TextStyle(
-        fontFamily: 'Inter',
+      helperStyle: GoogleFonts.nunito(
         fontSize: 12,
         color: Colors.white.withValues(alpha: 0.6),
       ),
@@ -515,21 +472,19 @@ class AppTheme {
       margin: EdgeInsets.zero,
       clipBehavior: Clip.antiAlias,
     ),
-    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-      backgroundColor: Color(0xFF1E1E1E),
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      backgroundColor: const Color(0xFF1E1E1E),
       selectedItemColor: AppColors.primaryLight,
-      unselectedItemColor: Color(0xFF9E9E9E),
-      selectedIconTheme: IconThemeData(size: 26),
-      unselectedIconTheme: IconThemeData(size: 24),
-      selectedLabelStyle: TextStyle(
+      unselectedItemColor: const Color(0xFF9E9E9E),
+      selectedIconTheme: const IconThemeData(size: 26),
+      unselectedIconTheme: const IconThemeData(size: 24),
+      selectedLabelStyle: GoogleFonts.nunito(
         fontSize: 12,
         fontWeight: FontWeight.w600,
-        fontFamily: 'Inter',
       ),
-      unselectedLabelStyle: TextStyle(
+      unselectedLabelStyle: GoogleFonts.nunito(
         fontSize: 12,
         fontWeight: FontWeight.w500,
-        fontFamily: 'Inter',
       ),
       type: BottomNavigationBarType.fixed,
       elevation: 12,

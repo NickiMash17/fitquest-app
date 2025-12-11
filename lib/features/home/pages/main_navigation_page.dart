@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fitquest/core/constants/app_colors.dart';
 import 'package:fitquest/core/constants/app_border_radius.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:fitquest/features/home/pages/home_page.dart';
 import 'package:fitquest/features/home/pages/activities_page.dart';
 import 'package:fitquest/features/community/pages/leaderboard_page.dart';
@@ -132,16 +133,14 @@ class _MainNavigationPageState extends State<MainNavigationPage>
               size: 24,
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
-            selectedLabelStyle: const TextStyle(
+            selectedLabelStyle: GoogleFonts.nunito(
               fontSize: 12,
               fontWeight: FontWeight.w700,
-              fontFamily: 'Inter',
               letterSpacing: 0.2,
             ),
-            unselectedLabelStyle: const TextStyle(
+            unselectedLabelStyle: GoogleFonts.nunito(
               fontSize: 12,
               fontWeight: FontWeight.w500,
-              fontFamily: 'Inter',
             ),
             items: [
               BottomNavigationBarItem(

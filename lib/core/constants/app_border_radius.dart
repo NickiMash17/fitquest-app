@@ -5,11 +5,12 @@ import 'package:flutter/material.dart';
 class AppBorderRadius {
   AppBorderRadius._();
 
+  // From spec: Default: 16px, Large: 16px, Medium: 14px, Small: 12px, XL: 20px
   static const double xs = 4.0;
-  static const double sm = 8.0;
-  static const double md = 12.0;
-  static const double lg = 16.0;
-  static const double xl = 20.0;
+  static const double sm = 12.0; // Small: 12px from spec
+  static const double md = 14.0; // Medium: 14px from spec
+  static const double lg = 16.0; // Default: 16px from spec
+  static const double xl = 20.0; // XL: 20px from spec
   static const double xxl = 24.0;
   static const double round = 999.0; // Fully rounded
 
