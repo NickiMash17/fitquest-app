@@ -42,18 +42,8 @@ class ImageWithFallback extends StatelessWidget {
 
       Widget imageWidget;
 
-      // Prioritize assetPath over imageUrl for plant images
-      if (assetPath != null && assetPath!.isNotEmpty) {
-        // Try to load asset first, fallback to network image if asset fails
-        imageWidget = _buildAssetImageWithFallback(
-          context,
-          assetPath!,
-          fallbackIcon,
-          iconColor,
-          backgroundColor,
-          backgroundGradient,
-        );
-      } else if (imageUrl != null && imageUrl!.isNotEmpty) {
+      // Prioritize network image if available, then asset, then icon fallback
+      if (imageUrl != null && imageUrl!.isNotEmpty) {
         // Try network image first, fallback to icon on error
         imageWidget = CachedNetworkImage(
           imageUrl: imageUrl!,
@@ -138,8 +128,27 @@ class ImageWithFallback extends StatelessWidget {
     Color backgroundColor,
     Gradient? gradient,
   ) {
-    // Try to load asset, fallback to network image if available, then icon
-    // Wrap in error boundary to prevent errors from propagating
+    // If network image is available, use it directly instead of trying asset first
+    // This avoids unnecessary asset loading errors
+    if (imageUrl != null && imageUrl!.isNotEmpty) {
+      return CachedNetworkImage(
+        imageUrl: imageUrl!,
+        width: width,
+        height: height,
+        fit: fit,
+        placeholder: (context, url) => _buildShimmer(context),
+        errorWidget: (context, url, error) => _buildIconFallback(
+          context,
+          fallbackIcon,
+          iconColor,
+          backgroundColor,
+          gradient,
+        ),
+        fadeInDuration: const Duration(milliseconds: 300),
+      );
+    }
+    
+    // Only try asset if no network image is available
     return Builder(
       builder: (context) {
         try {
@@ -149,25 +158,7 @@ class ImageWithFallback extends StatelessWidget {
             height: height,
             fit: fit,
             errorBuilder: (context, error, stackTrace) {
-              // Silently handle asset loading errors - don't log to avoid Crashlytics issues
-              // Asset doesn't exist, try network image if available, otherwise show icon fallback
-              if (imageUrl != null && imageUrl!.isNotEmpty) {
-                return CachedNetworkImage(
-                  imageUrl: imageUrl!,
-                  width: width,
-                  height: height,
-                  fit: fit,
-                  placeholder: (context, url) => _buildShimmer(context),
-                  errorWidget: (context, url, error) => _buildIconFallback(
-                    context,
-                    fallbackIcon,
-                    iconColor,
-                    backgroundColor,
-                    gradient,
-                  ),
-                  fadeInDuration: const Duration(milliseconds: 300),
-                );
-              }
+              // Silently handle asset loading errors - show icon fallback
               return _buildIconFallback(
                 context,
                 fallbackIcon,
@@ -185,23 +176,6 @@ class ImageWithFallback extends StatelessWidget {
           );
         } catch (e) {
           // If asset loading fails completely, show icon fallback immediately
-          if (imageUrl != null && imageUrl!.isNotEmpty) {
-            return CachedNetworkImage(
-              imageUrl: imageUrl!,
-              width: width,
-              height: height,
-              fit: fit,
-              placeholder: (context, url) => _buildShimmer(context),
-              errorWidget: (context, url, error) => _buildIconFallback(
-                context,
-                fallbackIcon,
-                iconColor,
-                backgroundColor,
-                gradient,
-              ),
-              fadeInDuration: const Duration(milliseconds: 300),
-            );
-          }
           return _buildIconFallback(
             context,
             fallbackIcon,

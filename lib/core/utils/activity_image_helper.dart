@@ -11,31 +11,17 @@ class ActivityImageHelper {
   }
 
   /// Get the image asset path for an activity type (fallback)
-  static String getActivityImagePath(ActivityType type) {
-    switch (type) {
-      case ActivityType.exercise:
-        return 'assets/images/activities/exercise.png';
-      case ActivityType.meditation:
-        return 'assets/images/activities/meditation.png';
-      case ActivityType.hydration:
-        return 'assets/images/activities/hydration.png';
-      case ActivityType.sleep:
-        return 'assets/images/activities/sleep.png';
-    }
+  /// Returns null since we use network images and icon fallbacks
+  static String? getActivityImagePath(ActivityType type) {
+    // No local assets - using network images and icon fallbacks
+    return null;
   }
 
   /// Get the placeholder image path for an activity type
-  static String getActivityPlaceholderPath(ActivityType type) {
-    switch (type) {
-      case ActivityType.exercise:
-        return 'assets/images/activities/exercise_placeholder.png';
-      case ActivityType.meditation:
-        return 'assets/images/activities/meditation_placeholder.png';
-      case ActivityType.hydration:
-        return 'assets/images/activities/hydration_placeholder.png';
-      case ActivityType.sleep:
-        return 'assets/images/activities/sleep_placeholder.png';
-    }
+  /// Returns null since we use network images and icon fallbacks
+  static String? getActivityPlaceholderPath(ActivityType type) {
+    // No local assets - using network images and icon fallbacks
+    return null;
   }
 
   /// Get the image URL for quick actions (preferred - uses online images)
@@ -44,17 +30,10 @@ class ActivityImageHelper {
   }
 
   /// Get the icon for quick actions (fallback)
-  static String getQuickActionImagePath(ActivityType type) {
-    switch (type) {
-      case ActivityType.exercise:
-        return 'assets/images/activities/workout.png';
-      case ActivityType.meditation:
-        return 'assets/images/activities/meditate.png';
-      case ActivityType.hydration:
-        return 'assets/images/activities/hydrate.png';
-      case ActivityType.sleep:
-        return 'assets/images/activities/sleep.png';
-    }
+  /// Returns null since we use network images and icon fallbacks
+  static String? getQuickActionImagePath(ActivityType type) {
+    // No local assets - using network images and icon fallbacks
+    return null;
   }
 
   /// Get the fallback icon for an activity type
