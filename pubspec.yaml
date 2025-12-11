@@ -57,6 +57,7 @@ dependencies:
   haptic_feedback: ^0.6.4+2
   fluttertoast: ^8.2.8
   package_info_plus: ^8.0.2
+  google_fonts: ^6.1.0
 
 dev_dependencies:
   flutter_test:
