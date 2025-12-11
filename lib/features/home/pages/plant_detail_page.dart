@@ -1,13 +1,14 @@
 // lib/features/home/pages/plant_detail_page.dart
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitquest/core/constants/app_colors.dart';
 import 'package:fitquest/core/constants/app_spacing.dart';
 import 'package:fitquest/shared/widgets/premium_card.dart';
-import 'package:fitquest/shared/widgets/image_with_fallback.dart';
-import 'package:fitquest/core/utils/image_url_helper.dart';
+import 'package:fitquest/shared/widgets/custom_plant_widget.dart';
 import 'package:fitquest/shared/services/plant_service.dart';
 import 'package:fitquest/core/di/injection.dart';
 import 'package:fitquest/shared/models/user_model.dart';
+import 'package:fitquest/shared/repositories/user_repository.dart';
 
 class PlantDetailPage extends StatefulWidget {
   final UserModel user;
@@ -24,6 +25,9 @@ class PlantDetailPage extends StatefulWidget {
 class _PlantDetailPageState extends State<PlantDetailPage> {
   late TextEditingController _nameController;
   final PlantService _plantService = getIt<PlantService>();
+  final UserRepository _userRepository = getIt<UserRepository>();
+  final FirebaseAuth _auth = getIt<FirebaseAuth>();
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -35,6 +39,58 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
   void dispose() {
     _nameController.dispose();
     super.dispose();
+  }
+
+  Future<void> _savePlantName() async {
+    final userId = _auth.currentUser?.uid;
+    if (userId == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please sign in to save plant name'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+      return;
+    }
+
+    setState(() {
+      _isSaving = true;
+    });
+
+    try {
+      final plantName = _nameController.text.trim();
+      await _userRepository.updatePlantName(
+          userId, plantName.isEmpty ? null : plantName);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Plant name saved!'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+        // Dismiss keyboard
+        FocusScope.of(context).unfocus();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to save plant name: ${e.toString()}'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+        });
+      }
+    }
   }
 
   @override
@@ -88,15 +144,9 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
                   ],
                 ),
                 padding: const EdgeInsets.all(20),
-                child: ImageWithFallback(
-                  imageUrl: ImageUrlHelper.getPlantImageUrl(evolutionStage),
-                  assetPath: _getPlantImagePath(evolutionStage),
-                  fallbackIcon: Icons.eco_rounded,
-                  width: 200,
-                  height: 200,
-                  fit: BoxFit.contain,
-                  backgroundColor: Colors.transparent,
-                  iconColor: Colors.white,
+                child: CustomPlantWidget(
+                  evolutionStage: evolutionStage,
+                  size: 200,
                 ),
               ),
             ),
@@ -110,13 +160,14 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.edit_rounded, color: AppColors.primaryGreen),
+                      Icon(Icons.edit_rounded, color: AppColors.primaryGreen),
                       const SizedBox(width: 8),
                       Text(
                         'Plant Name',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                       ),
                     ],
                   ),
@@ -128,18 +179,20 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      suffixIcon: IconButton(
-                        icon: const Icon(Icons.check_rounded),
-                        onPressed: () {
-                          // TODO: Save plant name to user repository
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Plant name saved!'),
-                              duration: Duration(seconds: 2),
+                      suffixIcon: _isSaving
+                          ? const Padding(
+                              padding: EdgeInsets.all(12.0),
+                              child: SizedBox(
+                                width: 20,
+                                height: 20,
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
+                              ),
+                            )
+                          : IconButton(
+                              icon: const Icon(Icons.check_rounded),
+                              onPressed: _savePlantName,
                             ),
-                          );
-                        },
-                      ),
                     ),
                   ),
                 ],
@@ -293,19 +346,4 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
     if (health > 30) return Colors.orange;
     return Colors.red;
   }
-
-  String _getPlantImagePath(int evolutionStage) {
-    if (evolutionStage <= 1) {
-      return 'assets/images/companion/seed.png';
-    } else if (evolutionStage <= 2) {
-      return 'assets/images/companion/sprout.png';
-    } else if (evolutionStage <= 3) {
-      return 'assets/images/companion/sapling.png';
-    } else if (evolutionStage <= 4) {
-      return 'assets/images/companion/tree.png';
-    } else {
-      return 'assets/images/companion/ancient_tree.png';
-    }
-  }
 }
-

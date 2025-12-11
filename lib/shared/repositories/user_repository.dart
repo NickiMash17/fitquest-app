@@ -37,15 +37,16 @@ class UserRepository {
   Future<UserModel?> getUser(String userId) async {
     const int maxRetries = 3;
     int retryCount = 0;
-    
+
     while (retryCount < maxRetries) {
       try {
-        _logger.d('Fetching user: $userId (attempt ${retryCount + 1}/$maxRetries)');
+        _logger.d(
+            'Fetching user: $userId (attempt ${retryCount + 1}/$maxRetries)');
         final doc = await _firestore
             .collection(AppConstants.usersCollection)
             .doc(userId)
             .get(const GetOptions(source: Source.serverAndCache));
-        
+
         if (!doc.exists) {
           _logger.w('User document does not exist: $userId');
           return null;
@@ -65,17 +66,21 @@ class UserRepository {
         return user;
       } on FirebaseException catch (e, stackTrace) {
         // Handle offline/unavailable errors with retry
-        if ((e.code == 'unavailable' || e.code == 'deadline-exceeded') && retryCount < maxRetries - 1) {
+        if ((e.code == 'unavailable' || e.code == 'deadline-exceeded') &&
+            retryCount < maxRetries - 1) {
           retryCount++;
           final delay = Duration(seconds: retryCount);
-          _logger.w('Firestore unavailable, retrying in ${delay.inSeconds}s...');
+          _logger
+              .w('Firestore unavailable, retrying in ${delay.inSeconds}s...');
           await Future.delayed(delay);
           continue;
         }
-        _logger.e('Error getting user: $userId', error: e, stackTrace: stackTrace);
+        _logger.e('Error getting user: $userId',
+            error: e, stackTrace: stackTrace);
         rethrow;
       } catch (e, stackTrace) {
-        _logger.e('Error getting user: $userId', error: e, stackTrace: stackTrace);
+        _logger.e('Error getting user: $userId',
+            error: e, stackTrace: stackTrace);
         rethrow;
       }
     }
@@ -178,7 +183,8 @@ class UserRepository {
         'updatedAt': FieldValue.serverTimestamp(),
       });
     } catch (e, stackTrace) {
-      _logger.e('Error updating plant health', error: e, stackTrace: stackTrace);
+      _logger.e('Error updating plant health',
+          error: e, stackTrace: stackTrace);
       rethrow;
     }
   }
@@ -194,7 +200,25 @@ class UserRepository {
         'updatedAt': FieldValue.serverTimestamp(),
       });
     } catch (e, stackTrace) {
-      _logger.e('Error updating plant evolution stage', error: e, stackTrace: stackTrace);
+      _logger.e('Error updating plant evolution stage',
+          error: e, stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  /// Update plant name
+  Future<void> updatePlantName(String userId, String? plantName) async {
+    try {
+      await _firestore
+          .collection(AppConstants.usersCollection)
+          .doc(userId)
+          .update({
+        'plantName': plantName,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+      _logger.i('Plant name updated for user: $userId');
+    } catch (e, stackTrace) {
+      _logger.e('Error updating plant name', error: e, stackTrace: stackTrace);
       rethrow;
     }
   }
