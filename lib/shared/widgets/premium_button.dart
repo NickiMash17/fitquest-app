@@ -81,7 +81,7 @@ class _PremiumButtonState extends State<PremiumButton>
     final gradient = widget.gradient ?? AppColors.primaryGradient;
     final backgroundColor = widget.backgroundColor ?? AppColors.primaryGreen;
 
-    return GestureDetector(
+    final button = GestureDetector(
       onTapDown: _handleTapDown,
       onTapUp: _handleTapUp,
       onTapCancel: _handleTapCancel,
@@ -156,6 +156,19 @@ class _PremiumButtonState extends State<PremiumButton>
           },
         ),
       ),
+    );
+
+    // Wrap with Semantics for accessibility
+    return Semantics(
+      label: widget.label,
+      hint: widget.isLoading
+          ? 'Loading, please wait'
+          : widget.onPressed == null
+              ? 'Button disabled'
+              : 'Double tap to activate',
+      button: true,
+      enabled: widget.onPressed != null && !widget.isLoading,
+      child: button,
     );
   }
 }

@@ -76,7 +76,7 @@ class _PremiumCardState extends State<PremiumCard>
         ? Theme.of(context).colorScheme.surface
         : (widget.backgroundColor ?? AppColors.surface);
     
-    final card = Container(
+    Widget card = Container(
       margin: widget.margin ?? EdgeInsets.zero,
       decoration: BoxDecoration(
         color: widget.gradient == null ? defaultBackground : null,
@@ -135,6 +135,17 @@ class _PremiumCardState extends State<PremiumCard>
         ),
       ),
     );
+
+    // Add semantics for accessibility when card is tappable
+    if (widget.onTap != null || widget.onDoubleTap != null) {
+      return Semantics(
+        button: true,
+        hint: widget.onDoubleTap != null
+            ? 'Double tap to view details'
+            : 'Double tap to open',
+        child: card,
+      );
+    }
 
     return card;
   }

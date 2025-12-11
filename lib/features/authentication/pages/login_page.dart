@@ -9,6 +9,7 @@ import 'package:fitquest/shared/widgets/theme_toggle_button.dart';
 import 'package:fitquest/features/authentication/bloc/auth_bloc.dart';
 import 'package:fitquest/features/authentication/bloc/auth_event.dart';
 import 'package:fitquest/features/authentication/bloc/auth_state.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -115,42 +116,60 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         const SizedBox(height: 48),
                         // Email field
-                        TextFormField(
-                          controller: _emailController,
-                          keyboardType: TextInputType.emailAddress,
-                          decoration: const InputDecoration(
-                            labelText: 'Email',
-                            prefixIcon: Icon(Icons.email_outlined),
-                            hintText: 'Enter your email',
+                        Semantics(
+                          label: 'Email address',
+                          hint: 'Enter your email address to sign in',
+                          textField: true,
+                          child: TextFormField(
+                            controller: _emailController,
+                            keyboardType: TextInputType.emailAddress,
+                            textInputAction: TextInputAction.next,
+                            decoration: const InputDecoration(
+                              labelText: 'Email',
+                              prefixIcon: Icon(Icons.email_outlined),
+                              hintText: 'Enter your email',
+                            ),
+                            validator: Validators.email,
                           ),
-                          validator: Validators.email,
                         ),
                         const SizedBox(height: 20),
                         // Password field
-                        TextFormField(
-                          controller: _passwordController,
-                          obscureText: _obscurePassword,
-                          decoration: InputDecoration(
-                            labelText: 'Password',
-                            prefixIcon: const Icon(Icons.lock_outlined),
-                            hintText: 'Enter your password',
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscurePassword
-                                    ? Icons.visibility_outlined
-                                    : Icons.visibility_off_outlined,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurfaceVariant,
+                        Semantics(
+                          label: 'Password',
+                          hint: 'Enter your password',
+                          textField: true,
+                          child: TextFormField(
+                            controller: _passwordController,
+                            obscureText: _obscurePassword,
+                            textInputAction: TextInputAction.done,
+                            decoration: InputDecoration(
+                              labelText: 'Password',
+                              prefixIcon: const Icon(Icons.lock_outlined),
+                              hintText: 'Enter your password',
+                              suffixIcon: Semantics(
+                                label: _obscurePassword
+                                    ? 'Show password'
+                                    : 'Hide password',
+                                button: true,
+                                child: IconButton(
+                                  icon: Icon(
+                                    _obscurePassword
+                                        ? Icons.visibility_outlined
+                                        : Icons.visibility_off_outlined,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscurePassword = !_obscurePassword;
+                                    });
+                                  },
+                                ),
                               ),
-                              onPressed: () {
-                                setState(() {
-                                  _obscurePassword = !_obscurePassword;
-                                });
-                              },
                             ),
+                            validator: Validators.password,
                           ),
-                          validator: Validators.password,
                         ),
                         const SizedBox(height: 12),
                         // Forgot password
@@ -166,9 +185,9 @@ class _LoginPageState extends State<LoginPage> {
                                 vertical: 4,
                               ),
                             ),
-                            child: const Text(
+                            child: Text(
                               'Forgot Password?',
-                              style: TextStyle(
+                              style: GoogleFonts.nunito(
                                 color: AppColors.primaryGreen,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -183,7 +202,8 @@ class _LoginPageState extends State<LoginPage> {
                           icon: Icons.login_rounded,
                           gradient: AppColors.primaryGradient,
                           width: double.infinity,
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 18),
                         ),
                         if (state is AuthLoading)
                           const Padding(
@@ -221,9 +241,9 @@ class _LoginPageState extends State<LoginPage> {
                                   vertical: 4,
                                 ),
                               ),
-                              child: const Text(
+                              child: Text(
                                 'Sign Up',
-                                style: TextStyle(
+                                style: GoogleFonts.nunito(
                                   color: AppColors.primaryGreen,
                                   fontWeight: FontWeight.w700,
                                 ),
