@@ -9,11 +9,15 @@ import 'package:fitquest/core/navigation/app_router.dart';
 import 'package:fitquest/core/di/injection.dart';
 import 'package:fitquest/shared/services/local_storage_service.dart';
 import 'package:fitquest/core/services/cache_service.dart';
+import 'package:fitquest/core/services/theme_service.dart';
+import 'package:fitquest/core/services/firestore_cache_service.dart';
+import 'package:fitquest/core/constants/app_constants.dart';
 import 'package:fitquest/core/config/firebase_config.dart';
+import 'package:fitquest/core/config/image_cache_config.dart';
 import 'package:fitquest/features/authentication/bloc/auth_bloc.dart';
 import 'package:fitquest/features/authentication/bloc/auth_event.dart';
 import 'package:fitquest/features/activities/bloc/activity_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 Future<void> _initializeApp() async {
   // Initialize Hive (skip on web if it fails)
@@ -30,16 +34,30 @@ Future<void> _initializeApp() async {
   await FirebaseConfig.initialize();
   debugPrint('Firebase initialized');
 
-  // Enable Firestore persistence for offline support
+  // Enable Firestore persistence for offline support with cache size limits
   try {
     final firestore = FirebaseFirestore.instance;
-    firestore.settings = const Settings(
+    firestore.settings = Settings(
       persistenceEnabled: true,
-      cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+      cacheSizeBytes: AppConstants.firestoreCacheSizeBytes,
     );
-    debugPrint('Firestore persistence enabled');
+    debugPrint(
+        'Firestore persistence enabled with cache size: ${AppConstants.firestoreCacheSizeBytes ~/ (1024 * 1024)} MB');
   } catch (e) {
     debugPrint('Firestore persistence setup skipped: $e');
+    // On some platforms (e.g., web), settings might not be configurable
+    // This is okay - Firestore will use default settings
+  }
+
+  // Initialize Firestore cache service and ensure proper limits
+  debugPrint('Initializing Firestore cache service...');
+  try {
+    final firestoreCacheService = getIt<FirestoreCacheService>();
+    await firestoreCacheService.ensureCacheSizeLimit();
+    firestoreCacheService.logCacheStats();
+    debugPrint('Firestore cache service initialized');
+  } catch (e) {
+    debugPrint('Firestore cache service initialization skipped: $e');
   }
 
   // Initialize dependency injection
@@ -56,6 +74,16 @@ Future<void> _initializeApp() async {
   debugPrint('Initializing cache service...');
   await getIt<CacheService>().init();
   debugPrint('Cache service initialized');
+
+  // Initialize theme service
+  debugPrint('Initializing theme service...');
+  await getIt<ThemeService>().initialize();
+  debugPrint('Theme service initialized');
+
+  // Configure image cache
+  debugPrint('Configuring image cache...');
+  ImageCacheConfig.configure();
+  debugPrint('Image cache configured');
 }
 
 void main() async {
@@ -85,50 +113,26 @@ class FitQuestApp extends StatefulWidget {
 }
 
 class _FitQuestAppState extends State<FitQuestApp> {
-  ThemeMode _themeMode = ThemeMode.light; // Default to light mode
+  late ThemeService _themeService;
 
   @override
   void initState() {
     super.initState();
-    _loadThemeMode();
-    // Listen for theme changes periodically
-    _listenForThemeChanges();
+    _themeService = getIt<ThemeService>();
+    // Listen to theme changes reactively
+    _themeService.addListener(_onThemeChanged);
   }
 
-  Future<void> _loadThemeMode() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final darkMode = prefs.getBool('dark_mode');
-      if (mounted) {
-        setState(() {
-          // Default to light mode if no preference is set
-          _themeMode = darkMode == true ? ThemeMode.dark : ThemeMode.light;
-        });
-      }
-    } catch (e) {
-      debugPrint('Error loading theme mode: $e');
-      // Default to light mode on error
-      if (mounted) {
-        setState(() {
-          _themeMode = ThemeMode.light;
-        });
-      }
+  @override
+  void dispose() {
+    _themeService.removeListener(_onThemeChanged);
+    super.dispose();
+  }
+
+  void _onThemeChanged() {
+    if (mounted) {
+      setState(() {});
     }
-  }
-
-  void _listenForThemeChanges() {
-    // Check theme preference every 200ms when app is active for faster updates
-    Future.delayed(const Duration(milliseconds: 200), () {
-      if (mounted) {
-        _loadThemeMode();
-        _listenForThemeChanges();
-      }
-    });
-  }
-
-  // Method to trigger immediate theme reload (can be called from theme toggle)
-  void reloadTheme() {
-    _loadThemeMode();
   }
 
   @override
@@ -147,7 +151,7 @@ class _FitQuestAppState extends State<FitQuestApp> {
                 debugPrint('Stack: $stackTrace');
                 // Return a basic AuthBloc if DI fails
                 try {
-                  return AuthBloc(getIt(), getIt());
+                  return AuthBloc(getIt(), getIt(), getIt());
                 } catch (e2) {
                   debugPrint('Failed to create fallback AuthBloc: $e2');
                   rethrow;
@@ -164,7 +168,7 @@ class _FitQuestAppState extends State<FitQuestApp> {
                 debugPrint('Stack: $stackTrace');
                 // Return a basic ActivityBloc if DI fails
                 try {
-                  return ActivityBloc(getIt(), getIt(), getIt(), getIt());
+                  return ActivityBloc(getIt(), getIt(), getIt(), getIt(), getIt());
                 } catch (e2) {
                   debugPrint('Failed to create fallback ActivityBloc: $e2');
                   rethrow;
@@ -178,7 +182,7 @@ class _FitQuestAppState extends State<FitQuestApp> {
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
-          themeMode: _themeMode,
+          themeMode: _themeService.themeMode,
           onGenerateRoute: AppRouter.generateRoute,
           initialRoute: AppRouter.splash,
           builder: (context, child) {
@@ -211,9 +215,9 @@ class _FitQuestAppState extends State<FitQuestApp> {
                       color: Colors.red,
                     ),
                     const SizedBox(height: 16),
-                    const Text(
+                    Text(
                       'App Error',
-                      style: TextStyle(
+                      style: GoogleFonts.fredoka(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
@@ -222,7 +226,7 @@ class _FitQuestAppState extends State<FitQuestApp> {
                     Text(
                       'Error: $e',
                       textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 14),
+                      style: GoogleFonts.nunito(fontSize: 14),
                     ),
                     const SizedBox(height: 24),
                     ElevatedButton(
