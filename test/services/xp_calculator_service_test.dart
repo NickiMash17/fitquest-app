@@ -24,7 +24,7 @@ void main() {
 
         final xp = service.calculateXp(activity);
         expect(
-            xp, equals(30 * AppConstants.exerciseXpPerMinute)); // 30 * 5 = 150
+            xp, equals(30 * AppConstants.exerciseXpPerMinute),); // 30 * 5 = 150
       });
 
       test('calculates XP correctly for meditation activity', () {
@@ -38,7 +38,7 @@ void main() {
 
         final xp = service.calculateXp(activity);
         expect(xp,
-            equals(20 * AppConstants.meditationXpPerMinute)); // 20 * 7 = 140
+            equals(20 * AppConstants.meditationXpPerMinute),); // 20 * 7 = 140
       });
 
       test('calculates XP correctly for hydration activity', () {
@@ -104,7 +104,7 @@ void main() {
 
         final points = service.calculatePoints(activity);
         expect(points,
-            equals(30 * AppConstants.exercisePointsPerMinute)); // 30 * 2 = 60
+            equals(30 * AppConstants.exercisePointsPerMinute),); // 30 * 2 = 60
       });
 
       test('calculates points correctly for meditation activity', () {
@@ -118,7 +118,7 @@ void main() {
 
         final points = service.calculatePoints(activity);
         expect(points,
-            equals(20 * AppConstants.meditationPointsPerMinute)); // 20 * 3 = 60
+            equals(20 * AppConstants.meditationPointsPerMinute),); // 20 * 3 = 60
       });
 
       test('calculates points correctly for hydration activity', () {
@@ -133,7 +133,7 @@ void main() {
 
         final points = service.calculatePoints(activity);
         expect(points,
-            equals(4 * AppConstants.hydrationPointsPerGlass)); // 4 * 10 = 40
+            equals(4 * AppConstants.hydrationPointsPerGlass),); // 4 * 10 = 40
       });
 
       test('calculates points correctly for sleep activity', () {
@@ -148,7 +148,7 @@ void main() {
 
         final points = service.calculatePoints(activity);
         expect(
-            points, equals(8 * AppConstants.sleepPointsPerHour)); // 8 * 5 = 40
+            points, equals(8 * AppConstants.sleepPointsPerHour),); // 8 * 5 = 40
       });
     });
 

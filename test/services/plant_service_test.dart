@@ -60,7 +60,7 @@ void main() {
       test('returns correct XP for stage 1 (Seedling)', () {
         final xp = service.xpRequiredForNextStage(0);
         expect(
-            xp, equals(AppConstants.sproutStageThreshold - 0)); // 20 - 0 = 20
+            xp, equals(AppConstants.sproutStageThreshold - 0),); // 20 - 0 = 20
       });
 
       test('returns correct XP for stage 1 (Seedling) with XP below threshold', () {
