@@ -35,18 +35,21 @@ class ProfilePage extends StatelessWidget {
             return SingleChildScrollView(
               padding: AppSpacing.screenPadding,
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   // Enhanced Profile header
                   PremiumCard(
                     padding: const EdgeInsets.all(32.0),
                     gradient: AppColors.primaryGradient,
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         AnimatedPremiumAvatar(
                           user: user,
                           size: 100,
                           showBadge: true,
                           showLevelRing: true,
+                          usePlantAvatar: true,
                         ),
                         const SizedBox(height: 20),
                         Text(
@@ -241,6 +244,7 @@ class ProfilePage extends StatelessWidget {
       padding: const EdgeInsets.all(20.0),
       gradient: gradient,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
             padding: const EdgeInsets.all(12),
@@ -302,6 +306,7 @@ class ProfilePage extends StatelessWidget {
             const SizedBox(width: 16),
             Expanded(
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -321,7 +326,7 @@ class ProfilePage extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(
+            Icon(
               Icons.chevron_right_rounded,
               color: AppColors.textTertiary,
             ),

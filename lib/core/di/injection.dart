@@ -6,13 +6,19 @@ import 'package:fitquest/shared/repositories/user_repository.dart';
 import 'package:fitquest/shared/repositories/activity_repository.dart';
 import 'package:fitquest/shared/repositories/challenge_repository.dart';
 import 'package:fitquest/shared/repositories/leaderboard_repository.dart';
+import 'package:fitquest/shared/repositories/goal_repository.dart';
 import 'package:fitquest/shared/services/xp_calculator_service.dart';
 import 'package:fitquest/shared/services/plant_service.dart';
 import 'package:fitquest/shared/services/local_storage_service.dart';
 import 'package:fitquest/core/services/cache_service.dart';
+import 'package:fitquest/core/services/performance_cache_service.dart';
 import 'package:fitquest/core/services/analytics_service.dart';
 import 'package:fitquest/core/services/connectivity_service.dart';
+import 'package:fitquest/core/services/theme_service.dart';
+import 'package:fitquest/core/services/firestore_cache_service.dart';
+import 'package:fitquest/core/services/error_handler_service.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:fitquest/features/authentication/bloc/auth_bloc.dart';
 import 'package:fitquest/features/activities/bloc/activity_bloc.dart';
 import 'package:fitquest/features/home/bloc/home_bloc.dart';
@@ -27,12 +33,16 @@ void configureDependencies() {
   if (_isConfigured) {
     return;
   }
-  
+
   // Register Firebase services
   getIt.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
-  getIt.registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance);
-  getIt.registerLazySingleton<FirebaseAnalytics>(() => FirebaseAnalytics.instance);
-  
+  getIt.registerLazySingleton<FirebaseFirestore>(
+      () => FirebaseFirestore.instance,);
+  getIt.registerLazySingleton<FirebaseAnalytics>(
+      () => FirebaseAnalytics.instance,);
+  getIt.registerLazySingleton<FirebaseCrashlytics>(
+      () => FirebaseCrashlytics.instance,);
+
   // Register repositories
   getIt.registerLazySingleton<UserRepository>(
     () => UserRepository(getIt(), getIt()),
@@ -46,31 +56,50 @@ void configureDependencies() {
   getIt.registerLazySingleton<LeaderboardRepository>(
     () => LeaderboardRepository(getIt()),
   );
-  
+  getIt.registerLazySingleton<GoalRepository>(
+    () => GoalRepository(getIt()),
+  );
+
   // Register services
   getIt.registerLazySingleton<LocalStorageService>(() => LocalStorageService());
   getIt.registerLazySingleton<XpCalculatorService>(() => XpCalculatorService());
   getIt.registerLazySingleton<PlantService>(
     () => PlantService(getIt<XpCalculatorService>()),
   );
-  
-  // Register cache service
+
+  // Register cache services
   getIt.registerLazySingleton<CacheService>(() => CacheService());
-  
+  getIt.registerLazySingleton<PerformanceCacheService>(
+    () => PerformanceCacheService(getIt()),
+  );
+
   // Register analytics service
   getIt.registerLazySingleton<AnalyticsService>(
     () => AnalyticsService(getIt()),
   );
-  
+
   // Register connectivity service
   getIt.registerLazySingleton<ConnectivityService>(() => ConnectivityService());
-  
+
+  // Register theme service
+  getIt.registerLazySingleton<ThemeService>(() => ThemeService());
+
+  // Register Firestore cache service
+  getIt.registerLazySingleton<FirestoreCacheService>(
+    () => FirestoreCacheService(getIt()),
+  );
+
+  // Register error handler service
+  getIt.registerLazySingleton<ErrorHandlerService>(
+    () => ErrorHandlerService(getIt(), getIt()),
+  );
+
   // Register BLoCs (factories - can be registered multiple times safely)
   getIt.registerFactory<AuthBloc>(
-    () => AuthBloc(getIt(), getIt()),
+    () => AuthBloc(getIt(), getIt(), getIt()),
   );
   getIt.registerFactory<ActivityBloc>(
-    () => ActivityBloc(getIt(), getIt(), getIt(), getIt()),
+    () => ActivityBloc(getIt(), getIt(), getIt(), getIt(), getIt()),
   );
   getIt.registerFactory<HomeBloc>(
     () => HomeBloc(
@@ -78,9 +107,9 @@ void configureDependencies() {
       getIt<ChallengeRepository>(),
       getIt<ActivityRepository>(),
       getIt<FirebaseAuth>(),
+      getIt<ErrorHandlerService>(),
     ),
   );
-  
+
   _isConfigured = true;
 }
-

@@ -45,9 +45,9 @@ class SmartInsightsWidget extends StatelessWidget {
     } else if (health < 75) {
       return '🌱 Your plant is doing well! Keep up the consistency to see it thrive.';
     } else if (streak >= 7) {
-      return '🔥 Amazing ${streak}-day streak! Your dedication is inspiring your plant to grow!';
+      return '🔥 Amazing $streak-day streak! Your dedication is inspiring your plant to grow!';
     } else if (streak >= 3) {
-      return '✨ Great momentum! Your ${streak}-day streak is helping your plant flourish!';
+      return '✨ Great momentum! Your $streak-day streak is helping your plant flourish!';
     } else {
       return '🌿 Every activity counts! Your plant grows stronger with each logged session.';
     }
@@ -74,6 +74,7 @@ class SmartInsightsWidget extends StatelessWidget {
       padding: const EdgeInsets.all(20.0),
       backgroundColor: Theme.of(context).colorScheme.surface,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
@@ -127,6 +128,7 @@ class SmartInsightsWidget extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(

@@ -3,11 +3,13 @@ import 'package:fitquest/core/constants/app_colors.dart';
 import 'package:fitquest/core/constants/app_spacing.dart';
 import 'package:fitquest/core/constants/app_border_radius.dart';
 import 'package:fitquest/shared/repositories/leaderboard_repository.dart';
+import 'package:fitquest/shared/repositories/user_repository.dart';
 import 'package:fitquest/core/di/injection.dart';
 import 'package:fitquest/shared/models/leaderboard_entry.dart';
 import 'package:fitquest/shared/models/user_model.dart';
 import 'package:fitquest/shared/widgets/premium_card.dart';
 import 'package:fitquest/shared/widgets/premium_avatar.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class LeaderboardPage extends StatefulWidget {
   const LeaderboardPage({super.key});
@@ -20,22 +22,76 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
   final _leaderboardRepository = getIt<LeaderboardRepository>();
   List<LeaderboardEntry> _entries = [];
   bool _isLoading = true;
+  final ScrollController _scrollController = ScrollController();
+  bool _isLoadingMore = false;
+  bool _hasMore = true;
+  int _limit = 20;
+  Map<String, UserModel> _userInfoMap = {};
 
   @override
   void initState() {
     super.initState();
     _loadLeaderboard();
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >=
+              _scrollController.position.maxScrollExtent - 200 &&
+          !_isLoadingMore &&
+          _hasMore) {
+        _loadMore();
+      }
+    });
   }
 
-  Future<void> _loadLeaderboard() async {
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadLeaderboard({bool clear = false}) async {
     setState(() {
       _isLoading = true;
     });
     try {
-      final entries = await _leaderboardRepository.getLeaderboard();
+      final entries =
+          await _leaderboardRepository.getLeaderboard(limit: _limit);
+      // Ensure ranks are monotonically increasing
+      final indexed = List<LeaderboardEntry>.generate(
+          entries.length, (i) => entries[i].copyWith(rank: i + 1));
+
+      // Enrich entries with user details for accurate avatars
+      final userRepo = getIt<UserRepository>();
+      final userIds = indexed.map((e) => e.userId).toList();
+      final users = await userRepo.getUsersBulk(userIds);
+      final userMap = {for (final u in users) u.id: u};
+      final enriched = indexed.map((e) {
+        final u = userMap[e.userId];
+        return e.copyWith(photoUrl: u?.photoUrl ?? e.photoUrl);
+      }).toList();
+
       setState(() {
-        _entries = entries;
+        _entries = enriched;
+        _userInfoMap = userMap;
         _isLoading = false;
+      });
+
+      // Pre-cache top avatar images to speed up scrolling
+      final urls = _entries
+          .where((e) => e.photoUrl != null)
+          .take(10)
+          .map((e) => e.photoUrl!)
+          .toList();
+      if (urls.isNotEmpty && mounted) {
+        try {
+          await Future.wait(urls.map(
+              (u) => precacheImage(CachedNetworkImageProvider(u), context)));
+        } catch (_) {
+          // ignore - let the image provider handle failures
+        }
+      }
+      // Determine paging state
+      setState(() {
+        _hasMore = entries.length == _limit;
       });
     } catch (e) {
       setState(() {
@@ -46,6 +102,33 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
           const SnackBar(content: Text('Failed to load leaderboard')),
         );
       }
+    }
+  }
+
+  Future<void> _loadMore() async {
+    if (!_hasMore || _isLoadingMore || _isLoading) return;
+    setState(() => _isLoadingMore = true);
+    try {
+      final lastXp = _entries.isNotEmpty ? _entries.last.totalXp : null;
+      final more = await _leaderboardRepository.getLeaderboard(
+          limit: _limit, startAfterXp: lastXp);
+      // Fetch user details for the new page
+      final userRepo = getIt<UserRepository>();
+      final userIds = more.map((e) => e.userId).toList();
+      final users = await userRepo.getUsersBulk(userIds);
+      final userMap = {for (final u in users) u.id: u};
+      setState(() {
+        final startIndex = _entries.length;
+        final adjusted = List<LeaderboardEntry>.generate(
+            more.length, (i) => more[i].copyWith(rank: startIndex + i + 1));
+        _entries.addAll(adjusted);
+        _userInfoMap.addEntries(userMap.entries);
+        _hasMore = more.length == _limit;
+      });
+    } catch (e) {
+      // ignore - show existing list
+    } finally {
+      setState(() => _isLoadingMore = false);
     }
   }
 
@@ -94,21 +177,30 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
               onRefresh: _loadLeaderboard,
               child: ListView.builder(
                 padding: AppSpacing.screenPadding,
-                itemCount: _entries.length,
+                itemCount: _entries.length + (_isLoadingMore ? 1 : 0),
+                controller: _scrollController,
                 itemBuilder: (context, index) {
+                  if (index >= _entries.length) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 12.0),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
                   final entry = _entries[index];
                   final rankGradient = _getRankGradient(entry.rank);
 
-                  // Create user model for avatar
-                  final userModel = UserModel(
-                    id: entry.userId,
-                    email: '',
-                    displayName: entry.displayName,
-                    photoUrl: entry.photoUrl,
-                    totalXp: entry.totalXp,
-                    currentLevel: entry.currentLevel,
-                    currentStreak: entry.currentStreak,
-                  );
+                  // Create user model for avatar, prefer enriched user info where available
+                  final enrichedUser = _userInfoMap[entry.userId];
+                  final userModel = enrichedUser ??
+                      UserModel(
+                        id: entry.userId,
+                        email: '',
+                        displayName: entry.displayName,
+                        photoUrl: entry.photoUrl,
+                        totalXp: entry.totalXp,
+                        currentLevel: entry.currentLevel,
+                        currentStreak: entry.currentStreak,
+                      );
 
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 12),
@@ -116,8 +208,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                       padding: const EdgeInsets.all(20),
                       showShadow: true,
                       backgroundColor: entry.rank <= 3
-                          ? _getRankColor(entry.rank)
-                              .withValues(alpha: 0.05)
+                          ? _getRankColor(entry.rank).withValues(alpha: 0.05)
                           : null,
                       border: entry.rank <= 3
                           ? Border.all(
@@ -158,6 +249,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                             size: 56,
                             showBadge: true,
                             showLevelRing: true,
+                            usePlantAvatar: true,
                           ),
                           const SizedBox(width: 16),
                           // User info
@@ -190,8 +282,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                                         ),
                                         decoration: BoxDecoration(
                                           gradient: rankGradient,
-                                          borderRadius:
-                                              AppBorderRadius.allSM,
+                                          borderRadius: AppBorderRadius.allSM,
                                         ),
                                         child: Text(
                                           '#${entry.rank}',
@@ -318,7 +409,8 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                                       .textTheme
                                       .labelSmall
                                       ?.copyWith(
-                                        color: Colors.white.withValues(alpha: 0.9),
+                                        color:
+                                            Colors.white.withValues(alpha: 0.9),
                                         fontWeight: FontWeight.w600,
                                       ),
                                 ),

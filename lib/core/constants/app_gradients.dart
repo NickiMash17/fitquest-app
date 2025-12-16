@@ -1,11 +1,51 @@
 // lib/core/constants/app_gradients.dart
 import 'package:flutter/material.dart';
 
-/// Premium gradient system for the app
+/// Sophisticated gradients - subtle, multi-stop, professional
 class AppGradients {
   AppGradients._();
 
-  // Level-based avatar gradients
+  // Sophisticated gradients - subtle, multi-stop, professional
+
+  static const premiumGreen = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Color(0xFF1E5631),
+      Color(0xFF2D7A4A),
+      Color(0xFF1E5631),
+    ],
+    stops: [0.0, 0.5, 1.0],
+  );
+
+  static const glassEffect = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Color(0x40FFFFFF),
+      Color(0x10FFFFFF),
+    ],
+  );
+
+  static const premiumGold = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Color(0xFFD4AF37),
+      Color(0xFFFFD700),
+      Color(0xFFD4AF37),
+    ],
+    stops: [0.0, 0.5, 1.0],
+  );
+
+  // Mesh gradients for depth (requires custom implementation)
+  static const meshBackground = [
+    Color(0xFFF5F7F4),
+    Color(0xFFE8F0E3),
+    Color(0xFFD9E7D1),
+  ];
+
+  // Legacy compatibility
   static const Gradient level1to4 = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
@@ -36,7 +76,6 @@ class AppGradients {
     colors: [Color(0xFFFFD700), Color(0xFFFFA000)],
   );
 
-  // Premium card gradients
   static const Gradient premiumCard = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
@@ -55,13 +94,12 @@ class AppGradients {
     ],
   );
 
-  // Glassmorphic gradients
   static Gradient glassmorphicLight = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [
-      Colors.white.withValues(alpha: 0.25),
-      Colors.white.withValues(alpha: 0.1),
+      Colors.white.withOpacity(0.25),
+      Colors.white.withOpacity(0.1),
     ],
   );
 
@@ -69,34 +107,8 @@ class AppGradients {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [
-      Colors.white.withValues(alpha: 0.1),
-      Colors.white.withValues(alpha: 0.05),
+      Colors.white.withOpacity(0.1),
+      Colors.white.withOpacity(0.05),
     ],
   );
-
-  // Accent gradients
-  static const Gradient sunset = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [Color(0xFFFF6B6B), Color(0xFFFF8E53)],
-  );
-
-  static const Gradient ocean = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
-  );
-
-  static const Gradient forest = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [Color(0xFF134E5E), Color(0xFF71B280)],
-  );
-
-  static const Gradient aurora = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [Color(0xFF00C9FF), Color(0xFF92FE9D)],
-  );
 }
-

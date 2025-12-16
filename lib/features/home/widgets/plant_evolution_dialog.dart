@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
 import 'package:fitquest/core/constants/app_colors.dart';
 import 'package:fitquest/core/constants/app_border_radius.dart';
-import 'package:fitquest/shared/widgets/image_with_fallback.dart';
-import 'package:fitquest/core/utils/image_url_helper.dart';
+import 'package:fitquest/shared/widgets/custom_plant_widget.dart';
 import 'package:fitquest/shared/services/plant_service.dart';
 import 'package:fitquest/core/di/injection.dart';
 
@@ -148,17 +147,9 @@ class _PlantEvolutionDialogState extends State<PlantEvolutionDialog>
                                 color: Colors.white.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: ImageWithFallback(
-                                imageUrl: ImageUrlHelper.getPlantImageUrl(
-                                    widget.oldStage),
-                                assetPath: _getPlantImagePath(widget.oldStage),
-                                fallbackIcon: Icons.eco_rounded,
-                                width: 80,
-                                height: 80,
-                                fit: BoxFit.cover,
-                                backgroundColor:
-                                    Colors.white.withValues(alpha: 0.2),
-                                iconColor: Colors.white,
+                              child: CustomPlantWidget(
+                                evolutionStage: widget.oldStage,
+                                size: 80,
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -200,17 +191,9 @@ class _PlantEvolutionDialogState extends State<PlantEvolutionDialog>
                                   ),
                                 ],
                               ),
-                              child: ImageWithFallback(
-                                imageUrl: ImageUrlHelper.getPlantImageUrl(
-                                    widget.newStage),
-                                assetPath: _getPlantImagePath(widget.newStage),
-                                fallbackIcon: Icons.eco_rounded,
-                                width: 100,
-                                height: 100,
-                                fit: BoxFit.cover,
-                                backgroundColor:
-                                    Colors.white.withValues(alpha: 0.2),
-                                iconColor: Colors.white,
+                              child: CustomPlantWidget(
+                                evolutionStage: widget.newStage,
+                                size: 100,
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -268,18 +251,5 @@ class _PlantEvolutionDialogState extends State<PlantEvolutionDialog>
     );
   }
 
-  String _getPlantImagePath(int evolutionStage) {
-    if (evolutionStage <= 1) {
-      return 'assets/images/companion/seed.png';
-    } else if (evolutionStage <= 2) {
-      return 'assets/images/companion/sprout.png';
-    } else if (evolutionStage <= 3) {
-      return 'assets/images/companion/sapling.png';
-    } else if (evolutionStage <= 4) {
-      return 'assets/images/companion/tree.png';
-    } else {
-      return 'assets/images/companion/ancient_tree.png';
-    }
-  }
 }
 

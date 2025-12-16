@@ -19,7 +19,7 @@ class AchievementToast extends StatefulWidget {
     required this.title,
     required this.message,
     required this.icon,
-    this.color = AppColors.primaryGreen,
+    this.color = const Color(0xFF288347), // AppColors.primaryGreen equivalent
     this.gradient,
     this.points,
     this.onDismiss,
@@ -83,7 +83,7 @@ class _AchievementToastState extends State<AchievementToast>
     ).animate(CurvedAnimation(
       parent: _controller,
       curve: Curves.easeOutCubic,
-    ));
+    ),);
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeOut),
@@ -248,7 +248,7 @@ class _AchievementToastState extends State<AchievementToast>
                     emissionFrequency: 0.05,
                     numberOfParticles: 20,
                     gravity: 0.1,
-                    colors: const [
+                    colors: [
                       Colors.white,
                       AppColors.primaryGreen,
                       AppColors.accentOrange,
@@ -312,7 +312,7 @@ class _ToastOverlayState extends State<_ToastOverlay>
     ).animate(CurvedAnimation(
       parent: _controller,
       curve: Curves.easeOutCubic,
-    ));
+    ),);
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeOut),
@@ -490,7 +490,7 @@ class _ToastOverlayState extends State<_ToastOverlay>
                             emissionFrequency: 0.05,
                             numberOfParticles: 20,
                             gravity: 0.1,
-                            colors: const [
+                            colors: [
                               Colors.white,
                               AppColors.primaryGreen,
                               AppColors.accentOrange,

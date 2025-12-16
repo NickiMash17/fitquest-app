@@ -1,13 +1,14 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:logger/logger.dart';
 import 'package:fitquest/features/activities/bloc/activity_event.dart';
 import 'package:fitquest/features/activities/bloc/activity_state.dart';
 import 'package:fitquest/shared/repositories/activity_repository.dart';
 import 'package:fitquest/shared/repositories/user_repository.dart';
 import 'package:fitquest/shared/services/xp_calculator_service.dart';
 import 'package:fitquest/shared/models/activity_model.dart';
+import 'package:fitquest/core/services/error_handler_service.dart';
+import 'package:fitquest/core/utils/secure_logger.dart';
 import 'package:uuid/uuid.dart';
 
 /// Activity BLoC
@@ -17,7 +18,7 @@ class ActivityBloc extends Bloc<ActivityEvent, ActivityState> {
   final UserRepository _userRepository;
   final XpCalculatorService _xpCalculator;
   final FirebaseAuth _auth;
-  final Logger _logger = Logger();
+  final ErrorHandlerService _errorHandler;
   final Uuid _uuid = const Uuid();
 
   ActivityBloc(
@@ -25,6 +26,7 @@ class ActivityBloc extends Bloc<ActivityEvent, ActivityState> {
     this._userRepository,
     this._xpCalculator,
     this._auth,
+    this._errorHandler,
   ) : super(const ActivityInitial()) {
     on<ActivitiesLoadRequested>(_onActivitiesLoadRequested);
     on<ActivityCreateRequested>(_onActivityCreateRequested);
@@ -47,30 +49,46 @@ class ActivityBloc extends Bloc<ActivityEvent, ActivityState> {
       // Load activities - handle errors gracefully
       try {
         final activities = await _activityRepository.getActivities(userId);
-        _logger.d('Loaded ${activities.length} activities');
-        emit(ActivityLoaded(activities: activities));
+        SecureLogger.d('Loaded ${activities.length} activities');
+        
+        // Additional deduplication at bloc level
+        final seenIds = <String>{};
+        final uniqueActivities = activities.where((activity) {
+          if (seenIds.contains(activity.id)) {
+            SecureLogger.w('Duplicate activity detected in bloc: ${activity.id}');
+            return false;
+          }
+          seenIds.add(activity.id);
+          return true;
+        }).toList();
+        
+        SecureLogger.d('After deduplication: ${uniqueActivities.length} unique activities');
+        emit(ActivityLoaded(activities: uniqueActivities));
       } on FirebaseException catch (e) {
         // Handle Firestore index errors gracefully
         if (e.code == 'failed-precondition') {
-          _logger.w('Firestore index not created yet. Showing empty list.');
+          SecureLogger.w('Firestore index not created yet. Showing empty list.');
           emit(const ActivityLoaded(activities: []));
         } else {
-          _logger.e('Error loading activities', error: e);
-          emit(const ActivityError(message: 'Failed to load activities'));
+          SecureLogger.e('Error loading activities', error: e);
+          final message = _errorHandler.handleFirebaseException(e);
+          emit(ActivityError(message: message));
         }
       } catch (e, stackTrace) {
-        _logger.e('Error loading activities', error: e, stackTrace: stackTrace);
+        SecureLogger.e('Error loading activities',
+            error: e, stackTrace: stackTrace,);
         // On any other error, show empty list instead of error state
-        _logger.w('Showing empty list due to error');
+        SecureLogger.w('Showing empty list due to error');
         emit(const ActivityLoaded(activities: []));
       }
     } catch (e, stackTrace) {
-      _logger.e(
+      SecureLogger.e(
         'Unexpected error loading activities',
         error: e,
         stackTrace: stackTrace,
       );
-      emit(const ActivityError(message: 'Failed to load activities'));
+      final message = _errorHandler.handleError(e, type: ErrorType.unknown);
+      emit(ActivityError(message: message));
     }
   }
 
@@ -78,12 +96,12 @@ class ActivityBloc extends Bloc<ActivityEvent, ActivityState> {
     ActivityCreateRequested event,
     Emitter<ActivityState> emit,
   ) async {
-    _logger.i('=== ACTIVITY CREATE REQUESTED ===');
-    _logger.i(
-        'Event received: ${event.activity.type}, duration: ${event.activity.duration}');
+    SecureLogger.i('=== ACTIVITY CREATE REQUESTED ===');
+    SecureLogger.i(
+        'Event received: ${event.activity.type}, duration: ${event.activity.duration}',);
 
     // Emit loading state first to ensure state change
-    _logger.i('Emitting ActivityLoading state');
+    SecureLogger.i('Emitting ActivityLoading state');
     emit(const ActivityLoading());
 
     try {
@@ -106,59 +124,60 @@ class ActivityBloc extends Bloc<ActivityEvent, ActivityState> {
         createdAt: DateTime.now(),
       );
 
-      _logger.i('Creating activity: ${activity.id} for user: $userId');
-      _logger.i(
-          'Activity details: type=${activity.type}, duration=${activity.duration}, date=${activity.date}');
+      SecureLogger.i('Creating activity: ${activity.id} for user: $userId');
+      SecureLogger.i(
+          'Activity details: type=${activity.type}, duration=${activity.duration}, date=${activity.date}',);
 
       // Save activity
       String savedId;
       try {
         savedId = await _activityRepository.createActivity(activity);
-        _logger.i(
-            'Activity saved to Firestore with ID: $savedId (original: ${activity.id})');
+        SecureLogger.i(
+            'Activity saved to Firestore with ID: $savedId (original: ${activity.id})',);
       } catch (e, stackTrace) {
-        _logger.e('CRITICAL: Failed to save activity to Firestore',
-            error: e, stackTrace: stackTrace);
-        emit(
-            ActivityError(message: 'Failed to save activity: ${e.toString()}'));
+        SecureLogger.e('CRITICAL: Failed to save activity to Firestore',
+            error: e, stackTrace: stackTrace,);
+        final message = _errorHandler.handleError(e, type: ErrorType.server);
+        emit(ActivityError(message: message));
         return;
       }
 
       // Update user XP and points
       try {
         await _userRepository.addXp(userId, xp);
-        _logger.i('User XP updated');
+        SecureLogger.i('User XP updated');
       } catch (e, stackTrace) {
-        _logger.w('Failed to update user XP (non-critical): $e',
-            error: e, stackTrace: stackTrace);
+        SecureLogger.w('Failed to update user XP (non-critical): $e',
+            error: e, stackTrace: stackTrace,);
         // Continue even if XP update fails
       }
 
       // Update streak
       try {
         await _updateStreak(userId);
-        _logger.i('Streak updated');
+        SecureLogger.i('Streak updated');
       } catch (e, stackTrace) {
-        _logger.w('Failed to update streak (non-critical): $e',
-            error: e, stackTrace: stackTrace);
+        SecureLogger.w('Failed to update streak (non-critical): $e',
+            error: e, stackTrace: stackTrace,);
         // Continue even if streak update fails
       }
 
-      _logger.i('Activity created successfully: ${activity.id}');
-      _logger.i('Firestore document ID: $savedId');
+      SecureLogger.i('Activity created successfully: ${activity.id}');
+      SecureLogger.i('Firestore document ID: $savedId');
 
       // First, verify the document exists by reading it directly
       try {
         final verifiedActivity = await _activityRepository.getActivityById(savedId);
         if (verifiedActivity != null) {
-          _logger.i('Verified: Activity document exists and can be loaded');
-          _logger.i('Verified activity userId: ${verifiedActivity.userId}, expected: $userId');
-          _logger.i('Verified activity date: ${verifiedActivity.date}');
+          SecureLogger.i('Verified: Activity document exists and can be loaded');
+          SecureLogger.i('Verified activity userId: ${verifiedActivity.userId}, expected: $userId');
+          SecureLogger.i('Verified activity date: ${verifiedActivity.date}');
         } else {
-          _logger.e('ERROR: Activity document exists but cannot be loaded!');
+          SecureLogger.e('ERROR: Activity document exists but cannot be loaded!');
         }
       } catch (e, stackTrace) {
-        _logger.e('Error verifying activity document', error: e, stackTrace: stackTrace);
+        SecureLogger.e('Error verifying activity document',
+            error: e, stackTrace: stackTrace,);
       }
 
       // Wait a moment for Firestore to be ready, then reload
@@ -171,14 +190,14 @@ class ActivityBloc extends Bloc<ActivityEvent, ActivityState> {
 
       for (int attempt = 0; attempt < 3; attempt++) {
         try {
-          _logger.i(
-              'Reloading activities after creation (attempt ${attempt + 1}/3)...');
+          SecureLogger.i(
+              'Reloading activities after creation (attempt ${attempt + 1}/3)...',);
           activities = await _activityRepository.getActivities(userId);
-          _logger.i('Reloaded ${activities.length} activities after creation');
-          _logger
+          SecureLogger.i('Reloaded ${activities.length} activities after creation');
+          SecureLogger
               .i('Looking for activity with ID: $savedId (Firestore doc ID)');
-          _logger.i(
-              'Loaded activity IDs: ${activities.map((a) => a.id).toList()}');
+          SecureLogger.i(
+              'Loaded activity IDs: ${activities.map((a) => a.id).toList()}',);
 
           // Verify the new activity is in the list
           // Note: savedId is the Firestore document ID, which should match doc.id when reloading
@@ -192,29 +211,29 @@ class ActivityBloc extends Bloc<ActivityEvent, ActivityState> {
                 a.date.year == activity.date.year &&
                 a.date.month == activity.date.month &&
                 a.date.day == activity.date.day &&
-                a.duration == activity.duration);
+                a.duration == activity.duration,);
             if (foundActivity) {
-              _logger.i('Found activity by matching fields (not by ID)');
+              SecureLogger.i('Found activity by matching fields (not by ID)');
             }
           }
 
-          _logger.i('New activity found in reloaded list: $foundActivity');
+          SecureLogger.i('New activity found in reloaded list: $foundActivity');
 
           if (foundActivity) {
-            _logger.i('Activity found on attempt ${attempt + 1}');
+            SecureLogger.i('Activity found on attempt ${attempt + 1}');
             break; // Found it, exit loop
           }
 
           if (attempt < 2) {
             // Wait a bit longer before next attempt
             final delayMs = 800 * (attempt + 1);
-            _logger
+            SecureLogger
                 .i('Activity not found, waiting ${delayMs}ms before retry...');
             await Future.delayed(Duration(milliseconds: delayMs));
           }
         } catch (e, stackTrace) {
-          _logger.e('Error reloading activities (attempt ${attempt + 1})',
-              error: e, stackTrace: stackTrace);
+          SecureLogger.e('Error reloading activities (attempt ${attempt + 1})',
+              error: e, stackTrace: stackTrace,);
           if (attempt == 2) {
             // Last attempt failed, but still emit what we have
             break;
@@ -225,47 +244,49 @@ class ActivityBloc extends Bloc<ActivityEvent, ActivityState> {
 
       // If still not found, try to get it directly and add it to the list
       if (!foundActivity) {
-        _logger.w(
-            'WARNING: New activity not found in reloaded list after 3 attempts!');
-        _logger
+        SecureLogger.w(
+            'WARNING: New activity not found in reloaded list after 3 attempts!',);
+        SecureLogger
             .w('Activity UUID: ${activity.id}, Saved Firestore ID: $savedId');
-        _logger
+        SecureLogger
             .w('Activity userId: ${activity.userId}, Current userId: $userId');
-        _logger.w(
-            'Activity type: ${activity.type.name}, duration: ${activity.duration}');
-        _logger.w('Activity date: ${activity.date}');
-        _logger.w('Loaded ${activities.length} activities');
+        SecureLogger.w(
+            'Activity type: ${activity.type.name}, duration: ${activity.duration}',);
+        SecureLogger.w('Activity date: ${activity.date}');
+        SecureLogger.w('Loaded ${activities.length} activities');
         if (activities.isNotEmpty) {
-          _logger.w(
-              'First loaded activity: userId=${activities.first.userId}, type=${activities.first.type.name}');
+          SecureLogger.w(
+              'First loaded activity: userId=${activities.first.userId}, type=${activities.first.type.name}',);
         }
         
         // Try to get the activity directly and add it to the list
         try {
           final directActivity = await _activityRepository.getActivityById(savedId);
           if (directActivity != null) {
-            _logger.i('Found activity by direct lookup, adding to list');
+            SecureLogger.i('Found activity by direct lookup, adding to list');
             // Check if it's not already in the list (by ID)
             if (!activities.any((a) => a.id == savedId)) {
               activities.insert(0, directActivity); // Add at the beginning
-              _logger.i('Added activity to list directly. New count: ${activities.length}');
+              SecureLogger.i('Added activity to list directly. New count: ${activities.length}');
               foundActivity = true;
             }
           } else {
-            _logger.e('Activity cannot be loaded even by direct lookup!');
+            SecureLogger.e('Activity cannot be loaded even by direct lookup!');
           }
         } catch (e, stackTrace) {
-          _logger.e('Error loading activity directly', error: e, stackTrace: stackTrace);
+          SecureLogger.e('Error loading activity directly',
+              error: e, stackTrace: stackTrace,);
         }
       }
 
       // Always emit ActivityLoaded to trigger listener
       emit(ActivityLoaded(activities: activities));
-      _logger.i('Emitted ActivityLoaded with ${activities.length} activities');
+      SecureLogger.i('Emitted ActivityLoaded with ${activities.length} activities');
     } catch (e, stackTrace) {
-      _logger.e('Error creating activity', error: e, stackTrace: stackTrace);
-      emit(
-          ActivityError(message: 'Failed to create activity: ${e.toString()}'));
+      SecureLogger.e('Error creating activity',
+          error: e, stackTrace: stackTrace,);
+      final message = _errorHandler.handleError(e, type: ErrorType.server);
+      emit(ActivityError(message: message));
     }
   }
 
@@ -275,10 +296,12 @@ class ActivityBloc extends Bloc<ActivityEvent, ActivityState> {
   ) async {
     try {
       await _activityRepository.updateActivity(event.activity);
-      _logger.i('Activity updated: ${event.activity.id}');
+      SecureLogger.i('Activity updated: ${event.activity.id}');
     } catch (e, stackTrace) {
-      _logger.e('Error updating activity', error: e, stackTrace: stackTrace);
-      emit(const ActivityError(message: 'Failed to update activity'));
+      SecureLogger.e('Error updating activity',
+          error: e, stackTrace: stackTrace,);
+      final message = _errorHandler.handleError(e, type: ErrorType.server);
+      emit(ActivityError(message: message));
     }
   }
 
@@ -288,10 +311,12 @@ class ActivityBloc extends Bloc<ActivityEvent, ActivityState> {
   ) async {
     try {
       await _activityRepository.deleteActivity(event.activityId);
-      _logger.i('Activity deleted: ${event.activityId}');
+      SecureLogger.i('Activity deleted: ${event.activityId}');
     } catch (e, stackTrace) {
-      _logger.e('Error deleting activity', error: e, stackTrace: stackTrace);
-      emit(const ActivityError(message: 'Failed to delete activity'));
+      SecureLogger.e('Error deleting activity',
+          error: e, stackTrace: stackTrace,);
+      final message = _errorHandler.handleError(e, type: ErrorType.server);
+      emit(ActivityError(message: message));
     }
   }
 
@@ -322,7 +347,8 @@ class ActivityBloc extends Bloc<ActivityEvent, ActivityState> {
 
       await _userRepository.updateStreak(userId, newStreak);
     } catch (e, stackTrace) {
-      _logger.e('Error updating streak', error: e, stackTrace: stackTrace);
+      SecureLogger.e('Error updating streak',
+          error: e, stackTrace: stackTrace,);
     }
   }
 }

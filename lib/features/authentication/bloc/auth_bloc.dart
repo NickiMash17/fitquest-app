@@ -1,20 +1,22 @@
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
-import 'package:logger/logger.dart';
 import 'package:fitquest/features/authentication/bloc/auth_event.dart';
 import 'package:fitquest/features/authentication/bloc/auth_state.dart';
 import 'package:fitquest/shared/repositories/user_repository.dart';
 import 'package:fitquest/shared/models/user_model.dart';
+import 'package:fitquest/core/services/error_handler_service.dart';
+import 'package:fitquest/core/utils/secure_logger.dart';
 
 /// Authentication BLoC
 @injectable
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final firebase_auth.FirebaseAuth _auth;
   final UserRepository _userRepository;
-  final Logger _logger = Logger();
+  final ErrorHandlerService _errorHandler;
 
-  AuthBloc(this._auth, this._userRepository) : super(const AuthInitial()) {
+  AuthBloc(this._auth, this._userRepository, this._errorHandler)
+      : super(const AuthInitial()) {
     on<AuthCheckRequested>(_onAuthCheckRequested);
     on<AuthSignInRequested>(_onSignInRequested);
     on<AuthSignUpRequested>(_onSignUpRequested);
@@ -37,8 +39,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         }
       },
       onError: (error) {
-        _logger.w(
-            'Auth state change error (likely expired token), signing out: $error',);
+        SecureLogger.w(
+          'Auth state change error (likely expired token), signing out: $error',
+        );
         // If there's an error (like invalid credentials), sign out gracefully
         if (state is! AuthUnauthenticated) {
           add(const AuthSignOutRequested());
@@ -59,13 +62,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         // Reload the user to refresh the token and check if it's still valid
         try {
           await user.reload();
-          // If reload succeeds, the token is valid
-          await _loadUserData(user.uid);
+          // If reload succeeds, the token is valid - load user data directly
+          final userData = await _userRepository.getUserCached(user.uid);
+          if (userData != null) {
+            emit(AuthAuthenticated(user: userData));
+          } else {
+            emit(const AuthUnauthenticated());
+          }
         } on firebase_auth.FirebaseAuthException catch (e) {
           // Token is invalid/expired, sign out
           if (e.code == 'invalid-credential' ||
               e.code == 'user-token-expired') {
-            _logger.w('User token expired or invalid, signing out');
+            SecureLogger.w('User token expired or invalid, signing out');
             await _auth.signOut();
             emit(const AuthUnauthenticated());
           } else {
@@ -76,7 +84,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(const AuthUnauthenticated());
       }
     } catch (e, stackTrace) {
-      _logger.e('Error checking auth status', error: e, stackTrace: stackTrace);
+      SecureLogger.e(
+        'Error checking auth status',
+        error: e,
+        stackTrace: stackTrace,
+      );
       // On any error, treat as unauthenticated
       emit(const AuthUnauthenticated());
     }
@@ -93,14 +105,35 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         password: event.password,
       );
       if (credential.user != null) {
-        await _loadUserData(credential.user!.uid);
+        // Load user data directly instead of dispatching event
+        final user = await _userRepository.getUserCached(credential.user!.uid);
+        if (user != null) {
+          emit(AuthAuthenticated(user: user));
+        } else {
+          // User document doesn't exist, create it
+          final userModel = UserModel(
+            id: credential.user!.uid,
+            email: event.email,
+            displayName: credential.user!.displayName ?? 'User',
+            createdAt: DateTime.now(),
+          );
+          await _userRepository.createUser(userModel);
+          emit(AuthAuthenticated(user: userModel));
+        }
       }
     } on firebase_auth.FirebaseAuthException catch (e) {
-      _logger.e('Sign in error', error: e);
-      emit(AuthError(message: _getErrorMessage(e.code)));
+      SecureLogger.e('Sign in error', error: e);
+      final message = _errorHandler.handleFirebaseException(e);
+      emit(AuthError(message: message));
     } catch (e, stackTrace) {
-      _logger.e('Unexpected sign in error', error: e, stackTrace: stackTrace);
-      emit(const AuthError(message: 'An unexpected error occurred'));
+      SecureLogger.e(
+        'Unexpected sign in error',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      final message =
+          _errorHandler.handleError(e, type: ErrorType.authentication);
+      emit(AuthError(message: message));
     }
   }
 
@@ -129,11 +162,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         await _loadUserData(credential.user!.uid);
       }
     } on firebase_auth.FirebaseAuthException catch (e) {
-      _logger.e('Sign up error', error: e);
-      emit(AuthError(message: _getErrorMessage(e.code)));
+      SecureLogger.e('Sign up error', error: e);
+      final message = _errorHandler.handleFirebaseException(e);
+      emit(AuthError(message: message));
     } catch (e, stackTrace) {
-      _logger.e('Unexpected sign up error', error: e, stackTrace: stackTrace);
-      emit(const AuthError(message: 'An unexpected error occurred'));
+      SecureLogger.e(
+        'Unexpected sign up error',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      final message =
+          _errorHandler.handleError(e, type: ErrorType.authentication);
+      emit(AuthError(message: message));
     }
   }
 
@@ -145,7 +185,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await _auth.signOut();
       emit(const AuthUnauthenticated());
     } catch (e, stackTrace) {
-      _logger.e('Sign out error', error: e, stackTrace: stackTrace);
+      SecureLogger.e('Sign out error', error: e, stackTrace: stackTrace);
       emit(const AuthUnauthenticated()); // Still sign out on error
     }
   }
@@ -157,10 +197,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       await _auth.sendPasswordResetEmail(email: event.email);
       // Don't change state, just log success
-      _logger.i('Password reset email sent');
+      SecureLogger.i('Password reset email sent');
     } catch (e, stackTrace) {
-      _logger.e('Password reset error', error: e, stackTrace: stackTrace);
-      emit(const AuthError(message: 'Failed to send password reset email'));
+      SecureLogger.e('Password reset error', error: e, stackTrace: stackTrace);
+      final message =
+          _errorHandler.handleError(e, type: ErrorType.authentication);
+      emit(AuthError(message: message));
     }
   }
 
@@ -169,14 +211,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     try {
-      final user = await _userRepository.getUser(event.userId);
+      final user = await _userRepository.getUserCached(event.userId);
       if (user != null) {
         emit(AuthAuthenticated(user: user));
       } else {
         emit(const AuthUnauthenticated());
       }
     } catch (e, stackTrace) {
-      _logger.e('Error loading user data', error: e, stackTrace: stackTrace);
+      SecureLogger.e(
+        'Error loading user data',
+        error: e,
+        stackTrace: stackTrace,
+      );
       emit(const AuthUnauthenticated());
     }
   }
@@ -184,28 +230,5 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> _loadUserData(String userId) async {
     // Helper method that dispatches an event (for use in event handlers)
     add(AuthLoadUserDataRequested(userId: userId));
-  }
-
-  String _getErrorMessage(String code) {
-    switch (code) {
-      case 'user-not-found':
-        return 'No user found with this email';
-      case 'wrong-password':
-        return 'Incorrect password';
-      case 'invalid-credential':
-        return 'Invalid email or password. Please try again.';
-      case 'user-token-expired':
-        return 'Your session has expired. Please sign in again.';
-      case 'email-already-in-use':
-        return 'Email is already registered';
-      case 'weak-password':
-        return 'Password is too weak';
-      case 'invalid-email':
-        return 'Invalid email address';
-      case 'user-disabled':
-        return 'This account has been disabled';
-      default:
-        return 'Authentication failed. Please try again';
-    }
   }
 }

@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitquest/core/constants/app_colors.dart';
 import 'package:fitquest/core/constants/app_spacing.dart';
 import 'package:fitquest/shared/widgets/premium_card.dart';
 import 'package:fitquest/shared/widgets/premium_button.dart';
 import 'package:fitquest/shared/models/goal_model.dart';
+import 'package:fitquest/shared/repositories/goal_repository.dart';
+import 'package:fitquest/core/di/injection.dart';
+import 'package:fitquest/features/goals/widgets/create_goal_dialog.dart';
+import 'package:fitquest/core/services/error_handler_service.dart';
+import 'package:fitquest/core/utils/secure_logger.dart';
+import 'package:fitquest/shared/widgets/enhanced_snackbar.dart';
 
 class GoalsPage extends StatefulWidget {
   const GoalsPage({super.key});
@@ -13,11 +20,59 @@ class GoalsPage extends StatefulWidget {
 }
 
 class _GoalsPageState extends State<GoalsPage> {
-  // TODO: Replace with actual goals from BLoC/Repository
-  final List<GoalModel> _goals = [];
+  final GoalRepository _goalRepository = getIt<GoalRepository>();
+  final FirebaseAuth _auth = getIt<FirebaseAuth>();
+  final ErrorHandlerService _errorHandler = getIt<ErrorHandlerService>();
+  List<GoalModel> _goals = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadGoals();
+  }
+
+  Future<void> _loadGoals() async {
+    final userId = _auth.currentUser?.uid;
+    if (userId == null) {
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+
+    try {
+      final goals = await _goalRepository.getGoals(userId);
+      if (mounted) {
+        setState(() {
+          _goals = goals;
+          _isLoading = false;
+        });
+      }
+    } catch (e, stackTrace) {
+      SecureLogger.e('Error loading goals', error: e, stackTrace: stackTrace);
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        final message = _errorHandler.handleError(e, type: ErrorType.unknown);
+        EnhancedSnackBar.showError(context, message);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Goals',
+              style: TextStyle(fontWeight: FontWeight.bold),),
+          elevation: 0,
+        ),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -28,15 +83,20 @@ class _GoalsPageState extends State<GoalsPage> {
       ),
       body:
           _goals.isEmpty ? _buildEmptyState(context) : _buildGoalsList(context),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddGoalDialog(context),
-        backgroundColor: AppColors.primaryGreen,
-        icon: const Icon(Icons.add_rounded),
-        label: const Text(
-          'New Goal',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.5,
+      floatingActionButton: Semantics(
+        label: 'Create new goal',
+        hint: 'Double tap to open goal creation dialog',
+        button: true,
+        child: FloatingActionButton.extended(
+          onPressed: () => _showAddGoalDialog(context),
+          backgroundColor: AppColors.primaryGreen,
+          icon: const Icon(Icons.add_rounded),
+          label: const Text(
+            'New Goal',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.5,
+            ),
           ),
         ),
       ),
@@ -52,7 +112,7 @@ class _GoalsPageState extends State<GoalsPage> {
           children: [
             Container(
               padding: const EdgeInsets.all(24),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: AppColors.primaryGradient,
                 shape: BoxShape.circle,
               ),
@@ -94,11 +154,15 @@ class _GoalsPageState extends State<GoalsPage> {
     return ListView.builder(
       padding: AppSpacing.screenPadding,
       itemCount: _goals.length,
+      // Add cacheExtent for better performance
+      cacheExtent: 500,
       itemBuilder: (context, index) {
         final goal = _goals[index];
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: _buildGoalCard(context, goal),
+        return RepaintBoundary(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: _buildGoalCard(context, goal),
+          ),
         );
       },
     );
@@ -110,9 +174,12 @@ class _GoalsPageState extends State<GoalsPage> {
         : 0.0;
     final daysRemaining = goal.endDate.difference(DateTime.now()).inDays;
 
-    return PremiumCard(
-      padding: const EdgeInsets.all(20),
-      child: Column(
+    return Semantics(
+      label: 'Goal: ${goal.title}. Progress: ${goal.currentProgress} of ${goal.targetValue} ${goal.targetUnit}. ${daysRemaining > 0 ? '$daysRemaining days remaining' : 'Expired'}',
+      hint: 'Double tap to view goal details',
+      child: PremiumCard(
+        padding: const EdgeInsets.all(20),
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
@@ -192,6 +259,7 @@ class _GoalsPageState extends State<GoalsPage> {
             ],
           ),
         ],
+      ),
       ),
     );
   }
@@ -288,20 +356,15 @@ class _GoalsPageState extends State<GoalsPage> {
     }
   }
 
-  void _showAddGoalDialog(BuildContext context) {
-    // TODO: Implement goal creation dialog
-    showDialog(
+  Future<void> _showAddGoalDialog(BuildContext context) async {
+    final result = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('New Goal'),
-        content: const Text('Goal creation dialog coming soon!'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
-          ),
-        ],
-      ),
+      builder: (context) => const CreateGoalDialog(),
     );
+
+    if (result == true) {
+      // Reload goals after successful creation
+      _loadGoals();
+    }
   }
 }

@@ -6,10 +6,20 @@ import 'package:fitquest/core/constants/app_border_radius.dart';
 import 'package:fitquest/shared/widgets/premium_card.dart';
 import 'package:fitquest/shared/widgets/animated_counter.dart';
 import 'package:fitquest/shared/widgets/animated_progress_bar.dart';
-import 'package:fitquest/shared/widgets/image_with_fallback.dart';
-import 'package:fitquest/core/utils/image_url_helper.dart';
+import 'package:fitquest/shared/widgets/custom_plant_widget.dart';
 import 'package:fitquest/shared/services/plant_service.dart';
 import 'package:fitquest/core/di/injection.dart';
+import 'package:fitquest/shared/widgets/tree_sway_animation.dart';
+import 'package:fitquest/shared/widgets/golden_fruit.dart';
+import 'package:fitquest/shared/widgets/sparkle_effect.dart';
+import 'package:fitquest/shared/widgets/tree_sparkle_particles.dart';
+import 'package:fitquest/shared/widgets/tree_shake_interaction.dart';
+import 'package:fitquest/shared/widgets/leaf_fall_particles.dart';
+import 'package:fitquest/shared/widgets/enhanced_tree_sway.dart';
+import 'package:fitquest/core/constants/app_typography.dart';
+
+// Import FloatingLeavesBackground from tree_sway_animation.dart
+// (it's in the same file)
 
 class EnhancedPlantCard extends StatefulWidget {
   final String plantName;
@@ -18,6 +28,7 @@ class EnhancedPlantCard extends StatefulWidget {
   final int requiredXp;
   final int health;
   final int streak;
+  final int? userLevel; // User level for golden fruit (level 36+)
   final DateTime? lastActivityDate;
   final int? xpGained; // XP gained from last activity (for animation)
   final VoidCallback? onTap;
@@ -31,6 +42,7 @@ class EnhancedPlantCard extends StatefulWidget {
     required this.requiredXp,
     required this.health,
     required this.streak,
+    this.userLevel,
     this.lastActivityDate,
     this.xpGained,
     this.onTap,
@@ -69,7 +81,7 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
       duration: const Duration(milliseconds: 1500),
     );
 
-    // Pulse animation for plant breathing effect
+    // Pulse animation for plant breathing effect - more visible
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2000),
@@ -87,7 +99,8 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
       duration: const Duration(milliseconds: 3000),
     );
 
-    _confettiController = ConfettiController(duration: const Duration(seconds: 3));
+    _confettiController =
+        ConfettiController(duration: const Duration(seconds: 3));
 
     _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
       CurvedAnimation(
@@ -96,7 +109,8 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
       ),
     );
 
-    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
+    // More visible pulse animation (1.0 to 1.08 = 8% scale change)
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.08).animate(
       CurvedAnimation(
         parent: _pulseController,
         curve: Curves.easeInOut,
@@ -152,15 +166,15 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
   @override
   void didUpdateWidget(EnhancedPlantCard oldWidget) {
     super.didUpdateWidget(oldWidget);
-    
+
     // Check for evolution
     if (widget.evolutionStage > oldWidget.evolutionStage) {
       _triggerEvolutionCelebration();
     }
 
     // Trigger XP gain animation if XP was gained
-    if (widget.xpGained != null && 
-        widget.xpGained! > 0 && 
+    if (widget.xpGained != null &&
+        widget.xpGained! > 0 &&
         (oldWidget.xpGained == null || oldWidget.xpGained == 0)) {
       _triggerXpGainAnimation();
     }
@@ -212,15 +226,17 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
     super.dispose();
   }
 
+  // Cache PlantService to avoid repeated lookups
+  static PlantService? _cachedPlantService;
+
   @override
   Widget build(BuildContext context) {
-    // Get PlantService from dependency injection
+    // Get PlantService from dependency injection (cached)
     PlantService plantService;
     try {
-      plantService = getIt<PlantService>();
+      plantService = _cachedPlantService ??= getIt<PlantService>();
     } catch (e) {
-      debugPrint('ERROR: PlantService not found in DI: $e');
-      // Return a simple error widget
+      // Return a simple error widget without debugPrint in production
       return Container(
         padding: const EdgeInsets.all(24.0),
         margin: const EdgeInsets.all(16.0),
@@ -229,40 +245,45 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(Icons.error, color: Colors.red),
             const SizedBox(height: 8),
-            Text('Plant Card Error: $e'),
+            Text('Plant Card Error'),
           ],
         ),
       );
     }
-    
-    final mood = plantService.getPlantMood(widget.health, widget.streak);
-    
-    debugPrint('EnhancedPlantCard building: stage=${widget.evolutionStage}, xp=${widget.currentXp}, health=${widget.health}');
 
-    return Stack(
-      children: [
-        ScaleTransition(
-          scale: _scaleAnimation,
-          child: GestureDetector(
-            onDoubleTap: widget.onDoubleTap,
-            child: PremiumCard(
-              padding: const EdgeInsets.all(24.0),
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  AppColors.primaryGreen,
-                  AppColors.primaryDark,
-                  AppColors.primaryGreen.withValues(alpha: 0.8),
-                ],
-                stops: const [0.0, 0.5, 1.0],
-              ),
-              onTap: widget.onTap,
-              showShadow: true,
-              child: Column(
+    final mood = plantService.getPlantMood(widget.health, widget.streak);
+
+    return RepaintBoundary(
+      child: _buildPlantCard(plantService, mood),
+    );
+  }
+
+  Widget _buildPlantCard(PlantService plantService, PlantMood mood) {
+    final stackChildren = <Widget>[
+      ScaleTransition(
+        scale: _scaleAnimation,
+        child: GestureDetector(
+          onDoubleTap: widget.onDoubleTap,
+          child: PremiumCard(
+            padding: const EdgeInsets.all(24.0),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppColors.primaryGreen,
+                AppColors.primaryDark,
+                AppColors.primaryGreen.withValues(alpha: 0.8),
+              ],
+              stops: const [0.0, 0.5, 1.0],
+            ),
+            onTap: widget.onTap,
+            showShadow: true,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
@@ -281,8 +302,8 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
                             },
                             onDoubleTap: widget.onDoubleTap,
                             child: Container(
-                              width: 90,
-                              height: 90,
+                              width: 120,
+                              height: 120,
                               decoration: BoxDecoration(
                                 color: Colors.white.withValues(alpha: 0.25),
                                 borderRadius: AppBorderRadius.allMD,
@@ -301,22 +322,72 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
                               child: Stack(
                                 alignment: Alignment.center,
                                 children: [
-                                  ClipRRect(
-                                    borderRadius: AppBorderRadius.allLG,
-                                    child: ImageWithFallback(
-                                      imageUrl: ImageUrlHelper.getPlantImageUrl(
-                                        widget.evolutionStage,
+                                  // Sparkle particles around tree
+                                  Positioned.fill(
+                                    child: TreeSparkleParticles(
+                                      treeSize: 120,
+                                      particleCount: 8,
+                                      active: widget.evolutionStage >= 3,
+                                    ),
+                                  ),
+                                  // Enhanced tree sway with wind strength
+                                  TreeShakeInteraction(
+                                    onShake: () {
+                                      // Trigger leaf fall particles
+                                      final RenderBox? renderBox = context
+                                          .findRenderObject() as RenderBox?;
+                                      if (renderBox != null) {
+                                        final position = renderBox
+                                            .localToGlobal(Offset.zero);
+                                        LeafFallParticles.show(
+                                          context,
+                                          Offset(
+                                            position.dx + 60,
+                                            position.dy + 60,
+                                          ),
+                                          leafCount: 5,
+                                        );
+                                      }
+                                    },
+                                    child: EnhancedTreeSway(
+                                      windStrength: widget.streak > 7
+                                          ? 0.8
+                                          : widget.streak > 3
+                                              ? 0.5
+                                              : 0.3,
+                                      child: Container(
+                                        width: 120,
+                                        height: 120,
+                                        decoration: BoxDecoration(
+                                          borderRadius: AppBorderRadius.allLG,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.white
+                                                  .withValues(alpha: 0.4),
+                                              blurRadius: 25,
+                                              spreadRadius: 8,
+                                            ),
+                                          ],
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius: AppBorderRadius.allLG,
+                                          child: Container(
+                                            width: 120,
+                                            height: 120,
+                                            decoration: BoxDecoration(
+                                              color: Colors.white
+                                                  .withValues(alpha: 0.1),
+                                              borderRadius:
+                                                  AppBorderRadius.allLG,
+                                            ),
+                                            child: CustomPlantWidget(
+                                              evolutionStage:
+                                                  widget.evolutionStage,
+                                              size: 120,
+                                            ),
+                                          ),
+                                        ),
                                       ),
-                                      assetPath: _getPlantImagePath(
-                                        widget.evolutionStage,
-                                      ),
-                                      fallbackIcon: Icons.eco_rounded,
-                                      width: 100,
-                                      height: 100,
-                                      fit: BoxFit.cover,
-                                      backgroundColor:
-                                          Colors.white.withValues(alpha: 0.2),
-                                      iconColor: Colors.white,
                                     ),
                                   ),
                                   // Mood indicator
@@ -326,15 +397,29 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
                                     child: Container(
                                       padding: const EdgeInsets.all(4),
                                       decoration: BoxDecoration(
-                                        color: Colors.black.withValues(alpha: 0.3),
+                                        color:
+                                            Colors.black.withValues(alpha: 0.3),
                                         shape: BoxShape.circle,
                                       ),
                                       child: Text(
                                         mood.emoji,
-                                        style: const TextStyle(fontSize: 16),
+                                        style: AppTypography.bodyLarge
+                                            .copyWith(fontSize: 16),
                                       ),
                                     ),
                                   ),
+                                  // Golden fruit for majestic trees (level 36+)
+                                  if (widget.userLevel != null &&
+                                      widget.userLevel! >= 36)
+                                    Positioned(
+                                      top: -10,
+                                      left: 20,
+                                      child: SparkleEffect(
+                                        active: true,
+                                        sparkleColor: AppColors.xpGold,
+                                        child: const GoldenFruit(size: 25),
+                                      ),
+                                    ),
                                 ],
                               ),
                             ),
@@ -345,6 +430,7 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
                     const SizedBox(width: 16),
                     Expanded(
                       child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
@@ -352,7 +438,7 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
                                 ? widget.plantName
                                 : plantService.getEvolutionStageName(
                                     widget.evolutionStage,
-                                ),
+                                  ),
                             style: Theme.of(context)
                                 .textTheme
                                 .titleLarge
@@ -387,7 +473,8 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
                                 const SizedBox(width: 6),
                                 Text(
                                   mood.emoji,
-                                  style: const TextStyle(fontSize: 12),
+                                  style: AppTypography.labelMedium
+                                      .copyWith(fontSize: 12),
                                 ),
                               ],
                             ),
@@ -400,11 +487,13 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
                 const SizedBox(height: 24),
                 // Enhanced Growth Progress Bar
                 Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     AnimatedProgressBar(
                       progress: widget.requiredXp > 0
-                          ? (widget.currentXp / widget.requiredXp).clamp(0.0, 1.0)
+                          ? (widget.currentXp / widget.requiredXp)
+                              .clamp(0.0, 1.0)
                           : 0.0,
                       height: 16,
                       backgroundColor: Colors.white.withValues(alpha: 0.2),
@@ -470,92 +559,108 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
                     ),
                   ],
                 ),
-                // XP Gain Animation Overlay
-                if (widget.xpGained != null && widget.xpGained! > 0)
-                  Positioned.fill(
-                    child: IgnorePointer(
-                      child: AnimatedBuilder(
-                        animation: _xpTextAnimation,
-                        builder: (context, child) {
-                          return Transform.translate(
-                            offset: Offset(
-                              0,
-                              _xpTextAnimation.value.dy * 50,
-                            ),
-                            child: Opacity(
-                              opacity: 1 - _xpGainAnimation.value,
-                              child: Center(
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 6,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.green.withValues(alpha: 0.9),
-                                    borderRadius: BorderRadius.circular(20),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.green.withValues(alpha: 0.5),
-                                        blurRadius: 10,
-                                        spreadRadius: 2,
-                                      ),
-                                    ],
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      const Icon(
-                                        Icons.star_rounded,
-                                        color: Colors.white,
-                                        size: 16,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        '+${widget.xpGained} XP',
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
               ],
-            ),
             ),
           ),
         ),
-        // Confetti for evolution celebration
-        if (_showEvolutionCelebration)
-          Positioned.fill(
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: ConfettiWidget(
-                confettiController: _confettiController,
-                blastDirection: 1.5708, // Down
-                maxBlastForce: 5,
-                minBlastForce: 2,
-                emissionFrequency: 0.05,
-                numberOfParticles: 20,
-                gravity: 0.1,
-                colors: const [
-                  Colors.green,
-                  Colors.lightGreen,
-                  Colors.white,
-                  Colors.yellow,
-                ],
-              ),
+      ),
+    ];
+
+    // Add XP Gain Animation Overlay if needed
+    if (widget.xpGained != null && widget.xpGained! > 0) {
+      stackChildren.add(
+        Positioned.fill(
+          child: IgnorePointer(
+            child: AnimatedBuilder(
+              animation: _xpTextAnimation,
+              builder: (context, child) {
+                return Transform.translate(
+                  offset: Offset(
+                    0,
+                    _xpTextAnimation.value.dy * 50,
+                  ),
+                  child: Opacity(
+                    opacity: 1 - _xpGainAnimation.value,
+                    child: Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.green.withValues(alpha: 0.9),
+                          borderRadius: AppBorderRadius.allXL,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.green.withValues(alpha: 0.5),
+                              blurRadius: 10,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.star_rounded,
+                              color: Colors.white,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              '+${widget.xpGained} XP',
+                              style: AppTypography.labelMedium.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
-      ],
+        ),
+      );
+    }
+
+    // Add confetti for evolution celebration
+    if (_showEvolutionCelebration) {
+      stackChildren.add(
+        Positioned.fill(
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: ConfettiWidget(
+              confettiController: _confettiController,
+              blastDirection: 1.5708, // Down
+              maxBlastForce: 5,
+              minBlastForce: 2,
+              emissionFrequency: 0.05,
+              numberOfParticles: 20,
+              gravity: 0.1,
+              colors: const [
+                Colors.green,
+                Colors.lightGreen,
+                Colors.white,
+                Colors.yellow,
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    // Wrap in FloatingLeavesBackground for ambient effect - more visible
+    return FloatingLeavesBackground(
+      leafCount: 10, // More leaves for better visibility
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: stackChildren,
+      ),
     );
   }
 
@@ -564,19 +669,4 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
     if (health > 30) return Colors.orange;
     return Colors.red;
   }
-
-  String _getPlantImagePath(int evolutionStage) {
-    if (evolutionStage <= 1) {
-      return 'assets/images/companion/seed.png';
-    } else if (evolutionStage <= 2) {
-      return 'assets/images/companion/sprout.png';
-    } else if (evolutionStage <= 3) {
-      return 'assets/images/companion/sapling.png';
-    } else if (evolutionStage <= 4) {
-      return 'assets/images/companion/tree.png';
-    } else {
-      return 'assets/images/companion/ancient_tree.png';
-    }
-  }
 }
-

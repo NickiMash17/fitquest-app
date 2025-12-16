@@ -7,16 +7,16 @@ import 'package:fitquest/core/utils/image_url_helper.dart';
 class AchievementImageHelper {
   /// Get the badge image URL (preferred - uses online images)
   static String? getBadgeImageUrl(
-      AchievementType type, AchievementRarity rarity) {
+      AchievementType type, AchievementRarity rarity,) {
     return ImageUrlHelper.getAchievementBadgeUrl(type, rarity);
   }
 
   /// Get the badge image asset path for an achievement (fallback)
   static String getBadgeImagePath(
-      AchievementType type, AchievementRarity rarity) {
+      AchievementType type, AchievementRarity rarity,) {
     final rarityName = rarity.name;
     final typeName = type.name;
-    return 'assets/images/badges/${typeName}_${rarityName}.png';
+    return 'assets/images/badges/${typeName}_$rarityName.png';
   }
 
   /// Get the placeholder badge image path

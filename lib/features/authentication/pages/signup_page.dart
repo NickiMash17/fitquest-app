@@ -9,6 +9,7 @@ import 'package:fitquest/shared/widgets/theme_toggle_button.dart';
 import 'package:fitquest/features/authentication/bloc/auth_bloc.dart';
 import 'package:fitquest/features/authentication/bloc/auth_event.dart';
 import 'package:fitquest/features/authentication/bloc/auth_state.dart';
+import 'package:fitquest/core/constants/app_typography.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -79,6 +80,7 @@ class _SignUpPageState extends State<SignUpPage> {
               child: Form(
                 key: _formKey,
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const SizedBox(height: 40),
@@ -138,41 +140,61 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     const SizedBox(height: 20),
                     // Email field
-                    TextFormField(
-                      controller: _emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: const InputDecoration(
-                        labelText: 'Email',
-                        prefixIcon: Icon(Icons.email_outlined),
-                        hintText: 'Enter your email',
+                    Semantics(
+                      label: 'Email address',
+                      hint: 'Enter your email address to create an account',
+                      textField: true,
+                      child: TextFormField(
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next,
+                        decoration: const InputDecoration(
+                          labelText: 'Email',
+                          prefixIcon: Icon(Icons.email_outlined),
+                          hintText: 'Enter your email',
+                        ),
+                        validator: Validators.email,
                       ),
-                      validator: Validators.email,
                     ),
                     const SizedBox(height: 20),
                     // Password field
-                    TextFormField(
-                      controller: _passwordController,
-                      obscureText: _obscurePassword,
-                      decoration: InputDecoration(
-                        labelText: 'Password',
-                        prefixIcon: const Icon(Icons.lock_outlined),
-                        hintText: 'Create a password',
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscurePassword
-                                ? Icons.visibility_outlined
-                                : Icons.visibility_off_outlined,
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
+                    Semantics(
+                      label: 'Password',
+                      hint:
+                          'Create a strong password with at least 8 characters',
+                      textField: true,
+                      child: TextFormField(
+                        controller: _passwordController,
+                        obscureText: _obscurePassword,
+                        textInputAction: TextInputAction.next,
+                        decoration: InputDecoration(
+                          labelText: 'Password',
+                          prefixIcon: const Icon(Icons.lock_outlined),
+                          hintText: 'Create a password',
+                          suffixIcon: Semantics(
+                            label: _obscurePassword
+                                ? 'Show password'
+                                : 'Hide password',
+                            button: true,
+                            child: IconButton(
+                              icon: Icon(
+                                _obscurePassword
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off_outlined,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _obscurePassword = !_obscurePassword;
+                                });
+                              },
+                            ),
                           ),
-                          onPressed: () {
-                            setState(() {
-                              _obscurePassword = !_obscurePassword;
-                            });
-                          },
                         ),
+                        validator: Validators.passwordStrength,
                       ),
-                      validator: Validators.password,
                     ),
                     const SizedBox(height: 20),
                     // Confirm password field
@@ -199,8 +221,10 @@ class _SignUpPageState extends State<SignUpPage> {
                           },
                         ),
                       ),
-                      validator: (value) => Validators.required(value,
-                          fieldName: 'Confirm Password',),
+                      validator: (value) => Validators.required(
+                        value,
+                        fieldName: 'Confirm Password',
+                      ),
                     ),
                     const SizedBox(height: 32),
                     // Sign up button
@@ -210,7 +234,10 @@ class _SignUpPageState extends State<SignUpPage> {
                       icon: Icons.person_add_rounded,
                       gradient: AppColors.primaryGradient,
                       width: double.infinity,
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 18,
+                      ),
                     ),
                     if (state is AuthLoading)
                       const Padding(
@@ -236,7 +263,9 @@ class _SignUpPageState extends State<SignUpPage> {
                         TextButton(
                           onPressed: () {
                             AppRouter.navigateAndReplace(
-                                context, AppRouter.login,);
+                              context,
+                              AppRouter.login,
+                            );
                           },
                           style: TextButton.styleFrom(
                             padding: const EdgeInsets.symmetric(
@@ -244,10 +273,10 @@ class _SignUpPageState extends State<SignUpPage> {
                               vertical: 4,
                             ),
                           ),
-                          child: const Text(
+                          child: Text(
                             'Sign In',
-                            style: TextStyle(
-                              color: AppColors.primaryGreen,
+                            style: AppTypography.labelMedium.copyWith(
+                              color: AppColors.primary,
                               fontWeight: FontWeight.w700,
                             ),
                           ),

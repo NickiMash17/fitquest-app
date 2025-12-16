@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fitquest/core/constants/app_colors.dart';
 import 'package:fitquest/core/constants/app_border_radius.dart';
+import 'package:fitquest/core/constants/app_typography.dart';
 import 'package:fitquest/features/home/pages/home_page.dart';
 import 'package:fitquest/features/home/pages/activities_page.dart';
 import 'package:fitquest/features/community/pages/leaderboard_page.dart';
@@ -68,9 +69,9 @@ class _MainNavigationPageState extends State<MainNavigationPage>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     final isOffline = _connectivityStatus == ConnectivityResult.none;
-    
+
     return Scaffold(
       body: Column(
         children: [
@@ -122,26 +123,24 @@ class _MainNavigationPageState extends State<MainNavigationPage>
             type: BottomNavigationBarType.fixed,
             elevation: 0,
             backgroundColor: Colors.transparent,
-            selectedItemColor: AppColors.primaryGreen,
+            selectedItemColor: AppColors.primary,
             unselectedItemColor: Theme.of(context).colorScheme.onSurfaceVariant,
             selectedIconTheme: IconThemeData(
               size: 28,
-              color: AppColors.primaryGreen,
+              color: AppColors.primary,
             ),
             unselectedIconTheme: IconThemeData(
               size: 24,
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
-            selectedLabelStyle: const TextStyle(
+            selectedLabelStyle: AppTypography.labelMedium.copyWith(
               fontSize: 12,
               fontWeight: FontWeight.w700,
-              fontFamily: 'Inter',
               letterSpacing: 0.2,
             ),
-            unselectedLabelStyle: const TextStyle(
+            unselectedLabelStyle: AppTypography.labelMedium.copyWith(
               fontSize: 12,
               fontWeight: FontWeight.w500,
-              fontFamily: 'Inter',
             ),
             items: [
               BottomNavigationBarItem(
@@ -150,7 +149,7 @@ class _MainNavigationPageState extends State<MainNavigationPage>
                   decoration: BoxDecoration(
                     borderRadius: AppBorderRadius.allMD,
                     color: _currentIndex == 0
-                        ? AppColors.primaryGreen.withValues(alpha: 0.1)
+                        ? AppColors.primary.withValues(alpha: 0.09)
                         : Colors.transparent,
                   ),
                   child: Icon(
@@ -167,7 +166,7 @@ class _MainNavigationPageState extends State<MainNavigationPage>
                   decoration: BoxDecoration(
                     borderRadius: AppBorderRadius.allMD,
                     color: _currentIndex == 1
-                        ? AppColors.primaryGreen.withValues(alpha: 0.1)
+                        ? AppColors.primary.withValues(alpha: 0.09)
                         : Colors.transparent,
                   ),
                   child: Icon(
@@ -184,7 +183,7 @@ class _MainNavigationPageState extends State<MainNavigationPage>
                   decoration: BoxDecoration(
                     borderRadius: AppBorderRadius.allMD,
                     color: _currentIndex == 2
-                        ? AppColors.primaryGreen.withValues(alpha: 0.1)
+                        ? AppColors.primary.withValues(alpha: 0.09)
                         : Colors.transparent,
                   ),
                   child: Icon(
@@ -201,7 +200,7 @@ class _MainNavigationPageState extends State<MainNavigationPage>
                   decoration: BoxDecoration(
                     borderRadius: AppBorderRadius.allMD,
                     color: _currentIndex == 3
-                        ? AppColors.primaryGreen.withValues(alpha: 0.1)
+                        ? AppColors.primary.withValues(alpha: 0.09)
                         : Colors.transparent,
                   ),
                   child: Icon(

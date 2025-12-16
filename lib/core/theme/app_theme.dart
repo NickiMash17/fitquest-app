@@ -1,196 +1,85 @@
 import 'package:flutter/material.dart';
 import 'package:fitquest/core/constants/app_colors.dart';
 import 'package:fitquest/core/constants/app_border_radius.dart';
+import 'package:fitquest/core/constants/app_typography.dart';
 
 class AppTheme {
   AppTheme._();
 
+  // Prefer AppTypography getters for consistent typographic scale
+  static final TextStyle _fredokaAppBar = AppTypography.headlineSmall.copyWith(
+    color: Colors.white,
+    fontSize: 22,
+    fontWeight: FontWeight.w700,
+  );
+
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
-    colorScheme: const ColorScheme.light(
-      primary: AppColors.primaryGreen,
-      primaryContainer: AppColors.primaryLightest,
-      secondary: AppColors.accentOrange,
-      secondaryContainer: AppColors.accentOrangeLight,
+    colorScheme: ColorScheme.light(
+      primary: AppColors.primary,
+      primaryContainer: AppColors.primaryLight,
+      secondary: AppColors.secondary,
+      secondaryContainer: AppColors.secondary,
       surface: AppColors.surface,
       surfaceContainerHighest: AppColors.surfaceVariant,
       error: AppColors.error,
       errorContainer: AppColors.errorLight,
-      onPrimary: AppColors.textOnPrimary,
-      onSecondary: Colors.black,
-      onSurface: AppColors.textPrimary,
-      onError: AppColors.textOnPrimary,
-      outline: AppColors.divider,
+      onPrimary: AppColors.primaryForeground,
+      onSecondary: AppColors.secondaryForeground,
+      onSurface: AppColors.foreground,
+      onError: Colors.white,
+      outline: AppColors.border,
       shadow: AppColors.shadowLight,
     ),
     scaffoldBackgroundColor: AppColors.background,
-    appBarTheme: const AppBarTheme(
+    appBarTheme: AppBarTheme(
       elevation: 0,
       centerTitle: false,
-      backgroundColor: AppColors.primaryGreen,
+      backgroundColor: AppColors.primary,
       foregroundColor: Colors.white,
       surfaceTintColor: Colors.transparent,
       shadowColor: Colors.transparent,
-      titleTextStyle: TextStyle(
-        fontSize: 22,
-        fontWeight: FontWeight.w700,
-        color: Colors.white,
-        fontFamily: 'Poppins',
-        letterSpacing: -0.5,
-      ),
-      iconTheme: IconThemeData(color: Colors.white, size: 24),
+      titleTextStyle: _fredokaAppBar,
+      iconTheme: const IconThemeData(color: Colors.white, size: 24),
     ),
-    textTheme: const TextTheme(
-      displayLarge: TextStyle(
-        fontSize: 36,
-        fontWeight: FontWeight.w800,
-        fontFamily: 'Poppins',
-        color: AppColors.textPrimary,
-        letterSpacing: -1.0,
-        height: 1.2,
-      ),
-      displayMedium: TextStyle(
-        fontSize: 30,
-        fontWeight: FontWeight.w700,
-        fontFamily: 'Poppins',
-        color: AppColors.textPrimary,
-        letterSpacing: -0.5,
-        height: 1.3,
-      ),
-      displaySmall: TextStyle(
-        fontSize: 26,
-        fontWeight: FontWeight.w700,
-        fontFamily: 'Poppins',
-        color: AppColors.textPrimary,
-        letterSpacing: -0.5,
-        height: 1.3,
-      ),
-      headlineLarge: TextStyle(
-        fontSize: 24,
-        fontWeight: FontWeight.w700,
-        fontFamily: 'Poppins',
-        color: AppColors.textPrimary,
-        letterSpacing: -0.3,
-        height: 1.3,
-      ),
-      headlineMedium: TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.w600,
-        fontFamily: 'Poppins',
-        color: AppColors.textPrimary,
-        letterSpacing: -0.2,
-        height: 1.4,
-      ),
-      headlineSmall: TextStyle(
-        fontSize: 18,
-        fontWeight: FontWeight.w600,
-        fontFamily: 'Poppins',
-        color: AppColors.textPrimary,
-        letterSpacing: 0,
-        height: 1.4,
-      ),
-      titleLarge: TextStyle(
-        fontSize: 18,
-        fontWeight: FontWeight.w600,
-        fontFamily: 'Poppins',
-        color: AppColors.textPrimary,
-        letterSpacing: 0,
-        height: 1.4,
-      ),
-      titleMedium: TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.w600,
-        fontFamily: 'Inter',
-        color: AppColors.textPrimary,
-        letterSpacing: 0.1,
-        height: 1.5,
-      ),
-      titleSmall: TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        fontFamily: 'Inter',
-        color: AppColors.textPrimary,
-        letterSpacing: 0.1,
-        height: 1.5,
-      ),
-      bodyLarge: TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.w400,
-        fontFamily: 'Inter',
-        color: AppColors.textPrimary,
-        letterSpacing: 0.15,
-        height: 1.6,
-      ),
-      bodyMedium: TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.w400,
-        fontFamily: 'Inter',
-        color: AppColors.textSecondary,
-        letterSpacing: 0.25,
-        height: 1.6,
-      ),
-      bodySmall: TextStyle(
-        fontSize: 12,
-        fontWeight: FontWeight.w400,
-        fontFamily: 'Inter',
-        color: AppColors.textTertiary,
-        letterSpacing: 0.4,
-        height: 1.5,
-      ),
-      labelLarge: TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        fontFamily: 'Inter',
-        color: AppColors.textPrimary,
-        letterSpacing: 0.1,
-        height: 1.4,
-      ),
-      labelMedium: TextStyle(
-        fontSize: 12,
-        fontWeight: FontWeight.w500,
-        fontFamily: 'Inter',
-        color: AppColors.textSecondary,
-        letterSpacing: 0.5,
-        height: 1.4,
-      ),
-      labelSmall: TextStyle(
-        fontSize: 11,
-        fontWeight: FontWeight.w500,
-        fontFamily: 'Inter',
-        color: AppColors.textTertiary,
-        letterSpacing: 0.5,
-        height: 1.4,
-      ),
+    textTheme: TextTheme(
+      displayLarge: AppTypography.displayLarge,
+      displayMedium: AppTypography.displayMedium,
+      displaySmall: AppTypography.displaySmall,
+      headlineLarge: AppTypography.headlineLarge,
+      headlineMedium: AppTypography.headlineMedium,
+      headlineSmall: AppTypography.headlineSmall,
+      titleLarge: AppTypography.headlineSmall.copyWith(fontSize: 18),
+      titleMedium: AppTypography.bodyLarge,
+      titleSmall: AppTypography.bodyMedium,
+      bodyLarge: AppTypography.bodyLarge,
+      bodyMedium: AppTypography.bodyMedium,
+      bodySmall: AppTypography.bodySmall,
+      labelLarge: AppTypography.labelLarge,
+      labelMedium: AppTypography.labelMedium,
+      labelSmall: AppTypography.bodySmall,
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primaryGreen,
+        backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
-        elevation: 2,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        textStyle: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          fontFamily: 'Poppins',
-        ),
+        elevation: 4,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+        shape: RoundedRectangleBorder(borderRadius: AppBorderRadius.allLG),
+        textStyle: AppTypography.labelLarge.copyWith(color: Colors.white),
       ),
     ),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
         foregroundColor: AppColors.primaryGreen,
-        textStyle: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          fontFamily: 'Inter',
-        ),
+        textStyle: AppTypography.labelLarge.copyWith(fontSize: 14),
       ),
     ),
-    inputDecorationTheme: const InputDecorationTheme(
+    inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: AppColors.surface,
-      contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      fillColor: AppColors.surface.withValues(alpha: 0.96),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       border: OutlineInputBorder(
         borderRadius: AppBorderRadius.allMD,
         borderSide: BorderSide(color: AppColors.divider, width: 1.5),
@@ -211,27 +100,21 @@ class AppTheme {
         borderRadius: AppBorderRadius.allMD,
         borderSide: BorderSide(color: AppColors.error, width: 2),
       ),
-      labelStyle: TextStyle(
-        fontFamily: 'Inter',
-        fontSize: 14,
+      labelStyle: AppTypography.labelLarge.copyWith(
         fontWeight: FontWeight.w500,
         color: AppColors.textSecondary,
       ),
-      hintStyle: TextStyle(
-        fontFamily: 'Inter',
-        fontSize: 14,
+      hintStyle: AppTypography.labelMedium.copyWith(
         color: AppColors.textTertiary,
       ),
-      helperStyle: TextStyle(
-        fontFamily: 'Inter',
-        fontSize: 12,
+      helperStyle: AppTypography.labelMedium.copyWith(
         color: AppColors.textTertiary,
       ),
     ),
-    cardTheme: const CardThemeData(
-      elevation: 0,
-      shadowColor: Colors.transparent,
-      shape: RoundedRectangleBorder(
+    cardTheme: CardThemeData(
+      elevation: 2,
+      shadowColor: AppColors.shadowLight,
+      shape: const RoundedRectangleBorder(
         borderRadius: AppBorderRadius.allLG,
         side: BorderSide.none,
       ),
@@ -239,26 +122,30 @@ class AppTheme {
       margin: EdgeInsets.zero,
       clipBehavior: Clip.antiAlias,
     ),
-    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-      backgroundColor: Colors.white,
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      backgroundColor: AppColors.surface,
       selectedItemColor: AppColors.primaryGreen,
-      unselectedItemColor: Color(0xFF616161),
-      selectedIconTheme: IconThemeData(size: 26),
-      unselectedIconTheme: IconThemeData(size: 24),
-      selectedLabelStyle: TextStyle(
-        fontSize: 12,
+      unselectedItemColor: const Color(0xFF616161),
+      selectedIconTheme: const IconThemeData(size: 26),
+      unselectedIconTheme: const IconThemeData(size: 24),
+      selectedLabelStyle: AppTypography.labelMedium.copyWith(
         fontWeight: FontWeight.w600,
-        fontFamily: 'Inter',
       ),
-      unselectedLabelStyle: TextStyle(
-        fontSize: 12,
-        fontWeight: FontWeight.w500,
-        fontFamily: 'Inter',
-      ),
+      unselectedLabelStyle: AppTypography.labelMedium,
       type: BottomNavigationBarType.fixed,
       elevation: 12,
       showSelectedLabels: true,
       showUnselectedLabels: true,
+    ),
+    navigationBarTheme: NavigationBarThemeData(
+      backgroundColor: AppColors.surface,
+      indicatorColor: AppColors.primaryLight,
+      labelTextStyle: MaterialStateProperty.all(
+        AppTypography.labelMedium.copyWith(fontWeight: FontWeight.w600),
+      ),
+      iconTheme: MaterialStateProperty.resolveWith((states) {
+        return IconThemeData(color: AppColors.primary);
+      }),
     ),
   );
 
@@ -266,163 +153,57 @@ class AppTheme {
     useMaterial3: true,
     brightness: Brightness.dark,
     colorScheme: ColorScheme.dark(
-      primary: AppColors.primaryGreenDark,
-      primaryContainer: const Color(0xFF1B5E20),
-      secondary: AppColors.accentOrange,
-      secondaryContainer: AppColors.accentOrangeLight,
+      primary: AppColors.primaryDarkTheme,
+      primaryContainer: AppColors.primaryDark,
+      secondary: AppColors.secondary,
+      secondaryContainer: AppColors.secondary,
       surface: AppColors.surfaceDark,
       surfaceContainerHighest: AppColors.surfaceVariantDark,
       error: AppColors.error,
       errorContainer: AppColors.errorLight,
-      onPrimary: Colors.black,
-      onSecondary: Colors.black,
-      onSurface: AppColors.textPrimaryDark,
+      onPrimary: AppColors.primaryForeground,
+      onSecondary: AppColors.secondaryForeground,
+      onSurface: AppColors.foregroundDark,
       onError: Colors.white,
-      outline: AppColors.dividerDark,
+      outline: AppColors.border,
       shadow: Colors.black.withValues(alpha: 0.3),
     ),
     scaffoldBackgroundColor: AppColors.backgroundDark,
-    appBarTheme: const AppBarTheme(
+    appBarTheme: AppBarTheme(
       elevation: 0,
       centerTitle: false,
-      backgroundColor: AppColors.primaryGreen,
+      backgroundColor: AppColors.primary,
       foregroundColor: Colors.white,
       surfaceTintColor: Colors.transparent,
       shadowColor: Colors.transparent,
-      titleTextStyle: TextStyle(
-        fontSize: 22,
-        fontWeight: FontWeight.w700,
-        color: Colors.white,
-        fontFamily: 'Poppins',
-        letterSpacing: -0.5,
-      ),
-      iconTheme: IconThemeData(color: Colors.white, size: 24),
+      titleTextStyle: _fredokaAppBar,
+      iconTheme: const IconThemeData(color: Colors.white, size: 24),
     ),
-    textTheme: const TextTheme(
-      displayLarge: TextStyle(
-        fontSize: 36,
-        fontWeight: FontWeight.w800,
-        fontFamily: 'Poppins',
-        color: Colors.white,
-        letterSpacing: -1.0,
-        height: 1.2,
-      ),
-      displayMedium: TextStyle(
-        fontSize: 30,
-        fontWeight: FontWeight.w700,
-        fontFamily: 'Poppins',
-        color: Colors.white,
-        letterSpacing: -0.5,
-        height: 1.3,
-      ),
-      displaySmall: TextStyle(
-        fontSize: 26,
-        fontWeight: FontWeight.w700,
-        fontFamily: 'Poppins',
-        color: Colors.white,
-        letterSpacing: -0.5,
-        height: 1.3,
-      ),
-      headlineLarge: TextStyle(
-        fontSize: 24,
-        fontWeight: FontWeight.w700,
-        fontFamily: 'Poppins',
-        color: Colors.white,
-        letterSpacing: -0.3,
-        height: 1.3,
-      ),
-      headlineMedium: TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.w600,
-        fontFamily: 'Poppins',
-        color: Colors.white,
-        letterSpacing: -0.2,
-        height: 1.4,
-      ),
-      headlineSmall: TextStyle(
-        fontSize: 18,
-        fontWeight: FontWeight.w600,
-        fontFamily: 'Poppins',
-        color: Colors.white,
-        letterSpacing: 0,
-        height: 1.4,
-      ),
-      titleLarge: TextStyle(
-        fontSize: 18,
-        fontWeight: FontWeight.w600,
-        fontFamily: 'Poppins',
-        color: Colors.white,
-        letterSpacing: 0,
-        height: 1.4,
-      ),
-      titleMedium: TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.w600,
-        fontFamily: 'Inter',
-        color: Colors.white,
-        letterSpacing: 0.1,
-        height: 1.5,
-      ),
-      titleSmall: TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        fontFamily: 'Inter',
-        color: Colors.white,
-        letterSpacing: 0.1,
-        height: 1.5,
-      ),
-      bodyLarge: TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.w400,
-        fontFamily: 'Inter',
-        color: Colors.white,
-        letterSpacing: 0.15,
-        height: 1.6,
-      ),
-      bodyMedium: TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.w400,
-        fontFamily: 'Inter',
-        color: AppColors.textSecondaryDark,
-        letterSpacing: 0.25,
-        height: 1.6,
-      ),
-      bodySmall: TextStyle(
-        fontSize: 12,
-        fontWeight: FontWeight.w400,
-        fontFamily: 'Inter',
-        color: AppColors.textTertiaryDark,
-        letterSpacing: 0.4,
-        height: 1.5,
-      ),
-      labelLarge: TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        fontFamily: 'Inter',
-        color: Colors.white,
-        letterSpacing: 0.1,
-        height: 1.4,
-      ),
-      labelMedium: TextStyle(
-        fontSize: 12,
-        fontWeight: FontWeight.w500,
-        fontFamily: 'Inter',
-        color: AppColors.textSecondaryDark,
-        letterSpacing: 0.5,
-        height: 1.4,
-      ),
-      labelSmall: TextStyle(
-        fontSize: 11,
-        fontWeight: FontWeight.w500,
-        fontFamily: 'Inter',
-        color: AppColors.textTertiaryDark,
-        letterSpacing: 0.5,
-        height: 1.4,
-      ),
+    textTheme: TextTheme(
+      displayLarge: AppTypography.displayLarge.copyWith(color: Colors.white),
+      displayMedium: AppTypography.displayMedium.copyWith(color: Colors.white),
+      displaySmall: AppTypography.displaySmall.copyWith(color: Colors.white),
+      headlineLarge: AppTypography.headlineLarge.copyWith(color: Colors.white),
+      headlineMedium:
+          AppTypography.headlineMedium.copyWith(color: Colors.white),
+      headlineSmall: AppTypography.headlineSmall.copyWith(color: Colors.white),
+      titleLarge: AppTypography.headlineSmall.copyWith(color: Colors.white),
+      titleMedium: AppTypography.bodyLarge.copyWith(color: Colors.white),
+      titleSmall: AppTypography.bodyMedium.copyWith(color: Colors.white),
+      bodyLarge: AppTypography.bodyLarge.copyWith(color: Colors.white),
+      bodyMedium:
+          AppTypography.bodyMedium.copyWith(color: AppColors.textSecondaryDark),
+      bodySmall:
+          AppTypography.bodySmall.copyWith(color: AppColors.textTertiaryDark),
+      labelLarge: AppTypography.labelLarge.copyWith(color: Colors.white),
+      labelMedium: AppTypography.labelMedium
+          .copyWith(color: AppColors.textSecondaryDark),
+      labelSmall:
+          AppTypography.bodySmall.copyWith(color: AppColors.textTertiaryDark),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primaryGreen,
+        backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         elevation: 0,
         shadowColor: Colors.transparent,
@@ -431,12 +212,7 @@ class AppTheme {
         shape: const RoundedRectangleBorder(
           borderRadius: AppBorderRadius.allMD,
         ),
-        textStyle: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          fontFamily: 'Inter',
-          letterSpacing: 0.5,
-        ),
+        textStyle: AppTypography.bodyLarge.copyWith(letterSpacing: 0.5),
       ).copyWith(
         elevation: WidgetStateProperty.resolveWith<double>(
           (Set<WidgetState> states) {
@@ -455,10 +231,9 @@ class AppTheme {
         shape: const RoundedRectangleBorder(
           borderRadius: AppBorderRadius.allSM,
         ),
-        textStyle: const TextStyle(
+        textStyle: AppTypography.labelLarge.copyWith(
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          fontFamily: 'Inter',
           letterSpacing: 0.25,
         ),
       ),
@@ -475,31 +250,28 @@ class AppTheme {
         borderRadius: AppBorderRadius.allMD,
         borderSide: BorderSide(color: Color(0xFF424242), width: 1.5),
       ),
-      focusedBorder: const OutlineInputBorder(
+      focusedBorder: OutlineInputBorder(
         borderRadius: AppBorderRadius.allMD,
         borderSide: BorderSide(color: AppColors.primaryLight, width: 2),
       ),
-      errorBorder: const OutlineInputBorder(
+      errorBorder: OutlineInputBorder(
         borderRadius: AppBorderRadius.allMD,
         borderSide: BorderSide(color: AppColors.error, width: 1.5),
       ),
-      focusedErrorBorder: const OutlineInputBorder(
+      focusedErrorBorder: OutlineInputBorder(
         borderRadius: AppBorderRadius.allMD,
         borderSide: BorderSide(color: AppColors.error, width: 2),
       ),
-      labelStyle: TextStyle(
-        fontFamily: 'Inter',
+      labelStyle: AppTypography.labelLarge.copyWith(
         fontSize: 14,
         fontWeight: FontWeight.w500,
         color: Colors.white.withValues(alpha: 0.7),
       ),
-      hintStyle: TextStyle(
-        fontFamily: 'Inter',
+      hintStyle: AppTypography.labelLarge.copyWith(
         fontSize: 14,
         color: Colors.white.withValues(alpha: 0.5),
       ),
-      helperStyle: TextStyle(
-        fontFamily: 'Inter',
+      helperStyle: AppTypography.labelMedium.copyWith(
         fontSize: 12,
         color: Colors.white.withValues(alpha: 0.6),
       ),
@@ -515,22 +287,16 @@ class AppTheme {
       margin: EdgeInsets.zero,
       clipBehavior: Clip.antiAlias,
     ),
-    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-      backgroundColor: Color(0xFF1E1E1E),
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      backgroundColor: const Color(0xFF1E1E1E),
       selectedItemColor: AppColors.primaryLight,
-      unselectedItemColor: Color(0xFF9E9E9E),
-      selectedIconTheme: IconThemeData(size: 26),
-      unselectedIconTheme: IconThemeData(size: 24),
-      selectedLabelStyle: TextStyle(
-        fontSize: 12,
+      unselectedItemColor: const Color(0xFF9E9E9E),
+      selectedIconTheme: const IconThemeData(size: 26),
+      unselectedIconTheme: const IconThemeData(size: 24),
+      selectedLabelStyle: AppTypography.labelMedium.copyWith(
         fontWeight: FontWeight.w600,
-        fontFamily: 'Inter',
       ),
-      unselectedLabelStyle: TextStyle(
-        fontSize: 12,
-        fontWeight: FontWeight.w500,
-        fontFamily: 'Inter',
-      ),
+      unselectedLabelStyle: AppTypography.labelMedium,
       type: BottomNavigationBarType.fixed,
       elevation: 12,
       showSelectedLabels: true,

@@ -1,7 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:fitquest/firebase_options.dart';
 
@@ -25,7 +24,14 @@ class FirebaseConfig {
           final crashlytics = FirebaseCrashlytics.instance;
           
           // Set up error handlers only if Crashlytics is available
+          // Preserve existing handler from main.dart to keep error widget suppressed
+          final existingOnError = FlutterError.onError;
           FlutterError.onError = (errorDetails) {
+            // Call existing handler first (suppresses error widget)
+            if (existingOnError != null) {
+              existingOnError(errorDetails);
+            }
+            
             // Filter out asset loading errors - these are expected and shouldn't be reported
             final errorString = errorDetails.exception.toString();
             if (errorString.contains('Unable to load asset') ||
@@ -67,25 +73,12 @@ class FirebaseConfig {
           _logger.i('Crashlytics configured');
         } catch (e) {
           _logger.w('Crashlytics initialization failed (may not be available on this platform): $e');
-          // Set up basic error handlers that don't use Crashlytics
-          FlutterError.onError = (errorDetails) {
-            _logger.e('Flutter error: ${errorDetails.exception}');
-          };
+          // Don't override FlutterError.onError - preserve main.dart's handler that suppresses error widget
         }
       } else {
         _logger.i('Crashlytics skipped on web platform');
-        // Set up basic error handlers for web that don't use Crashlytics
-        FlutterError.onError = (errorDetails) {
-          // Filter out asset loading errors
-          final errorString = errorDetails.exception.toString();
-          if (errorString.contains('Unable to load asset') ||
-              errorString.contains('HTTP request succeeded') ||
-              errorString.contains('404')) {
-            // Silently ignore asset loading errors
-            return;
-          }
-          _logger.e('Flutter error: ${errorDetails.exception}');
-        };
+        // Don't override FlutterError.onError on web - let main.dart handle it
+        // This ensures the error widget is completely suppressed
       }
     } catch (e, stackTrace) {
       _logger.e('Error initializing Firebase', error: e, stackTrace: stackTrace);

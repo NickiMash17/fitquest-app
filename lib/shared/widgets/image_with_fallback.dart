@@ -42,18 +42,8 @@ class ImageWithFallback extends StatelessWidget {
 
       Widget imageWidget;
 
-      // Prioritize assetPath over imageUrl for plant images
-      if (assetPath != null && assetPath!.isNotEmpty) {
-        // Try to load asset first, fallback to network image if asset fails
-        imageWidget = _buildAssetImageWithFallback(
-          context,
-          assetPath!,
-          fallbackIcon,
-          iconColor,
-          backgroundColor,
-          backgroundGradient,
-        );
-      } else if (imageUrl != null && imageUrl!.isNotEmpty) {
+      // Prioritize network image if available, then asset, then icon fallback
+      if (imageUrl != null && imageUrl!.isNotEmpty) {
         // Try network image first, fallback to icon on error
         imageWidget = CachedNetworkImage(
           imageUrl: imageUrl!,
@@ -93,8 +83,8 @@ class ImageWithFallback extends StatelessWidget {
       debugPrint('ImageWithFallback error: $e');
       try {
         final safeIconColor =
-            this.iconColor ?? Theme.of(context).colorScheme.onSurface;
-        final safeBackgroundColor = this.backgroundColor ??
+            iconColor ?? Theme.of(context).colorScheme.onSurface;
+        final safeBackgroundColor = backgroundColor ??
             Theme.of(context).colorScheme.surfaceContainerHighest;
         return _buildIconFallback(
           context,
@@ -127,90 +117,6 @@ class ImageWithFallback extends StatelessWidget {
           borderRadius: borderRadius ?? AppBorderRadius.allMD,
         ),
       ),
-    );
-  }
-
-  Widget _buildAssetImageWithFallback(
-    BuildContext context,
-    String assetPath,
-    IconData fallbackIcon,
-    Color iconColor,
-    Color backgroundColor,
-    Gradient? gradient,
-  ) {
-    // Try to load asset, fallback to network image if available, then icon
-    // Wrap in error boundary to prevent errors from propagating
-    return Builder(
-      builder: (context) {
-        try {
-          return Image.asset(
-            assetPath,
-            width: width,
-            height: height,
-            fit: fit,
-            errorBuilder: (context, error, stackTrace) {
-              // Silently handle asset loading errors - don't log to avoid Crashlytics issues
-              // Asset doesn't exist, try network image if available, otherwise show icon fallback
-              if (imageUrl != null && imageUrl!.isNotEmpty) {
-                return CachedNetworkImage(
-                  imageUrl: imageUrl!,
-                  width: width,
-                  height: height,
-                  fit: fit,
-                  placeholder: (context, url) => _buildShimmer(context),
-                  errorWidget: (context, url, error) => _buildIconFallback(
-                    context,
-                    fallbackIcon,
-                    iconColor,
-                    backgroundColor,
-                    gradient,
-                  ),
-                  fadeInDuration: const Duration(milliseconds: 300),
-                );
-              }
-              return _buildIconFallback(
-                context,
-                fallbackIcon,
-                iconColor,
-                backgroundColor,
-                gradient,
-              );
-            },
-            frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-              if (wasSynchronouslyLoaded) return child;
-              if (frame != null) return child;
-              // Show shimmer while loading
-              return _buildShimmer(context);
-            },
-          );
-        } catch (e) {
-          // If asset loading fails completely, show icon fallback immediately
-          if (imageUrl != null && imageUrl!.isNotEmpty) {
-            return CachedNetworkImage(
-              imageUrl: imageUrl!,
-              width: width,
-              height: height,
-              fit: fit,
-              placeholder: (context, url) => _buildShimmer(context),
-              errorWidget: (context, url, error) => _buildIconFallback(
-                context,
-                fallbackIcon,
-                iconColor,
-                backgroundColor,
-                gradient,
-              ),
-              fadeInDuration: const Duration(milliseconds: 300),
-            );
-          }
-          return _buildIconFallback(
-            context,
-            fallbackIcon,
-            iconColor,
-            backgroundColor,
-            gradient,
-          );
-        }
-      },
     );
   }
 

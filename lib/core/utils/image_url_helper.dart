@@ -53,7 +53,7 @@ class ImageUrlHelper {
 
   /// Get achievement badge image URL
   static String getAchievementBadgeUrl(
-      AchievementType type, AchievementRarity rarity) {
+      AchievementType type, AchievementRarity rarity,) {
     // Using placeholder service with themed images
     return 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=200&h=200&fit=crop&auto=format';
   }

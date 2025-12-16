@@ -88,7 +88,7 @@ class _PremiumFloatingActionButtonState
               backgroundColor: Colors.transparent,
               elevation: 0,
               icon: widget.isLoading
-                  ? SizedBox(
+                  ? const SizedBox(
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(

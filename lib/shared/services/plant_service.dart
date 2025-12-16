@@ -9,9 +9,19 @@ class PlantService {
 
   PlantService(this._xpCalculator);
 
-  /// Calculate plant evolution stage from XP
+  /// Calculate plant evolution stage from user level
+  /// Level 1-2: Seedling | Level 3-5: Sprout | Level 6-10: Sapling |
+  /// Level 11-20: Young | Level 21-35: Mature | Level 36+: Majestic
+  int calculateEvolutionStageFromLevel(int level) {
+    return _xpCalculator.calculateEvolutionStage(level);
+  }
+
+  /// Calculate plant evolution stage from XP (legacy method for backward compatibility)
   int calculateEvolutionStage(int plantXp) {
-    return _xpCalculator.calculateEvolutionStage(plantXp);
+    // For backward compatibility, estimate level from XP
+    // This is approximate - ideally use level directly
+    final estimatedLevel = (plantXp / 100).floor() + 1;
+    return calculateEvolutionStageFromLevel(estimatedLevel);
   }
 
   /// Get evolution stage name
@@ -22,7 +32,7 @@ class PlantService {
   /// Calculate XP required for next evolution stage
   int xpRequiredForNextStage(int currentXp) {
     final currentStage = calculateEvolutionStage(currentXp);
-    
+
     switch (currentStage) {
       case 1: // Seed -> Sprout
         return AppConstants.sproutStageThreshold - currentXp;
@@ -176,4 +186,3 @@ extension PlantMoodExtension on PlantMood {
     }
   }
 }
-

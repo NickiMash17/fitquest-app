@@ -7,6 +7,7 @@ import 'package:fitquest/shared/models/activity_model.dart';
 import 'package:fitquest/shared/widgets/image_with_fallback.dart';
 import 'package:fitquest/core/utils/activity_image_helper.dart';
 import 'package:fitquest/core/utils/haptic_feedback_service.dart';
+import 'package:fitquest/core/widgets/staggered_animation_wrapper.dart';
 
 class QuickActionsSection extends StatelessWidget {
   const QuickActionsSection({super.key});
@@ -56,10 +57,16 @@ class QuickActionsSection extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       crossAxisCount: 4,
-      mainAxisSpacing: 12,
-      crossAxisSpacing: 12,
-      childAspectRatio: 0.85,
-      children: actions,
+      mainAxisSpacing: 14,
+      crossAxisSpacing: 14,
+      childAspectRatio: 0.88,
+      children: actions.asMap().entries.map((entry) {
+        return StaggeredAnimationWrapper(
+          index: entry.key,
+          delay: const Duration(milliseconds: 80),
+          child: entry.value,
+        );
+      }).toList(),
     );
   }
 
@@ -80,6 +87,7 @@ class QuickActionsSection extends StatelessWidget {
         );
       },
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
@@ -104,9 +112,11 @@ class QuickActionsSection extends StatelessWidget {
               child: activityType != null
                   ? ImageWithFallback(
                       imageUrl: ActivityImageHelper.getQuickActionImageUrl(
-                          activityType),
+                        activityType,
+                      ),
                       assetPath: ActivityImageHelper.getQuickActionImagePath(
-                          activityType),
+                        activityType,
+                      ),
                       fallbackIcon:
                           ActivityImageHelper.getActivityIcon(activityType),
                       width: 56,

@@ -2,17 +2,18 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:fitquest/core/constants/app_border_radius.dart';
+import 'package:fitquest/core/constants/app_colors.dart';
 
-/// Glassmorphic card widget for modern aesthetic
+/// GlassCard component matching spec:
+/// - backgroundColor: card.withOpacity(0.8)
+/// - backdropFilter: blur(8px)
+/// - border: 1px solid border.withOpacity(0.5)
+/// - boxShadow: softShadow
+/// - borderRadius: 16px
 class GlassmorphicCard extends StatelessWidget {
   final Widget child;
   final EdgeInsets? padding;
   final EdgeInsets? margin;
-  final double blur;
-  final double opacity;
-  final Color? borderColor;
-  final double borderWidth;
-  final Gradient? gradient;
   final VoidCallback? onTap;
 
   const GlassmorphicCard({
@@ -20,43 +21,28 @@ class GlassmorphicCard extends StatelessWidget {
     required this.child,
     this.padding,
     this.margin,
-    this.blur = 10.0,
-    this.opacity = 0.2,
-    this.borderColor,
-    this.borderWidth = 1.0,
-    this.gradient,
     this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
     return Container(
       margin: margin,
       decoration: BoxDecoration(
-        borderRadius: AppBorderRadius.allLG,
+        borderRadius: AppBorderRadius.allLG, // 16px
         border: Border.all(
-          color: borderColor ??
-              Colors.white.withValues(alpha: isDark ? 0.1 : 0.3),
-          width: borderWidth,
+          color: AppColors.border.withValues(alpha: 0.5),
+          width: 1.0,
         ),
+        boxShadow: [AppColors.softShadow],
       ),
       child: ClipRRect(
         borderRadius: AppBorderRadius.allLG,
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
+          filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8), // blur(8px)
           child: Container(
             decoration: BoxDecoration(
-              gradient: gradient ??
-                  LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Colors.white.withValues(alpha: isDark ? 0.1 : opacity),
-                      Colors.white.withValues(alpha: isDark ? 0.05 : opacity * 0.5),
-                    ],
-                  ),
+              color: AppColors.card.withValues(alpha: 0.8), // card.withOpacity(0.8)
             ),
             child: Material(
               color: Colors.transparent,

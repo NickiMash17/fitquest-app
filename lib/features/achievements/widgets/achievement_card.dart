@@ -142,7 +142,7 @@ class _AchievementCardState extends State<AchievementCard> {
                                   horizontal: 8,
                                   vertical: 4,
                                 ),
-                                decoration: const BoxDecoration(
+                                decoration: BoxDecoration(
                                   color: AppColors.success,
                                   borderRadius: AppBorderRadius.allSM,
                                 ),
@@ -219,7 +219,7 @@ class _AchievementCardState extends State<AchievementCard> {
               else
                 Container(
                   padding: const EdgeInsets.all(12),
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     gradient: AppColors.primaryGradient,
                     borderRadius: AppBorderRadius.allSM,
                   ),

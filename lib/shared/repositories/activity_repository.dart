@@ -18,7 +18,7 @@ class ActivityRepository {
     final converted = Map<String, dynamic>.from(data);
 
     // Helper function to convert any timestamp-like value to ISO8601 string
-    String? _convertTimestamp(dynamic value) {
+    String? convertTimestamp(dynamic value) {
       if (value == null) return null;
 
       if (value is String) {
@@ -72,7 +72,7 @@ class ActivityRepository {
                 .toIso8601String();
           } catch (e, stackTrace) {
             _logger.e('Error converting Map Timestamp',
-                error: e, stackTrace: stackTrace);
+                error: e, stackTrace: stackTrace,);
             return DateTime.now().toIso8601String();
           }
         }
@@ -90,7 +90,7 @@ class ActivityRepository {
     }
 
     // Convert date field
-    final dateConverted = _convertTimestamp(converted['date']);
+    final dateConverted = convertTimestamp(converted['date']);
     if (dateConverted != null) {
       converted['date'] = dateConverted;
     } else {
@@ -100,7 +100,7 @@ class ActivityRepository {
     }
 
     // Convert createdAt field if it exists
-    final createdAtConverted = _convertTimestamp(converted['createdAt']);
+    final createdAtConverted = convertTimestamp(converted['createdAt']);
     if (createdAtConverted != null) {
       converted['createdAt'] = createdAtConverted;
     }
@@ -128,11 +128,12 @@ class ActivityRepository {
         }
       }).map((snapshot) {
         final activities = <ActivityModel>[];
+        final seenIds = <String>{};
         for (final doc in snapshot.docs) {
           try {
             final data = doc.data();
             _logger.d(
-                'Stream: Processing document ${doc.id}, userId in doc: ${data['userId']}');
+                'Stream: Processing document ${doc.id}, userId in doc: ${data['userId']}',);
 
             // Convert timestamps first
             final converted = _convertActivityTimestamps(data);
@@ -140,7 +141,7 @@ class ActivityRepository {
             // Validate required fields before parsing
             if (converted['date'] == null || converted['date'] is! String) {
               _logger.e(
-                  'Stream: Document ${doc.id} has invalid or missing date field');
+                  'Stream: Document ${doc.id} has invalid or missing date field',);
               continue; // Skip this document
             }
 
@@ -148,9 +149,9 @@ class ActivityRepository {
             if (converted['createdAt'] != null &&
                 converted['createdAt'] is! String) {
               _logger.w(
-                  'Stream: Document ${doc.id} has invalid createdAt type after conversion: ${converted['createdAt']?.runtimeType}');
+                  'Stream: Document ${doc.id} has invalid createdAt type after conversion: ${converted['createdAt']?.runtimeType}',);
               try {
-                dynamic createdAtValue = converted['createdAt'];
+                final dynamic createdAtValue = converted['createdAt'];
                 if (createdAtValue is Timestamp) {
                   converted['createdAt'] =
                       createdAtValue.toDate().toIso8601String();
@@ -190,12 +191,18 @@ class ActivityRepository {
               ...converted,
             });
 
+            // Deduplicate by ID - skip if we've already seen this activity
+            if (seenIds.contains(activity.id)) {
+              _logger.w('Stream: Skipping duplicate activity with id: ${activity.id}');
+              continue;
+            }
+            seenIds.add(activity.id);
             activities.add(activity);
           } catch (e, stackTrace) {
             _logger.e(
                 'Stream: Error converting document ${doc.id} to ActivityModel',
                 error: e,
-                stackTrace: stackTrace);
+                stackTrace: stackTrace,);
             // Continue with next document instead of failing completely
           }
         }
@@ -222,11 +229,11 @@ class ActivityRepository {
 
       if (startDate != null) {
         query = query.where('date',
-            isGreaterThanOrEqualTo: Timestamp.fromDate(startDate));
+            isGreaterThanOrEqualTo: Timestamp.fromDate(startDate),);
       }
       if (endDate != null) {
         query = query.where('date',
-            isLessThanOrEqualTo: Timestamp.fromDate(endDate));
+            isLessThanOrEqualTo: Timestamp.fromDate(endDate),);
       }
 
       // Try with orderBy, but fallback without it if index is missing
@@ -264,17 +271,18 @@ class ActivityRepository {
       }
 
       final activities = <ActivityModel>[];
+      final seenIds = <String>{};
       for (final doc in sortedDocs) {
         try {
           final data = doc.data() as Map<String, dynamic>;
           final docUserId = data['userId'];
           _logger.d(
-              'Processing document ${doc.id}, userId in doc: $docUserId (expected: $userId)');
+              'Processing document ${doc.id}, userId in doc: $docUserId (expected: $userId)',);
 
           // Double-check userId matches (should already be filtered by query, but verify)
           if (docUserId != userId) {
             _logger.w(
-                'Document ${doc.id} has userId mismatch: $docUserId != $userId, skipping');
+                'Document ${doc.id} has userId mismatch: $docUserId != $userId, skipping',);
             continue;
           }
 
@@ -285,7 +293,7 @@ class ActivityRepository {
           if (converted['date'] == null || converted['date'] is! String) {
             _logger.e('Document ${doc.id} has invalid or missing date field');
             _logger.e(
-                'Date value: ${converted['date']}, type: ${converted['date']?.runtimeType}');
+                'Date value: ${converted['date']}, type: ${converted['date']?.runtimeType}',);
             continue; // Skip this document
           }
 
@@ -293,10 +301,10 @@ class ActivityRepository {
           if (converted['createdAt'] != null &&
               converted['createdAt'] is! String) {
             _logger.w(
-                'Document ${doc.id} has invalid createdAt type after conversion: ${converted['createdAt']?.runtimeType}');
+                'Document ${doc.id} has invalid createdAt type after conversion: ${converted['createdAt']?.runtimeType}',);
             // Try to manually convert it
             try {
-              dynamic createdAtValue = converted['createdAt'];
+              final dynamic createdAtValue = converted['createdAt'];
               if (createdAtValue is Timestamp) {
                 converted['createdAt'] =
                     createdAtValue.toDate().toIso8601String();
@@ -306,20 +314,20 @@ class ActivityRepository {
                 // Remove invalid createdAt - it's optional
                 converted.remove('createdAt');
                 _logger.w(
-                    'Removed invalid createdAt field from document ${doc.id}');
+                    'Removed invalid createdAt field from document ${doc.id}',);
               }
             } catch (e) {
               // Remove invalid createdAt - it's optional
               converted.remove('createdAt');
               _logger.w(
-                  'Removed invalid createdAt field from document ${doc.id} due to error: $e');
+                  'Removed invalid createdAt field from document ${doc.id} due to error: $e',);
             }
           }
 
           // Validate and convert type
           if (converted['type'] == null) {
             _logger.w(
-                'Document ${doc.id} has no type field, defaulting to exercise');
+                'Document ${doc.id} has no type field, defaulting to exercise',);
             converted['type'] = ActivityType.exercise.name;
           } else if (converted['type'] is String) {
             final typeString = converted['type'] as String;
@@ -329,12 +337,12 @@ class ActivityRepository {
               // Keep as string for JSON serialization
             } catch (e) {
               _logger.w(
-                  'Unknown activity type: $typeString, defaulting to exercise');
+                  'Unknown activity type: $typeString, defaulting to exercise',);
               converted['type'] = ActivityType.exercise.name;
             }
           } else {
             _logger.w(
-                'Document ${doc.id} has invalid type field, defaulting to exercise');
+                'Document ${doc.id} has invalid type field, defaulting to exercise',);
             converted['type'] = ActivityType.exercise.name;
           }
 
@@ -351,11 +359,18 @@ class ActivityRepository {
           });
 
           _logger.d(
-              'Created activity model: id=${activity.id}, userId=${activity.userId}, type=${activity.type.name}');
+              'Created activity model: id=${activity.id}, userId=${activity.userId}, type=${activity.type.name}',);
+          
+          // Deduplicate by ID - skip if we've already seen this activity
+          if (seenIds.contains(activity.id)) {
+            _logger.w('Skipping duplicate activity with id: ${activity.id}');
+            continue;
+          }
+          seenIds.add(activity.id);
           activities.add(activity);
         } catch (e, stackTrace) {
           _logger.e('Error converting document ${doc.id} to ActivityModel',
-              error: e, stackTrace: stackTrace);
+              error: e, stackTrace: stackTrace,);
           _logger.e('Document data: ${doc.data()}');
           // Continue with next document instead of failing completely
         }
@@ -532,7 +547,7 @@ class ActivityRepository {
       });
     } catch (e, stackTrace) {
       _logger.e('Error getting activity by ID',
-          error: e, stackTrace: stackTrace);
+          error: e, stackTrace: stackTrace,);
       return null;
     }
   }

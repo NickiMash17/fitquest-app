@@ -11,9 +11,8 @@
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Status](https://img.shields.io/badge/Status-In%20Development-yellow)](https://github.com/NickiMash17/fitquest-app)
 [![Platform](https://img.shields.io/badge/Platform-iOS%20%7C%20Android%20%7C%20Web-blue)]()
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-[Features](#-key-features) • [Demo](#-demo) • [Getting Started](#-getting-started) • [Documentation](#-documentation) • [Contributing](#-contributing)
+[Features](#-key-features) • [Getting Started](#-getting-started) • [Documentation](#-documentation) • [Contributing](#-contributing)
 
 </div>
 
@@ -26,6 +25,7 @@ FitQuest combines wellness tracking with gamification mechanics to create an eng
 ### 💪 How It Works
 
 Earn XP by completing daily wellness activities:
+
 - 🏃 **Exercise**: 50 XP per session (cardio, strength, yoga)
 - 🧘 **Meditation**: 30 XP per session (5+ minutes)
 - 💧 **Hydration**: 10 XP per glass (track your water intake)
@@ -34,52 +34,12 @@ Earn XP by completing daily wellness activities:
 ### 🌳 Plant Evolution Stages
 
 Watch your companion grow through 5 unique stages:
+
 1. **Seed** (0-100 XP) - Just beginning your journey
 2. **Sprout** (100-500 XP) - First signs of growth
 3. **Sapling** (500-1500 XP) - Building strong habits
 4. **Tree** (1500-5000 XP) - Thriving wellness routine
 5. **Ancient Tree** (5000+ XP) - Master of healthy living
-
----
-
-## 📸 Demo
-
-<div align="center">
-
-### Screenshots
-
-<table>
-  <tr>
-    <td align="center">
-      <img src="https://via.placeholder.com/250x500/E8F5E9/4CAF50?text=Onboarding" alt="Onboarding" width="200"/>
-      <br />
-      <sub><b>Onboarding</b></sub>
-    </td>
-    <td align="center">
-      <img src="https://via.placeholder.com/250x500/E3F2FD/2196F3?text=Home+Dashboard" alt="Dashboard" width="200"/>
-      <br />
-      <sub><b>Dashboard</b></sub>
-    </td>
-    <td align="center">
-      <img src="https://via.placeholder.com/250x500/FFF3E0/FF9800?text=Plant+Companion" alt="Plant" width="200"/>
-      <br />
-      <sub><b>Plant Companion</b></sub>
-    </td>
-    <td align="center">
-      <img src="https://via.placeholder.com/250x500/F3E5F5/9C27B0?text=Leaderboard" alt="Leaderboard" width="200"/>
-      <br />
-      <sub><b>Leaderboard</b></sub>
-    </td>
-  </tr>
-</table>
-
-### Demo Video
-
-[![FitQuest Demo](https://via.placeholder.com/600x338/000000/FFFFFF?text=▶️+Watch+Demo)](https://youtube.com/your-demo-video)
-
-*Click to watch the full demo video*
-
-</div>
 
 ---
 
@@ -117,23 +77,25 @@ Watch your companion grow through 5 unique stages:
 ### Frontend
 - **Framework:** Flutter 3.16.0
 - **Language:** Dart 3.0+
-- **State Management:** BLoC Pattern + Provider
-- **Animations:** Rive (plant animations), Lottie (UI animations)
+- **State Management:** BLoC Pattern + Provider (for theme)
+- **Animations:** Rive (plant animations), Lottie (UI animations), Custom Painters
 - **UI Components:** Custom design system with Material 3
 
 ### Backend & Services
 - **Authentication:** Firebase Auth (Email/Password, Google Sign-In)
-- **Database:** Cloud Firestore (NoSQL, real-time sync)
+- **Database:** Cloud Firestore (NoSQL, real-time sync, 40 MB cache limit)
 - **Storage:** Firebase Cloud Storage (user avatars, plant images)
 - **Functions:** Cloud Functions for Firebase (leaderboard calculations)
 - **Analytics:** Firebase Analytics & Crashlytics
 
 ### Architecture & Patterns
 - **Architecture:** Clean Architecture with Repository Pattern
-- **Dependency Injection:** GetIt
+- **Dependency Injection:** GetIt + Injectable
 - **Local Storage:** Hive (offline data), Shared Preferences (settings)
-- **API Communication:** Dio with interceptors
+- **Code Generation:** Freezed, Json Serializable, Injectable
 - **Testing:** Unit tests (mockito), Widget tests, Integration tests
+
+📖 **Demo Guides**: See the [docs/](docs/) folder for demo strategy and practice guides.
 
 ---
 
@@ -224,17 +186,7 @@ flutterfire configure
 
 Follow the prompts and select your Firebase project.
 
-### 4️⃣ Configure Environment Variables
-
-Create a `.env` file in the root directory:
-
-```env
-# Firebase Configuration (optional - handled by FlutterFire)
-# Add any API keys or secrets here
-ENVIRONMENT=development
-```
-
-### 5️⃣ Run the App
+### 4️⃣ Run the App
 
 ```bash
 # Run on Chrome (Web)
@@ -251,7 +203,7 @@ flutter devices  # List available devices
 flutter run -d <device-id>
 ```
 
-### 6️⃣ Build for Production
+### 5️⃣ Build for Production
 
 **Android (APK)**
 ```bash
@@ -279,30 +231,27 @@ flutter build web --release
 
 ```
 lib/
-├── core/
+├── core/                    # Core functionality (config, constants, services, theme)
 │   ├── constants/          # App constants, colors, strings
 │   ├── theme/             # Theme data, text styles
 │   ├── utils/             # Helper functions, validators
 │   ├── config/            # App configuration
-│   └── error/             # Error handling
-├── features/
-│   ├── authentication/    # Login, registration, password reset
-│   │   ├── bloc/         # Business logic
-│   │   ├── models/       # User models
-│   │   ├── pages/        # UI screens
-│   │   ├── repositories/ # Data layer
-│   │   └── widgets/      # Reusable widgets
-│   ├── activities/       # Activity tracking (exercise, meditation, etc.)
-│   ├── companion/        # Plant companion management
-│   ├── community/        # Leaderboards, friends, social features
-│   ├── profile/          # User profile, settings
-│   └── onboarding/       # First-time user experience
-├── shared/
-│   ├── widgets/          # Shared UI components
-│   ├── services/         # Firebase, analytics, notifications
-│   └── models/           # Shared data models
-├── routes/               # Navigation and routing
-└── main.dart            # App entry point
+│   ├── services/          # Core services
+│   └── widgets/           # Core reusable widgets
+├── features/                # Feature modules (feature-based structure)
+│   ├── authentication/     # Auth feature (BLoC, pages, widgets)
+│   ├── activities/         # Activity tracking feature
+│   ├── home/               # Home screen feature
+│   ├── goals/              # Goals feature
+│   ├── profile/            # User profile, settings
+│   ├── community/          # Leaderboards, friends, social features
+│   └── onboarding/         # First-time user experience
+├── shared/                  # Shared code across features
+│   ├── models/             # Data models (Freezed)
+│   ├── repositories/       # Data repositories
+│   ├── services/           # Business logic services
+│   └── widgets/            # Reusable widgets
+└── main.dart               # App entry point
 ```
 
 ---
@@ -345,13 +294,9 @@ flutter test test/features/authentication/bloc/auth_bloc_test.dart
 
 ## 📚 Documentation
 
-- **[API Documentation](docs/API.md)** - Backend endpoints and data structures
-- **[Architecture Guide](docs/ARCHITECTURE.md)** - Project structure and patterns
-- **[State Management](docs/STATE_MANAGEMENT.md)** - BLoC pattern implementation
-- **[Firebase Setup](docs/FIREBASE.md)** - Detailed Firebase configuration
-- **[Contributing Guide](CONTRIBUTING.md)** - How to contribute to the project
-- **[Code of Conduct](CODE_OF_CONDUCT.md)** - Community guidelines
-- **[Changelog](CHANGELOG.md)** - Version history and updates
+- **[Demo Strategy](docs/DEMO_STRATEGY.md)** - Complete demo script and strategy
+- **[Pre-Demo Checklist](docs/PRE_DEMO_CHECKLIST.md)** - Pre-demo action plan
+- **[Quick Demo Practice](docs/QUICK_DEMO_PRACTICE.md)** - Quick practice guide
 
 ---
 
@@ -363,6 +308,8 @@ flutter test test/features/authentication/bloc/auth_bloc_test.dart
 - [x] Basic activity tracking
 - [x] Plant companion mechanics
 - [x] XP and leveling system
+- [x] Celebration animations
+- [x] Theme system (light/dark mode)
 
 ### 🚧 In Progress (Q1 2025)
 - [ ] Firebase integration completion
@@ -385,8 +332,6 @@ flutter test test/features/authentication/bloc/auth_bloc_test.dart
 - [ ] Wearable device integration
 - [ ] Desktop applications (Windows, macOS)
 
-[View full roadmap on GitHub Projects](https://github.com/NickiMash17/fitquest-app/projects)
-
 ---
 
 ## 🐛 Troubleshooting
@@ -394,6 +339,7 @@ flutter test test/features/authentication/bloc/auth_bloc_test.dart
 ### Common Issues
 
 #### 1. Blank Screen on Web
+
 **Symptoms:** White/blank screen when running on web browser
 
 **Solutions:**
@@ -403,6 +349,7 @@ flutter test test/features/authentication/bloc/auth_bloc_test.dart
 4. Try Incognito Mode: Open browser in incognito and navigate to localhost
 
 #### 2. Firebase Configuration Errors
+
 **Symptoms:** `No Firebase App '[DEFAULT]' has been created`
 
 **Solutions:**
@@ -418,6 +365,7 @@ flutter run
 ```
 
 #### 3. Firestore Index Errors
+
 **Symptoms:** Console warnings about missing indexes
 
 **Solutions:**
@@ -427,6 +375,7 @@ flutter run
 - Wait 2-5 minutes for index creation
 
 #### 4. Build Errors After Updating Dependencies
+
 **Solutions:**
 ```bash
 flutter clean
@@ -436,6 +385,7 @@ flutter run
 ```
 
 #### 5. Port Already in Use (Web)
+
 **Symptoms:** `Port 8080 is already in use`
 
 **Solutions:**
@@ -460,8 +410,6 @@ To see the onboarding screen again:
 
 ### Need More Help?
 
-- 📖 Check our [FAQ](docs/FAQ.md)
-- 💬 Join our [Discord Community](https://discord.gg/fitquest)
 - 🐛 [Open an Issue](https://github.com/NickiMash17/fitquest-app/issues/new)
 - 📧 Email: [nene171408@gmail.com](mailto:nene171408@gmail.com)
 
@@ -487,8 +435,6 @@ We love contributions! FitQuest is built by developers like you.
 - Keep commits atomic and well-described
 - Be respectful and constructive in discussions
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
-
 ### Areas for Contribution
 
 - 🐛 Bug fixes
@@ -511,6 +457,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 - [x] Authentication flow
 - [x] Activity tracking UI
 - [x] Plant companion visuals
+- [x] Celebration animations
 - [ ] Data persistence
 - [ ] Offline support
 
@@ -547,7 +494,7 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 ```
 MIT License
 
-Copyright (c) 2024 Nicolette Mashaba
+Copyright (c) 2025 Nicolette Mashaba
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -581,23 +528,23 @@ Special thanks to:
 - 🎓 **Jediah Codes** - For the comprehensive learning path at [jediah.dev](https://jediah.dev)
 - 🌟 **Open Source Community** - For invaluable packages and support
 - 🎨 **Design Inspiration** - Duolingo, Habitica, and Forest App
-- 🧪 **Beta Testers** - For early feedback and bug reports
 
 ### Key Dependencies
 
 Special thanks to these amazing packages:
+
 - `firebase_core` & `firebase_auth` - Backend services
 - `flutter_bloc` - State management
 - `rive` - Beautiful animations
 - `fl_chart` - Data visualization
 - `hive` - Local storage
+- `confetti` - Celebration animations
 
 ---
 
 ## 📞 Support & Community
 
 ### Get Help
-- 💬 [Discord Server](https://discord.gg/fitquest) - Chat with the community
 - 📖 [Documentation](docs/) - Comprehensive guides
 - ❓ [Stack Overflow](https://stackoverflow.com/questions/tagged/fitquest) - Technical questions
 - 🐛 [Issue Tracker](https://github.com/NickiMash17/fitquest-app/issues) - Report bugs
@@ -605,19 +552,7 @@ Special thanks to these amazing packages:
 ### Stay Updated
 - ⭐ Star this repo to show support
 - 👀 Watch for updates
-- 🐦 Follow on Twitter [@FitQuestApp](https://twitter.com/fitquestapp) (coming soon)
 - 📧 Subscribe to our newsletter (coming soon)
-
----
-
-## 📈 Project Stats
-
-![GitHub stars](https://img.shields.io/github/stars/NickiMash17/fitquest-app?style=social)
-![GitHub forks](https://img.shields.io/github/forks/NickiMash17/fitquest-app?style=social)
-![GitHub watchers](https://img.shields.io/github/watchers/NickiMash17/fitquest-app?style=social)
-![GitHub issues](https://img.shields.io/github/issues/NickiMash17/fitquest-app)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/NickiMash17/fitquest-app)
-![GitHub last commit](https://img.shields.io/github/last-commit/NickiMash17/fitquest-app)
 
 ---
 

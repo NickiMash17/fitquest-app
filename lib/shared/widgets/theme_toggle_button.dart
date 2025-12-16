@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fitquest/core/di/injection.dart';
+import 'package:fitquest/core/services/theme_service.dart';
 
 /// A button widget to toggle between light and dark theme
 class ThemeToggleButton extends StatefulWidget {
@@ -17,53 +18,29 @@ class ThemeToggleButton extends StatefulWidget {
 }
 
 class _ThemeToggleButtonState extends State<ThemeToggleButton> {
-  bool _isDarkMode = false;
+  late ThemeService _themeService;
 
   @override
   void initState() {
     super.initState();
-    _loadThemeMode();
+    _themeService = getIt<ThemeService>();
+    _themeService.addListener(_onThemeChanged);
   }
 
-  Future<void> _loadThemeMode() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final darkMode = prefs.getBool('dark_mode') ?? false;
-      if (mounted) {
-        setState(() {
-          _isDarkMode = darkMode;
-        });
-      }
-    } catch (e) {
-      debugPrint('Error loading theme mode: $e');
+  @override
+  void dispose() {
+    _themeService.removeListener(_onThemeChanged);
+    super.dispose();
+  }
+
+  void _onThemeChanged() {
+    if (mounted) {
+      setState(() {});
     }
   }
 
   Future<void> _toggleTheme() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final newDarkMode = !_isDarkMode;
-      await prefs.setBool('dark_mode', newDarkMode);
-
-      if (mounted) {
-        setState(() {
-          _isDarkMode = newDarkMode;
-        });
-
-        // Trigger app rebuild by navigating to the same route
-        // This will cause the app to reload with the new theme
-        await Future.delayed(const Duration(milliseconds: 100));
-
-        // Force a rebuild of the MaterialApp
-        if (mounted) {
-          // The main app will pick up the change via _listenForThemeChanges
-          // For immediate effect, we can use a callback or state management
-          // For now, the theme will update on next navigation or app restart
-        }
-      }
-    } catch (e) {
-      debugPrint('Error toggling theme: $e');
-    }
+    await _themeService.toggleTheme();
   }
 
   @override
@@ -81,7 +58,7 @@ class _ThemeToggleButtonState extends State<ThemeToggleButton> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
-                _isDarkMode
+                _themeService.themeMode == ThemeMode.dark
                     ? Icons.light_mode_rounded
                     : Icons.dark_mode_rounded,
                 color: iconColor,
@@ -89,7 +66,9 @@ class _ThemeToggleButtonState extends State<ThemeToggleButton> {
               ),
               const SizedBox(width: 8),
               Text(
-                _isDarkMode ? 'Light Mode' : 'Dark Mode',
+                _themeService.themeMode == ThemeMode.dark
+                    ? 'Light Mode'
+                    : 'Dark Mode',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: iconColor,
                       fontWeight: FontWeight.w600,
@@ -103,10 +82,14 @@ class _ThemeToggleButtonState extends State<ThemeToggleButton> {
 
     return IconButton(
       icon: Icon(
-        _isDarkMode ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+        _themeService.themeMode == ThemeMode.dark
+            ? Icons.light_mode_rounded
+            : Icons.dark_mode_rounded,
         color: iconColor,
       ),
-      tooltip: _isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode',
+      tooltip: _themeService.themeMode == ThemeMode.dark
+          ? 'Switch to Light Mode'
+          : 'Switch to Dark Mode',
       onPressed: _toggleTheme,
     );
   }

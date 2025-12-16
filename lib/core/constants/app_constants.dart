@@ -66,6 +66,16 @@ class AppConstants {
   static const String badgesCollection = 'badges';
   static const String leaderboardCollection = 'leaderboard';
   static const String challengesCollection = 'challenges';
+  static const String goalsCollection = 'goals';
+
+  // Firestore Cache Configuration
+  /// Default cache size: 40 MB (recommended for mobile apps)
+  /// This provides good offline support while preventing excessive disk usage
+  static const int firestoreCacheSizeBytes = 40 * 1024 * 1024; // 40 MB
+
+  /// Maximum cache size: 100 MB (for power users with extensive data)
+  /// Can be increased if needed, but 40 MB is usually sufficient
+  static const int firestoreMaxCacheSizeBytes = 100 * 1024 * 1024; // 100 MB
 
   // Error Messages
   static const String networkErrorMessage =

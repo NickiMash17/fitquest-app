@@ -30,33 +30,31 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
   String _searchQuery = '';
   ActivityType? _filterType;
 
+  bool _hasLoaded = false;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Reload activities when page becomes visible
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        final bloc = context.read<ActivityBloc>();
-        // Only reload if we're not already loading
-        if (bloc.state is! ActivityLoading) {
-          debugPrint(
-              'ActivitiesPage: Triggering reload in didChangeDependencies');
-          bloc.add(const ActivitiesLoadRequested());
+    // Only reload if we haven't loaded yet and state is not already loaded
+    if (!_hasLoaded) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          final bloc = context.read<ActivityBloc>();
+          // Only reload if we're not already loading and not already loaded
+          if (bloc.state is! ActivityLoading && bloc.state is! ActivityLoaded) {
+            _hasLoaded = true;
+            bloc.add(const ActivitiesLoadRequested());
+          }
         }
-      }
-    });
+      });
+    }
   }
 
   @override
   void initState() {
     super.initState();
-    // Also reload when page is first created
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        debugPrint('ActivitiesPage: Triggering reload in initState');
-        context.read<ActivityBloc>().add(const ActivitiesLoadRequested());
-      }
-    });
+    // Don't load here - let didChangeDependencies handle it
+    // This prevents duplicate loads
   }
 
   @override
@@ -74,21 +72,16 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
       body: BlocConsumer<ActivityBloc, ActivityState>(
         listener: (context, state) {
           // Reload activities when returning from add activity page
-          if (state is ActivityLoaded) {
-            debugPrint(
-                'ActivitiesPage: Activities loaded - ${state.activities.length} activities');
-          } else if (state is ActivityError) {
-            debugPrint('ActivitiesPage: Error - ${state.message}');
-          }
+          // No debugPrint needed - listener handles state changes
         },
         buildWhen: (previous, current) {
-          // Always rebuild on state changes to show new activities
-          return true;
+          // Only rebuild when state actually changes
+          return previous.runtimeType != current.runtimeType ||
+              (previous is ActivityLoaded &&
+                  current is ActivityLoaded &&
+                  previous.activities.length != current.activities.length);
         },
         builder: (context, state) {
-          debugPrint(
-              'ActivitiesPage: Building with state ${state.runtimeType}');
-
           // Handle initial state - trigger load
           if (state is ActivityInitial) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -102,48 +95,42 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
           }
 
           if (state is ActivityError) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.error_outline,
-                      size: 64,
-                      color: Colors.red,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Error',
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(state.message),
-                    const SizedBox(height: 24),
-                    ElevatedButton(
-                      onPressed: () {
-                        context
-                            .read<ActivityBloc>()
-                            .add(const ActivitiesLoadRequested());
-                      },
-                      child: const Text('Retry'),
-                    ),
-                  ],
+            return SingleChildScrollView(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.error_outline,
+                        size: 64,
+                        color: Colors.red,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Error',
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(state.message),
+                      const SizedBox(height: 24),
+                      ElevatedButton(
+                        onPressed: () {
+                          context.read<ActivityBloc>().add(
+                            const ActivitiesLoadRequested(),
+                          );
+                        },
+                        child: const Text('Retry'),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             );
           }
 
           if (state is ActivityLoaded) {
-            debugPrint(
-              'ActivitiesPage: Loaded ${state.activities.length} activities',
-            );
-            // Log all activities for debugging
-            for (final activity in state.activities) {
-              debugPrint(
-                  '  Activity: id=${activity.id}, type=${activity.type.name}, date=${activity.date}, userId=${activity.userId}');
-            }
             try {
               if (state.activities.isEmpty) {
                 return EmptyStateWidget(
@@ -169,9 +156,9 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
 
               return RefreshIndicator(
                 onRefresh: () async {
-                  context
-                      .read<ActivityBloc>()
-                      .add(const ActivitiesLoadRequested());
+                  context.read<ActivityBloc>().add(
+                    const ActivitiesLoadRequested(),
+                  );
                 },
                 child: ListView(
                   padding: AppSpacing.screenPadding,
@@ -211,8 +198,9 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                                 isSelected: _filterType == type,
                                 onTap: () {
                                   setState(() {
-                                    _filterType =
-                                        _filterType == type ? null : type;
+                                    _filterType = _filterType == type
+                                        ? null
+                                        : type;
                                   });
                                 },
                               ),
@@ -232,8 +220,9 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                             borderRadius: BorderRadius.circular(10),
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.primaryGreen
-                                    .withValues(alpha: 0.3),
+                                color: AppColors.primaryGreen.withValues(
+                                  alpha: 0.3,
+                                ),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),
@@ -248,9 +237,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                         const SizedBox(width: 14),
                         Text(
                           'Recent Activities',
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineMedium
+                          style: Theme.of(context).textTheme.headlineMedium
                               ?.copyWith(
                                 fontWeight: FontWeight.w700,
                                 color: Theme.of(context).colorScheme.onSurface,
@@ -265,20 +252,20 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color:
-                                  AppColors.primaryGreen.withValues(alpha: 0.1),
+                              color: AppColors.primaryGreen.withValues(
+                                alpha: 0.1,
+                              ),
                               borderRadius: AppBorderRadius.allMD,
                               border: Border.all(
-                                color: AppColors.primaryGreen
-                                    .withValues(alpha: 0.2),
+                                color: AppColors.primaryGreen.withValues(
+                                  alpha: 0.2,
+                                ),
                                 width: 1,
                               ),
                             ),
                             child: Text(
                               '${filteredActivities.length} found',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .labelMedium
+                              style: Theme.of(context).textTheme.labelMedium
                                   ?.copyWith(
                                     color: AppColors.primaryGreen,
                                     fontWeight: FontWeight.w600,
@@ -296,43 +283,50 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                             Icon(
                               Icons.search_off_rounded,
                               size: 64,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurfaceVariant,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant,
                             ),
                             const SizedBox(height: 16),
                             Text(
                               'No activities found',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
+                              style: Theme.of(context).textTheme.titleMedium
                                   ?.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
                                   ),
                             ),
                             const SizedBox(height: 8),
                             Text(
                               'Try adjusting your search or filter',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
+                              style: Theme.of(context).textTheme.bodySmall
                                   ?.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
                                   ),
                             ),
                           ],
                         ),
                       )
                     else
-                      ...filteredActivities.map(
-                        (activity) => Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: _buildActivityCard(context, activity),
-                        ),
+                      // Use ListView.builder for better performance
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: filteredActivities.length,
+                        cacheExtent: 500,
+                        itemBuilder: (context, index) {
+                          final activity = filteredActivities[index];
+                          return RepaintBoundary(
+                            key: ValueKey('activity_${activity.id}_$index'),
+                            child: Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: _buildActivityCard(context, activity),
+                            ),
+                          );
+                        },
                       ),
                     const SizedBox(height: AppSpacing.lg),
                     // Activity categories
@@ -353,9 +347,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                         const SizedBox(width: 12),
                         Text(
                           'Quick Log',
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineMedium
+                          style: Theme.of(context).textTheme.headlineMedium
                               ?.copyWith(
                                 fontWeight: FontWeight.w700,
                                 color: Theme.of(context).colorScheme.onSurface,
@@ -407,37 +399,38 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                   ],
                 ),
               );
-            } catch (e, stackTrace) {
-              debugPrint('Error rendering activities: $e');
-              debugPrint('Stack: $stackTrace');
-              return Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.error_outline,
-                        size: 64,
-                        color: Colors.red,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Error Rendering Activities',
-                        style: Theme.of(context).textTheme.headlineSmall,
-                      ),
-                      const SizedBox(height: 8),
-                      Text('Error: $e'),
-                      const SizedBox(height: 24),
-                      ElevatedButton(
-                        onPressed: () {
-                          context
-                              .read<ActivityBloc>()
-                              .add(const ActivitiesLoadRequested());
-                        },
-                        child: const Text('Retry'),
-                      ),
-                    ],
+            } catch (e) {
+              // Error rendering - show error UI without logging
+              return SingleChildScrollView(
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.error_outline,
+                          size: 64,
+                          color: Colors.red,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Error Rendering Activities',
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                        const SizedBox(height: 8),
+                        Text('Error: $e'),
+                        const SizedBox(height: 24),
+                        ElevatedButton(
+                          onPressed: () {
+                            context.read<ActivityBloc>().add(
+                              const ActivitiesLoadRequested(),
+                            );
+                          },
+                          child: const Text('Retry'),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               );
@@ -445,33 +438,34 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
           }
 
           // Fallback - should never reach here, but just in case
-          debugPrint('ActivitiesPage: Unknown state ${state.runtimeType}');
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.help_outline,
-                  size: 64,
-                  color: Color(0xFF616161),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Unknown State',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 8),
-                Text('State: ${state.runtimeType}'),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: () {
-                    context
-                        .read<ActivityBloc>()
-                        .add(const ActivitiesLoadRequested());
-                  },
-                  child: const Text('Retry'),
-                ),
-              ],
+          return SingleChildScrollView(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.help_outline,
+                    size: 64,
+                    color: Color(0xFF616161),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Unknown State',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: 8),
+                  Text('State: ${state.runtimeType}'),
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: () {
+                      context.read<ActivityBloc>().add(
+                        const ActivitiesLoadRequested(),
+                      );
+                    },
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
             ),
           );
         },
@@ -506,17 +500,20 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
     final activityGradient = LinearGradient(
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
-      colors: [
-        activityColor,
-        activityColor.withValues(alpha: 0.7),
-      ],
+      colors: [activityColor, activityColor.withValues(alpha: 0.7)],
     );
 
     return SwipeableCard(
-      leftAction:
-          const Icon(Icons.delete_outline, color: Colors.white, size: 24),
-      rightAction:
-          const Icon(Icons.edit_outlined, color: Colors.white, size: 24),
+      leftAction: const Icon(
+        Icons.delete_outline,
+        color: Colors.white,
+        size: 24,
+      ),
+      rightAction: const Icon(
+        Icons.edit_outlined,
+        color: Colors.white,
+        size: 24,
+      ),
       leftActionColor: Colors.red,
       rightActionColor: AppColors.primaryGreen,
       onSwipeLeft: () {
@@ -525,10 +522,9 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
       },
       onSwipeRight: () {
         // Navigate to edit activity
-        Navigator.of(context).pushNamed(
-          AppRouter.addActivity,
-          arguments: activity,
-        );
+        Navigator.of(
+          context,
+        ).pushNamed(AppRouter.addActivity, arguments: activity);
       },
       child: PremiumCard(
         padding: const EdgeInsets.all(20),
@@ -561,12 +557,15 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                 child: ClipRRect(
                   borderRadius: AppBorderRadius.allLG,
                   child: ImageWithFallback(
-                    imageUrl:
-                        ActivityImageHelper.getActivityImageUrl(activity.type),
-                    assetPath:
-                        ActivityImageHelper.getActivityImagePath(activity.type),
-                    fallbackIcon:
-                        ActivityImageHelper.getActivityIcon(activity.type),
+                    imageUrl: ActivityImageHelper.getActivityImageUrl(
+                      activity.type,
+                    ),
+                    assetPath: ActivityImageHelper.getActivityImagePath(
+                      activity.type,
+                    ),
+                    fallbackIcon: ActivityImageHelper.getActivityIcon(
+                      activity.type,
+                    ),
                     width: 72,
                     height: 72,
                     fit: BoxFit.cover,
@@ -582,51 +581,12 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          _getActivityTypeName(activity.type),
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                    letterSpacing: -0.3,
-                                  ),
+                  Text(
+                    _getActivityTypeName(activity.type),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.3,
                         ),
-                      ),
-                      if (activity.xpEarned > 0)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            gradient: AppColors.primaryGradient,
-                            borderRadius: AppBorderRadius.allSM,
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(
-                                Icons.star_rounded,
-                                color: Colors.white,
-                                size: 14,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                '+${activity.xpEarned}',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .labelSmall
-                                    ?.copyWith(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                              ),
-                            ],
-                          ),
-                        ),
-                    ],
                   ),
                   const SizedBox(height: 8),
                   Row(
@@ -651,10 +611,9 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                             const SizedBox(width: 4),
                             Text(
                               app_date_utils.DateUtils.formatDateTime(
-                                  activity.date),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .labelSmall
+                                activity.date,
+                              ),
+                              style: Theme.of(context).textTheme.labelSmall
                                   ?.copyWith(
                                     color: activityColor,
                                     fontWeight: FontWeight.w600,
@@ -671,14 +630,15 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color:
-                                AppColors.primaryGreen.withValues(alpha: 0.1),
+                            color: AppColors.primaryGreen.withValues(
+                              alpha: 0.1,
+                            ),
                             borderRadius: AppBorderRadius.allSM,
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(
+                              const Icon(
                                 Icons.timer_rounded,
                                 size: 14,
                                 color: AppColors.primaryGreen,
@@ -686,9 +646,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                               const SizedBox(width: 4),
                               Text(
                                 '${activity.duration}min',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .labelSmall
+                                style: Theme.of(context).textTheme.labelSmall
                                     ?.copyWith(
                                       color: AppColors.primaryGreen,
                                       fontWeight: FontWeight.w600,
@@ -705,10 +663,9 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                     Text(
                       activity.notes!,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
-                            height: 1.4,
-                          ),
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        height: 1.4,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -725,7 +682,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                     horizontal: 10,
                     vertical: 6,
                   ),
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     gradient: AppColors.primaryGradient,
                     borderRadius: AppBorderRadius.allSM,
                   ),
@@ -741,9 +698,9 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                       Text(
                         '+${activity.xpEarned}',
                         style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
-                            ),
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ],
                   ),
@@ -752,9 +709,9 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                 Text(
                   '${activity.duration} min',
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        fontWeight: FontWeight.w500,
-                      ),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ],
             ),
@@ -782,10 +739,9 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Theme.of(context)
-                    .colorScheme
-                    .onSurfaceVariant
-                    .withValues(alpha: 0.3),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -798,26 +754,28 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                     Center(
                       child: ImageWithFallback(
                         imageUrl: ActivityImageHelper.getActivityImageUrl(
-                            activity.type),
+                          activity.type,
+                        ),
                         assetPath: ActivityImageHelper.getActivityImagePath(
-                            activity.type),
-                        fallbackIcon:
-                            ActivityImageHelper.getActivityIcon(activity.type),
+                          activity.type,
+                        ),
+                        fallbackIcon: ActivityImageHelper.getActivityIcon(
+                          activity.type,
+                        ),
                         width: 120,
                         height: 120,
                         fit: BoxFit.contain,
-                        backgroundColor: _getActivityColor(activity.type)
-                            .withValues(alpha: 0.1),
+                        backgroundColor: _getActivityColor(
+                          activity.type,
+                        ).withValues(alpha: 0.1),
                         iconColor: _getActivityColor(activity.type),
                       ),
                     ),
                     const SizedBox(height: 24),
                     Text(
                       _getActivityTypeName(activity.type),
-                      style:
-                          Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                      style: Theme.of(context).textTheme.headlineSmall
+                          ?.copyWith(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 16),
                     _buildDetailItem(
@@ -825,7 +783,8 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                       icon: Icons.access_time_rounded,
                       label: 'Date & Time',
                       value: app_date_utils.DateUtils.formatDateTime(
-                          activity.date),
+                        activity.date,
+                      ),
                     ),
                     const SizedBox(height: 12),
                     _buildDetailItem(
@@ -881,15 +840,15 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
               Text(
                 label,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
               const SizedBox(height: 4),
               Text(
                 value,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
               ),
             ],
           ),
@@ -904,7 +863,8 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
       builder: (context) => AlertDialog(
         title: const Text('Delete Activity?'),
         content: Text(
-            'Are you sure you want to delete this ${_getActivityTypeName(activity.type).toLowerCase()} activity?'),
+          'Are you sure you want to delete this ${_getActivityTypeName(activity.type).toLowerCase()} activity?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -916,12 +876,11 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
               // TODO: Implement delete functionality
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                    content: Text('Delete functionality coming soon')),
+                  content: Text('Delete functionality coming soon'),
+                ),
               );
             },
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.red,
-            ),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: const Text('Delete'),
           ),
         ],
@@ -979,9 +938,9 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
             Text(
               title,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
           ],
         ),
@@ -1006,9 +965,9 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
         ),
         title: Text(
           title,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w500,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w500),
         ),
         trailing: const Icon(
           Icons.chevron_right,
@@ -1026,7 +985,15 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
     String searchQuery,
     ActivityType? filterType,
   ) {
-    var filtered = activities;
+    // First, deduplicate by ID to ensure no duplicates
+    final seenIds = <String>{};
+    var filtered = activities.where((activity) {
+      if (seenIds.contains(activity.id)) {
+        return false; // Skip duplicate
+      }
+      seenIds.add(activity.id);
+      return true;
+    }).toList();
 
     // Filter by type
     if (filterType != null) {

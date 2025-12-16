@@ -1,7 +1,9 @@
 // lib/shared/widgets/premium_card.dart
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:fitquest/core/constants/app_border_radius.dart';
 import 'package:fitquest/core/constants/app_colors.dart';
+import 'package:fitquest/core/utils/haptic_feedback_service.dart';
 
 /// Premium card widget with modern design
 class PremiumCard extends StatefulWidget {
@@ -58,6 +60,7 @@ class _PremiumCardState extends State<PremiumCard>
   void _handleTapDown(TapDownDetails details) {
     if (widget.onTap != null) {
       _controller.forward();
+      HapticFeedbackService.lightImpact();
     }
   }
 
@@ -72,69 +75,110 @@ class _PremiumCardState extends State<PremiumCard>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final defaultBackground = isDark 
-        ? Theme.of(context).colorScheme.surface
-        : (widget.backgroundColor ?? AppColors.surface);
-    
-    final card = Container(
+    final surfaceColor = Theme.of(context).colorScheme.surface;
+    final onSurface = Theme.of(context).colorScheme.onSurface;
+
+    // Enhanced shadows for glassmorphism effect
+    final cardBackground = widget.gradient != null
+        ? null
+        : LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: isDark
+                ? [
+                    surfaceColor.withValues(alpha: 0.95),
+                    surfaceColor.withValues(alpha: 0.85),
+                  ]
+                : [
+                    surfaceColor.withValues(alpha: 0.95),
+                    surfaceColor.withValues(alpha: 0.85),
+                  ],
+          );
+
+    final enhancedShadows = widget.showShadow
+        ? [
+            // Primary shadow with brand color tint
+            BoxShadow(
+              color: AppColors.primary.withValues(alpha: isDark ? 0.2 : 0.1),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            ),
+            // Soft highlight (theme-aware)
+            if (!isDark)
+              BoxShadow(
+                color: Colors.white.withValues(alpha: 0.1),
+                blurRadius: 10,
+                offset: const Offset(-5, -5),
+              ),
+            // Base shadow (theme-aware)
+            BoxShadow(
+              color: isDark
+                  ? Colors.black.withValues(alpha: 0.3)
+                  : Colors.black.withValues(alpha: 0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+              spreadRadius: 0,
+            ),
+          ]
+        : null;
+
+    final Widget card = Container(
       margin: widget.margin ?? EdgeInsets.zero,
       decoration: BoxDecoration(
-        color: widget.gradient == null ? defaultBackground : null,
-        gradient: widget.gradient,
+        gradient: widget.gradient ?? cardBackground,
         borderRadius: AppBorderRadius.allLG,
         border: widget.border ??
-            (widget.gradient == null
-                ? Border.all(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .outline
-                        .withValues(alpha: 0.08),
-                    width: 1,
-                  )
-                : null),
-        boxShadow: widget.showShadow
-            ? [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                  spreadRadius: 0,
-                ),
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.02),
-                  blurRadius: 16,
-                  offset: const Offset(0, 4),
-                  spreadRadius: 0,
-                ),
-              ]
-            : null,
+            Border.all(
+              width: 1.0,
+              color: isDark
+                  ? AppColors.primaryGreen.shade300.withValues(alpha: 0.2)
+                  : AppColors.glassBorder,
+            ),
+        boxShadow: enhancedShadows,
       ),
-      child: Material(
-        color: Colors.transparent,
-        child: GestureDetector(
-          onTapDown: widget.onTap != null ? _handleTapDown : null,
-          onTapUp: widget.onTap != null ? _handleTapUp : null,
-          onTapCancel: widget.onTap != null ? _handleTapCancel : null,
-          onTap: widget.onTap,
-          onDoubleTap: widget.onDoubleTap,
-          child: ScaleTransition(
-            scale: _scaleAnimation,
-            child: InkWell(
-              onTap: null, // Handled by GestureDetector
-              borderRadius: AppBorderRadius.allLG,
-              splashColor: widget.gradient != null
-                  ? Colors.white.withValues(alpha: 0.1)
-                  : AppColors.primaryGreen.withValues(alpha: 0.1),
-              highlightColor: Colors.transparent,
-              child: Padding(
-                padding: widget.padding ?? const EdgeInsets.all(20.0),
-                child: widget.child,
+      child: ClipRRect(
+        borderRadius: AppBorderRadius.allLG,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Material(
+            color: Colors.transparent,
+            child: GestureDetector(
+              onTapDown: widget.onTap != null ? _handleTapDown : null,
+              onTapUp: widget.onTap != null ? _handleTapUp : null,
+              onTapCancel: widget.onTap != null ? _handleTapCancel : null,
+              onTap: widget.onTap,
+              onDoubleTap: widget.onDoubleTap,
+              child: ScaleTransition(
+                scale: _scaleAnimation,
+                child: InkWell(
+                  onTap: null, // Handled by GestureDetector
+                  borderRadius: AppBorderRadius.allLG,
+                  splashColor: widget.gradient != null
+                      ? onSurface.withValues(alpha: 0.1)
+                      : AppColors.primaryGreen.withValues(alpha: 0.1),
+                  highlightColor: Colors.transparent,
+                  child: Padding(
+                    padding: widget.padding ?? const EdgeInsets.all(20.0),
+                    child: widget.child,
+                  ),
+                ),
               ),
             ),
           ),
         ),
       ),
     );
+
+    // Add semantics for accessibility when card is tappable
+    if (widget.onTap != null || widget.onDoubleTap != null) {
+      return Semantics(
+        button: true,
+        hint: widget.onDoubleTap != null
+            ? 'Double tap to view details'
+            : 'Double tap to open',
+        child: card,
+      );
+    }
 
     return card;
   }

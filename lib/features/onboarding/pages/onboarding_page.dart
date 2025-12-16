@@ -24,14 +24,14 @@ class _OnboardingPageState extends State<OnboardingPage>
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
 
-  final List<_OnboardingSlide> _slides = const [
+  final List<_OnboardingSlide> _slides = [
     _OnboardingSlide(
       icon: Icons.fitness_center_rounded,
       title: 'Track Your Wellness',
       description:
           'Log daily activities like exercise, meditation, hydration, and sleep to build healthy habits that last.',
       gradient: AppColors.primaryGradient,
-      iconGradient: LinearGradient(
+      iconGradient: const LinearGradient(
         colors: [Color(0xFF81C784), Color(0xFF4CAF50)],
       ),
     ),
@@ -41,7 +41,7 @@ class _OnboardingPageState extends State<OnboardingPage>
       description:
           'Watch your virtual plant evolve from a tiny seed to a majestic tree as you complete activities and reach new milestones.',
       gradient: AppColors.blueGradient,
-      iconGradient: LinearGradient(
+      iconGradient: const LinearGradient(
         colors: [Color(0xFF64B5F6), Color(0xFF2196F3)],
       ),
     ),
@@ -51,7 +51,7 @@ class _OnboardingPageState extends State<OnboardingPage>
       description:
           'Join leaderboards, unlock achievements, and challenge friends on your wellness journey to stay motivated.',
       gradient: AppColors.accentGradient,
-      iconGradient: LinearGradient(
+      iconGradient: const LinearGradient(
         colors: [Color(0xFFFFB74D), Color(0xFFFF9800)],
       ),
     ),

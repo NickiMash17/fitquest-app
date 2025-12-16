@@ -21,18 +21,32 @@ class DailyChallengeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PremiumCard(
-      padding: const EdgeInsets.all(20.0),
+      padding: const EdgeInsets.all(24.0),
       gradient: AppColors.blueGradient,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
+              // Enhanced icon container with better depth
               Container(
-                padding: const EdgeInsets.all(12),
+                width: 56,
+                height: 56,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.25),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: AppBorderRadius.allMD,
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.3),
+                    width: 1.5,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 child: const Icon(
                   Icons.emoji_events_rounded,
@@ -43,20 +57,25 @@ class DailyChallengeCard extends StatelessWidget {
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       title,
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.w700,
+                            fontWeight: FontWeight.w800,
                             color: Colors.white,
+                            letterSpacing: -0.3,
+                            height: 1.2,
                           ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 6),
                     Text(
                       description,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.white.withValues(alpha: 0.9),
+                            color: Colors.white.withValues(alpha: 0.95),
+                            fontWeight: FontWeight.w500,
+                            height: 1.4,
                           ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -64,18 +83,26 @@ class DailyChallengeCard extends StatelessWidget {
                   ],
                 ),
               ),
+              // Enhanced reward badge
               Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
+                  horizontal: 14,
+                  vertical: 10,
                 ),
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.25),
                   borderRadius: AppBorderRadius.allMD,
                   border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.3),
-                    width: 1,
+                    color: Colors.white.withValues(alpha: 0.4),
+                    width: 1.5,
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -83,14 +110,15 @@ class DailyChallengeCard extends StatelessWidget {
                     const Icon(
                       Icons.stars_rounded,
                       color: Colors.white,
-                      size: 18,
+                      size: 20,
                     ),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: 6),
                     Text(
                       '+$reward',
                       style: Theme.of(context).textTheme.labelLarge?.copyWith(
                             color: Colors.white,
-                            fontWeight: FontWeight.w700,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.2,
                           ),
                     ),
                   ],
@@ -98,25 +126,29 @@ class DailyChallengeCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          // Enhanced progress bar with shimmer effect
+          const SizedBox(height: 24),
+          // Enhanced progress bar with better visual design
           Stack(
             children: [
               Container(
-                height: 12,
+                height: 14,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: Colors.white.withValues(alpha: 0.15),
                   borderRadius: AppBorderRadius.allRound,
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    width: 1,
+                  ),
                 ),
               ),
               TweenAnimationBuilder<double>(
                 tween: Tween<double>(begin: 0.0, end: progress.clamp(0.0, 1.0)),
-                duration: const Duration(milliseconds: 800),
+                duration: const Duration(milliseconds: 1000),
                 curve: Curves.easeOutCubic,
                 builder: (context, value, child) {
                   return Container(
-                    height: 12,
-                    decoration: BoxDecoration(
+                    height: 14,
+                    decoration: const BoxDecoration(
                       borderRadius: AppBorderRadius.allRound,
                     ),
                     child: FractionallySizedBox(
@@ -127,16 +159,16 @@ class DailyChallengeCard extends StatelessWidget {
                           gradient: LinearGradient(
                             colors: [
                               Colors.white,
-                              Colors.white.withValues(alpha: 0.9),
+                              Colors.white.withValues(alpha: 0.95),
                             ],
                           ),
                           borderRadius: AppBorderRadius.allRound,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.white.withValues(alpha: 0.6),
-                              blurRadius: 8,
+                              color: Colors.white.withValues(alpha: 0.5),
+                              blurRadius: 10,
                               spreadRadius: 1,
-                              offset: const Offset(0, 0),
+                              offset: const Offset(0, 1),
                             ),
                           ],
                         ),
@@ -147,7 +179,7 @@ class DailyChallengeCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

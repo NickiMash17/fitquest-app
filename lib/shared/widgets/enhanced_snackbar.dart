@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fitquest/core/constants/app_colors.dart';
+import 'package:fitquest/core/constants/app_typography.dart';
 import 'package:fitquest/core/constants/app_border_radius.dart';
 import 'package:fitquest/core/utils/haptic_feedback_service.dart';
+import 'package:fitquest/shared/widgets/live_region.dart';
 
 /// Enhanced snackbar with animations and haptic feedback
 class EnhancedSnackBar {
@@ -11,6 +13,8 @@ class EnhancedSnackBar {
     Duration duration = const Duration(seconds: 2),
   }) {
     HapticFeedbackService.success();
+    // Announce to screen readers
+    LiveRegionController.announce(context, 'Success: $message');
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -29,13 +33,15 @@ class EnhancedSnackBar {
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(
-                message,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  fontFamily: 'Inter',
+              child: Semantics(
+                label: 'Success: $message',
+                child: Text(
+                  message,
+                  style: AppTypography.labelMedium.copyWith(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),
@@ -59,6 +65,8 @@ class EnhancedSnackBar {
     Duration duration = const Duration(seconds: 3),
   }) {
     HapticFeedbackService.error();
+    // Announce to screen readers (assertive for errors)
+    LiveRegionController.announce(context, 'Error: $message', assertive: true);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -77,13 +85,15 @@ class EnhancedSnackBar {
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(
-                message,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  fontFamily: 'Inter',
+              child: Semantics(
+                label: 'Success: $message',
+                child: Text(
+                  message,
+                  style: AppTypography.labelMedium.copyWith(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),
@@ -97,6 +107,13 @@ class EnhancedSnackBar {
         margin: const EdgeInsets.all(16),
         duration: duration,
         elevation: 6,
+        action: SnackBarAction(
+          label: 'Dismiss',
+          textColor: Colors.white,
+          onPressed: () {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          },
+        ),
       ),
     );
   }
@@ -107,6 +124,8 @@ class EnhancedSnackBar {
     Duration duration = const Duration(seconds: 2),
   }) {
     HapticFeedbackService.lightImpact();
+    // Announce to screen readers
+    LiveRegionController.announce(context, 'Info: $message');
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -125,13 +144,15 @@ class EnhancedSnackBar {
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(
-                message,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  fontFamily: 'Inter',
+              child: Semantics(
+                label: 'Success: $message',
+                child: Text(
+                  message,
+                  style: AppTypography.labelMedium.copyWith(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),
@@ -155,6 +176,8 @@ class EnhancedSnackBar {
     Duration duration = const Duration(seconds: 2),
   }) {
     HapticFeedbackService.warning();
+    // Announce to screen readers
+    LiveRegionController.announce(context, 'Warning: $message');
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -173,13 +196,15 @@ class EnhancedSnackBar {
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(
-                message,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  fontFamily: 'Inter',
+              child: Semantics(
+                label: 'Success: $message',
+                child: Text(
+                  message,
+                  style: AppTypography.labelMedium.copyWith(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),

@@ -4,6 +4,7 @@ import 'package:confetti/confetti.dart';
 import 'package:fitquest/core/constants/app_colors.dart';
 import 'package:fitquest/core/constants/app_border_radius.dart';
 import 'package:fitquest/shared/widgets/premium_card.dart';
+import 'package:fitquest/core/constants/app_typography.dart';
 
 /// Celebration widget for streak milestones
 class StreakCelebrationWidget extends StatefulWidget {
@@ -174,14 +175,15 @@ class _StreakCelebrationWidgetState extends State<StreakCelebrationWidget>
                         horizontal: 24,
                         vertical: 12,
                       ),
-                      shape: RoundedRectangleBorder(
+                      shape: const RoundedRectangleBorder(
                         borderRadius: AppBorderRadius.allMD,
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Awesome!',
-                      style: TextStyle(
+                      style: AppTypography.labelLarge.copyWith(
                         fontWeight: FontWeight.w700,
+                        color: Colors.white,
                       ),
                     ),
                   ),
@@ -199,12 +201,12 @@ class _StreakCelebrationWidgetState extends State<StreakCelebrationWidget>
                   emissionFrequency: 0.03,
                   numberOfParticles: 30,
                   gravity: 0.2,
-                  colors: const [
+                  colors: [
                     Colors.white,
                     AppColors.primaryGreen,
                     AppColors.accentOrange,
                     AppColors.accentBlue,
-                    Color(0xFFFFD700),
+                    const Color(0xFFFFD700),
                   ],
                 ),
               ),
