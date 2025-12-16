@@ -38,9 +38,7 @@ FitQuest combines wellness tracking with gamification mechanics to create an eng
 - **Local Storage:** Hive + SharedPreferences
 - **Code Generation:** Freezed, Json Serializable, Injectable
 
-📖 **Architecture Details**: See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for comprehensive documentation.
-
-🎯 **Expert Review**: See [EXPERT_REVIEW.md](docs/EXPERT_REVIEW.md) for front-end & mobile engineering best practices and recommendations.
+📖 **Demo Guides**: See the [docs/](docs/) folder for demo strategy and practice guides.
 
 ## 📋 Prerequisites
 
@@ -84,8 +82,6 @@ Before you begin, ensure you have the following installed:
 ```
 
 ## 📁 Project Structure
-
-See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed architecture documentation.
 
 ```
 lib/
@@ -132,7 +128,7 @@ flutter build ipa --release
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+Contributions are welcome! Please open an issue or submit a pull request.
 
 ## 📝 Development Progress
 
@@ -144,7 +140,6 @@ Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for de
 - [ ] Phase 5: Testing & Quality
 - [ ] Phase 6: Production & Deployment
 
-See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
 
 ## 📄 License
 
