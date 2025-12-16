@@ -66,7 +66,7 @@ class _AnimatedCounterState extends State<AnimatedCounter>
 
   @override
   Widget build(BuildContext context) {
-    Widget counter = TweenAnimationBuilder<int>(
+    final Widget counter = TweenAnimationBuilder<int>(
       tween: IntTween(begin: _previousValue, end: widget.value),
       duration: widget.duration,
       curve: Curves.easeOutCubic,

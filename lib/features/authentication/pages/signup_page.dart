@@ -9,7 +9,7 @@ import 'package:fitquest/shared/widgets/theme_toggle_button.dart';
 import 'package:fitquest/features/authentication/bloc/auth_bloc.dart';
 import 'package:fitquest/features/authentication/bloc/auth_event.dart';
 import 'package:fitquest/features/authentication/bloc/auth_state.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:fitquest/core/constants/app_typography.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -80,6 +80,7 @@ class _SignUpPageState extends State<SignUpPage> {
               child: Form(
                 key: _formKey,
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const SizedBox(height: 40),
@@ -159,7 +160,8 @@ class _SignUpPageState extends State<SignUpPage> {
                     // Password field
                     Semantics(
                       label: 'Password',
-                      hint: 'Create a strong password with at least 8 characters',
+                      hint:
+                          'Create a strong password with at least 8 characters',
                       textField: true,
                       child: TextFormField(
                         controller: _passwordController,
@@ -179,8 +181,9 @@ class _SignUpPageState extends State<SignUpPage> {
                                 _obscurePassword
                                     ? Icons.visibility_outlined
                                     : Icons.visibility_off_outlined,
-                                color:
-                                    Theme.of(context).colorScheme.onSurfaceVariant,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
                               ),
                               onPressed: () {
                                 setState(() {
@@ -232,7 +235,9 @@ class _SignUpPageState extends State<SignUpPage> {
                       gradient: AppColors.primaryGradient,
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 24, vertical: 18),
+                        horizontal: 24,
+                        vertical: 18,
+                      ),
                     ),
                     if (state is AuthLoading)
                       const Padding(
@@ -270,8 +275,8 @@ class _SignUpPageState extends State<SignUpPage> {
                           ),
                           child: Text(
                             'Sign In',
-                            style: GoogleFonts.nunito(
-                              color: AppColors.primaryGreen,
+                            style: AppTypography.labelMedium.copyWith(
+                              color: AppColors.primary,
                               fontWeight: FontWeight.w700,
                             ),
                           ),

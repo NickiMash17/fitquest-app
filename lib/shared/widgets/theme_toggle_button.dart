@@ -58,7 +58,7 @@ class _ThemeToggleButtonState extends State<ThemeToggleButton> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
-                _themeService.isDarkMode
+                _themeService.themeMode == ThemeMode.dark
                     ? Icons.light_mode_rounded
                     : Icons.dark_mode_rounded,
                 color: iconColor,
@@ -66,7 +66,9 @@ class _ThemeToggleButtonState extends State<ThemeToggleButton> {
               ),
               const SizedBox(width: 8),
               Text(
-                _themeService.isDarkMode ? 'Light Mode' : 'Dark Mode',
+                _themeService.themeMode == ThemeMode.dark
+                    ? 'Light Mode'
+                    : 'Dark Mode',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: iconColor,
                       fontWeight: FontWeight.w600,
@@ -80,12 +82,12 @@ class _ThemeToggleButtonState extends State<ThemeToggleButton> {
 
     return IconButton(
       icon: Icon(
-        _themeService.isDarkMode
+        _themeService.themeMode == ThemeMode.dark
             ? Icons.light_mode_rounded
             : Icons.dark_mode_rounded,
         color: iconColor,
       ),
-      tooltip: _themeService.isDarkMode
+      tooltip: _themeService.themeMode == ThemeMode.dark
           ? 'Switch to Light Mode'
           : 'Switch to Dark Mode',
       onPressed: _toggleTheme,

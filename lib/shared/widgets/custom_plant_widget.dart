@@ -217,9 +217,9 @@ class _PlantPainter extends CustomPainter {
 
     // Draw two small leaves
     _drawLeaf(canvas, centerX - size * 0.15, centerY - size * 0.15, size * 0.2,
-        _cachedLeafPaint!);
+        _cachedLeafPaint!,);
     _drawLeaf(canvas, centerX + size * 0.15, centerY - size * 0.15, size * 0.2,
-        _cachedLeafPaint!);
+        _cachedLeafPaint!,);
   }
 
   // Stage 2: Sprout - Growing with more leaves
@@ -251,9 +251,9 @@ class _PlantPainter extends CustomPainter {
 
     // Draw multiple leaves
     _drawLeaf(canvas, centerX - size * 0.2, centerY - size * 0.2, size * 0.25,
-        _cachedLeafPaint!);
+        _cachedLeafPaint!,);
     _drawLeaf(canvas, centerX + size * 0.2, centerY - size * 0.2, size * 0.25,
-        _cachedLeafPaint!);
+        _cachedLeafPaint!,);
     _drawLeaf(canvas, centerX, centerY - size * 0.3, size * 0.2, _cachedLeafPaint!);
   }
 
@@ -293,11 +293,11 @@ class _PlantPainter extends CustomPainter {
 
     // Draw leaf clusters
     _drawLeafCluster(canvas, centerX - size * 0.25, centerY - size * 0.15,
-        size * 0.3, _cachedLeafPaint!);
+        size * 0.3, _cachedLeafPaint!,);
     _drawLeafCluster(canvas, centerX + size * 0.25, centerY - size * 0.15,
-        size * 0.3, _cachedLeafPaint!);
+        size * 0.3, _cachedLeafPaint!,);
     _drawLeafCluster(
-        canvas, centerX, centerY - size * 0.25, size * 0.25, _cachedLeafPaint!);
+        canvas, centerX, centerY - size * 0.25, size * 0.25, _cachedLeafPaint!,);
   }
 
   // Stage 4: Young Tree - Medium tree with fuller canopy
@@ -324,7 +324,7 @@ class _PlantPainter extends CustomPainter {
 
     // Draw branches
     _drawBranch(
-        canvas, centerX, centerY - size * 0.1, -size * 0.3, size * 0.15);
+        canvas, centerX, centerY - size * 0.1, -size * 0.3, size * 0.15,);
     _drawBranch(canvas, centerX, centerY - size * 0.1, size * 0.3, size * 0.15);
     _drawBranch(canvas, centerX, centerY - size * 0.2, 0, size * 0.2);
 
@@ -358,9 +358,9 @@ class _PlantPainter extends CustomPainter {
     _drawBranch(canvas, centerX, centerY, -size * 0.35, size * 0.2);
     _drawBranch(canvas, centerX, centerY, size * 0.35, size * 0.2);
     _drawBranch(
-        canvas, centerX, centerY - size * 0.1, -size * 0.25, size * 0.18);
+        canvas, centerX, centerY - size * 0.1, -size * 0.25, size * 0.18,);
     _drawBranch(
-        canvas, centerX, centerY - size * 0.1, size * 0.25, size * 0.18);
+        canvas, centerX, centerY - size * 0.1, size * 0.25, size * 0.18,);
     _drawBranch(canvas, centerX, centerY - size * 0.2, 0, size * 0.25);
 
     // Draw large canopy
@@ -424,7 +424,7 @@ class _PlantPainter extends CustomPainter {
   }
 
   void _drawLeaf(
-      Canvas canvas, double x, double y, double leafSize, Paint paint) {
+      Canvas canvas, double x, double y, double leafSize, Paint paint,) {
     final path = Path();
     path.moveTo(x, y);
     path.quadraticBezierTo(
@@ -450,14 +450,14 @@ class _PlantPainter extends CustomPainter {
   }
 
   void _drawLeafCluster(
-      Canvas canvas, double x, double y, double clusterSize, Paint paint) {
+      Canvas canvas, double x, double y, double clusterSize, Paint paint,) {
     _drawLeaf(canvas, x, y, clusterSize, paint);
     _drawLeaf(canvas, x - clusterSize * 0.3, y, clusterSize * 0.7, paint);
     _drawLeaf(canvas, x + clusterSize * 0.3, y, clusterSize * 0.7, paint);
   }
 
   void _drawBranch(Canvas canvas, double startX, double startY, double offsetX,
-      double branchWidth) {
+      double branchWidth,) {
     final branchPaint = Paint()
       ..color = AppColors.treeTrunk
       ..strokeWidth = branchWidth * 0.3
@@ -471,7 +471,7 @@ class _PlantPainter extends CustomPainter {
   }
 
   void _drawCanopy(Canvas canvas, double centerX, double centerY,
-      double canopySize, Paint paint) {
+      double canopySize, Paint paint,) {
     canvas.drawCircle(
       Offset(centerX, centerY),
       canopySize * 0.5,

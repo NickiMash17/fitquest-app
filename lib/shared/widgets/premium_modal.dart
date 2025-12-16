@@ -66,7 +66,7 @@ class _PremiumModalContentState extends State<_PremiumModalContent>
     ).animate(CurvedAnimation(
       parent: _controller,
       curve: Curves.easeOutCubic,
-    ));
+    ),);
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeOut),
@@ -141,7 +141,7 @@ class _PremiumModalContentState extends State<_PremiumModalContent>
                     ],
                   ),
                 ),
-                Divider(height: 1),
+                const Divider(height: 1),
               ],
               Flexible(child: widget.child),
             ],

@@ -7,13 +7,13 @@ import 'package:fitquest/features/activities/bloc/activity_bloc.dart';
 import 'package:fitquest/features/activities/bloc/activity_event.dart';
 import 'package:fitquest/features/activities/bloc/activity_state.dart';
 import 'package:fitquest/shared/models/activity_model.dart';
-import 'package:fitquest/shared/widgets/enhanced_snackbar.dart';
 import 'package:fitquest/shared/widgets/premium_button.dart';
 import 'package:fitquest/shared/widgets/premium_card.dart';
 import 'package:fitquest/shared/widgets/premium_text_field.dart';
 import 'package:fitquest/shared/services/xp_calculator_service.dart';
 import 'package:fitquest/core/constants/app_colors.dart';
 import 'package:fitquest/core/constants/app_border_radius.dart';
+import 'package:fitquest/core/widgets/enhanced_activity_celebration.dart';
 
 class AddActivityPage extends StatefulWidget {
   final ActivityType? initialType;
@@ -103,13 +103,16 @@ class _AddActivityPageState extends State<AddActivityPage> {
       // Dispatch create event
       debugPrint('AddActivityPage: Dispatching ActivityCreateRequested event');
       debugPrint(
-          'AddActivityPage: Activity type: ${activity.type}, duration: ${activity.duration}');
+        'AddActivityPage: Activity type: ${activity.type}, duration: ${activity.duration}',
+      );
       final bloc = context.read<ActivityBloc>();
       debugPrint(
-          'AddActivityPage: Current bloc state: ${bloc.state.runtimeType}');
+        'AddActivityPage: Current bloc state: ${bloc.state.runtimeType}',
+      );
       bloc.add(ActivityCreateRequested(activity: activity));
       debugPrint(
-          'AddActivityPage: Event dispatched, waiting for state change...');
+        'AddActivityPage: Event dispatched, waiting for state change...',
+      );
 
       // Set a timeout - if we don't get a response in 10 seconds, show error
       _timeoutTimer?.cancel();
@@ -117,7 +120,8 @@ class _AddActivityPageState extends State<AddActivityPage> {
         if (mounted && _isSubmitting) {
           debugPrint('AddActivityPage: TIMEOUT - No response after 10 seconds');
           _handleActivityError(
-              'Request timed out. Please check your connection and try again.');
+            'Request timed out. Please check your connection and try again.',
+          );
         }
       });
     }
@@ -128,34 +132,61 @@ class _AddActivityPageState extends State<AddActivityPage> {
 
     _timeoutTimer?.cancel();
     debugPrint(
-        'AddActivityPage: Activity created successfully, navigating back');
+      'AddActivityPage: Activity created successfully, showing celebration',
+    );
 
     final xp = _lastXp ?? 0;
+    final duration = int.tryParse(_durationController.text) ?? 0;
+
+    // Calculate points earned BEFORE navigation
+    final points = _xpCalculator.calculatePoints(
+      ActivityModel(
+        id: '',
+        userId: '',
+        type: _selectedType!,
+        date: DateTime.now(),
+        duration: duration,
+      ),
+    );
 
     setState(() {
       _isSubmitting = false;
     });
 
-    // Navigate back immediately
-    Navigator.of(context).pop();
-
-    // Trigger a reload on the activities page
-    Future.delayed(const Duration(milliseconds: 100), () {
-      if (mounted) {
-        debugPrint('AddActivityPage: Triggering reload on activities page');
-        context.read<ActivityBloc>().add(const ActivitiesLoadRequested());
-      }
-    });
-
-    // Show success message after navigation
-    Future.delayed(const Duration(milliseconds: 400), () {
-      if (mounted) {
-        EnhancedSnackBar.showSuccess(
-          context,
-          'Activity logged successfully! +$xp XP',
-        );
-      }
-    });
+    // Show celebration BEFORE navigation (context is still valid)
+    debugPrint('AddActivityPage: Showing celebration - XP: $xp, Points: $points');
+    EnhancedActivityCelebration.show(
+      context,
+      xp,
+      points,
+      onComplete: () {
+        debugPrint('AddActivityPage: Celebration complete, navigating back');
+        // Navigate back after celebration
+        if (mounted) {
+          Navigator.of(context).pop();
+          
+          // Trigger a reload on the activities page
+          Future.delayed(const Duration(milliseconds: 200), () {
+            // Get context from navigator
+            final navigatorContext = Navigator.of(context, rootNavigator: false).context;
+            if (navigatorContext.mounted) {
+              debugPrint('AddActivityPage: Triggering reload on activities page');
+              navigatorContext.read<ActivityBloc>().add(const ActivitiesLoadRequested());
+              
+              // Show snackbar
+              ScaffoldMessenger.of(navigatorContext).showSnackBar(
+                SnackBar(
+                  content: Text('Activity logged successfully! +$xp XP'),
+                  backgroundColor: AppColors.success,
+                  behavior: SnackBarBehavior.floating,
+                  duration: const Duration(seconds: 2),
+                ),
+              );
+            }
+          });
+        }
+      },
+    );
   }
 
   void _handleActivityError(String message) {
@@ -187,7 +218,8 @@ class _AddActivityPageState extends State<AddActivityPage> {
     return BlocListener<ActivityBloc, ActivityState>(
       listenWhen: (previous, current) {
         debugPrint(
-            'AddActivityPage: listenWhen - previous: ${previous.runtimeType}, current: ${current.runtimeType}, submitting: $_isSubmitting');
+          'AddActivityPage: listenWhen - previous: ${previous.runtimeType}, current: ${current.runtimeType}, submitting: $_isSubmitting',
+        );
 
         // Only listen when we're submitting
         if (!_isSubmitting) {
@@ -210,13 +242,15 @@ class _AddActivityPageState extends State<AddActivityPage> {
         // Handle ActivityLoaded - always trigger when we see it after submitting
         if (current is ActivityLoaded) {
           debugPrint(
-              'AddActivityPage: ActivityLoaded detected with ${current.activities.length} activities');
+            'AddActivityPage: ActivityLoaded detected with ${current.activities.length} activities',
+          );
           // Always trigger if we're submitting - this means creation completed
           return true;
         }
 
         debugPrint(
-            'AddActivityPage: State change not handled: ${current.runtimeType}');
+          'AddActivityPage: State change not handled: ${current.runtimeType}',
+        );
         return false;
       },
       listener: (context, state) {
@@ -229,7 +263,8 @@ class _AddActivityPageState extends State<AddActivityPage> {
           _handleActivityError(state.message);
         } else if (state is ActivityLoaded) {
           debugPrint(
-              'AddActivityPage: Activities loaded - ${state.activities.length} activities');
+            'AddActivityPage: Activities loaded - ${state.activities.length} activities',
+          );
           // Activity was created and activities reloaded
           // Navigate back immediately - the activities page will show the updated list
           if (mounted && _isSubmitting) {
@@ -249,6 +284,7 @@ class _AddActivityPageState extends State<AddActivityPage> {
           child: Form(
             key: _formKey,
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Enhanced Activity type selector
@@ -420,6 +456,7 @@ class _AddActivityPageState extends State<AddActivityPage> {
                       const SizedBox(width: 16),
                       Expanded(
                         child: Column(
+                          mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(

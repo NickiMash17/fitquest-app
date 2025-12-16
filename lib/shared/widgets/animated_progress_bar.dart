@@ -48,7 +48,7 @@ class _AnimatedProgressBarState extends State<AnimatedProgressBar>
     ).animate(CurvedAnimation(
       parent: _controller,
       curve: Curves.easeOutCubic,
-    ));
+    ),);
 
     _glowAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
       CurvedAnimation(
@@ -79,7 +79,7 @@ class _AnimatedProgressBarState extends State<AnimatedProgressBar>
       ).animate(CurvedAnimation(
         parent: _controller,
         curve: Curves.easeOutCubic,
-      ));
+      ),);
       _controller.reset();
       _controller.forward();
     }

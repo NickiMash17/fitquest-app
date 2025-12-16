@@ -46,7 +46,13 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _saveDarkMode(bool value) async {
+    debugPrint('Settings: Toggling dark mode to: $value');
     await _themeService.setDarkMode(value);
+    debugPrint('Settings: Dark mode set, current mode: ${_themeService.themeMode}');
+    // Force rebuild to update UI
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   Future<void> _saveNotifications(bool value) async {

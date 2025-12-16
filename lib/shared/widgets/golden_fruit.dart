@@ -37,7 +37,7 @@ class _GoldenFruitState extends State<GoldenFruit>
       ).animate(CurvedAnimation(
         parent: _controller,
         curve: Curves.easeInOut,
-      ));
+      ),);
 
       _glowAnimation = TweenSequence<double>([
         TweenSequenceItem(
@@ -51,7 +51,7 @@ class _GoldenFruitState extends State<GoldenFruit>
       ]).animate(CurvedAnimation(
         parent: _controller,
         curve: Curves.easeInOut,
-      ));
+      ),);
     }
   }
 

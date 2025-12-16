@@ -67,7 +67,7 @@ class _GoalsPageState extends State<GoalsPage> {
       return Scaffold(
         appBar: AppBar(
           title: const Text('Goals',
-              style: TextStyle(fontWeight: FontWeight.bold)),
+              style: TextStyle(fontWeight: FontWeight.bold),),
           elevation: 0,
         ),
         body: const Center(child: CircularProgressIndicator()),

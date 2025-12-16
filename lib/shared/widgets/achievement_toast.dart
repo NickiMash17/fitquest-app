@@ -14,7 +14,7 @@ class AchievementToast extends StatefulWidget {
   final int? points;
   final VoidCallback? onDismiss;
 
-  AchievementToast({
+  const AchievementToast({
     super.key,
     required this.title,
     required this.message,
@@ -83,7 +83,7 @@ class _AchievementToastState extends State<AchievementToast>
     ).animate(CurvedAnimation(
       parent: _controller,
       curve: Curves.easeOutCubic,
-    ));
+    ),);
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeOut),
@@ -312,7 +312,7 @@ class _ToastOverlayState extends State<_ToastOverlay>
     ).animate(CurvedAnimation(
       parent: _controller,
       curve: Curves.easeOutCubic,
-    ));
+    ),);
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeOut),

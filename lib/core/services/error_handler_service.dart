@@ -92,11 +92,11 @@ class ErrorHandlerService {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Row(
+        title: const Row(
           children: [
             Icon(Icons.error_outline, color: Colors.red),
-            const SizedBox(width: 8),
-            const Text('Error'),
+            SizedBox(width: 8),
+            Text('Error'),
           ],
         ),
         content: Text(message),

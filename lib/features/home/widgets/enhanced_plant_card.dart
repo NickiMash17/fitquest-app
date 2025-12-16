@@ -12,7 +12,11 @@ import 'package:fitquest/core/di/injection.dart';
 import 'package:fitquest/shared/widgets/tree_sway_animation.dart';
 import 'package:fitquest/shared/widgets/golden_fruit.dart';
 import 'package:fitquest/shared/widgets/sparkle_effect.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:fitquest/shared/widgets/tree_sparkle_particles.dart';
+import 'package:fitquest/shared/widgets/tree_shake_interaction.dart';
+import 'package:fitquest/shared/widgets/leaf_fall_particles.dart';
+import 'package:fitquest/shared/widgets/enhanced_tree_sway.dart';
+import 'package:fitquest/core/constants/app_typography.dart';
 
 // Import FloatingLeavesBackground from tree_sway_animation.dart
 // (it's in the same file)
@@ -222,15 +226,17 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
     super.dispose();
   }
 
+  // Cache PlantService to avoid repeated lookups
+  static PlantService? _cachedPlantService;
+
   @override
   Widget build(BuildContext context) {
-    // Get PlantService from dependency injection
+    // Get PlantService from dependency injection (cached)
     PlantService plantService;
     try {
-      plantService = getIt<PlantService>();
+      plantService = _cachedPlantService ??= getIt<PlantService>();
     } catch (e) {
-      debugPrint('ERROR: PlantService not found in DI: $e');
-      // Return a simple error widget
+      // Return a simple error widget without debugPrint in production
       return Container(
         padding: const EdgeInsets.all(24.0),
         margin: const EdgeInsets.all(16.0),
@@ -239,19 +245,17 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(Icons.error, color: Colors.red),
             const SizedBox(height: 8),
-            Text('Plant Card Error: $e'),
+            Text('Plant Card Error'),
           ],
         ),
       );
     }
 
     final mood = plantService.getPlantMood(widget.health, widget.streak);
-
-    debugPrint(
-        'EnhancedPlantCard building: stage=${widget.evolutionStage}, xp=${widget.currentXp}, health=${widget.health}');
 
     return RepaintBoundary(
       child: _buildPlantCard(plantService, mood),
@@ -279,6 +283,7 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
             onTap: widget.onTap,
             showShadow: true,
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
@@ -317,37 +322,69 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
                               child: Stack(
                                 alignment: Alignment.center,
                                 children: [
-                                  // Tree swaying animation wrapper - more visible
-                                  TreeSwayAnimation(
-                                    swayAmount: 0.15, // Very visible sway (15%)
-                                    child: Container(
-                                      width: 120,
-                                      height: 120,
-                                      decoration: BoxDecoration(
-                                        borderRadius: AppBorderRadius.allLG,
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.white
-                                                .withValues(alpha: 0.4),
-                                            blurRadius: 25,
-                                            spreadRadius: 8,
+                                  // Sparkle particles around tree
+                                  Positioned.fill(
+                                    child: TreeSparkleParticles(
+                                      treeSize: 120,
+                                      particleCount: 8,
+                                      active: widget.evolutionStage >= 3,
+                                    ),
+                                  ),
+                                  // Enhanced tree sway with wind strength
+                                  TreeShakeInteraction(
+                                    onShake: () {
+                                      // Trigger leaf fall particles
+                                      final RenderBox? renderBox = context
+                                          .findRenderObject() as RenderBox?;
+                                      if (renderBox != null) {
+                                        final position = renderBox
+                                            .localToGlobal(Offset.zero);
+                                        LeafFallParticles.show(
+                                          context,
+                                          Offset(
+                                            position.dx + 60,
+                                            position.dy + 60,
                                           ),
-                                        ],
-                                      ),
-                                      child: ClipRRect(
-                                        borderRadius: AppBorderRadius.allLG,
-                                        child: Container(
-                                          width: 120,
-                                          height: 120,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white
-                                                .withValues(alpha: 0.1),
-                                            borderRadius: AppBorderRadius.allLG,
-                                          ),
-                                          child: CustomPlantWidget(
-                                            evolutionStage:
-                                                widget.evolutionStage,
-                                            size: 120,
+                                          leafCount: 5,
+                                        );
+                                      }
+                                    },
+                                    child: EnhancedTreeSway(
+                                      windStrength: widget.streak > 7
+                                          ? 0.8
+                                          : widget.streak > 3
+                                              ? 0.5
+                                              : 0.3,
+                                      child: Container(
+                                        width: 120,
+                                        height: 120,
+                                        decoration: BoxDecoration(
+                                          borderRadius: AppBorderRadius.allLG,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.white
+                                                  .withValues(alpha: 0.4),
+                                              blurRadius: 25,
+                                              spreadRadius: 8,
+                                            ),
+                                          ],
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius: AppBorderRadius.allLG,
+                                          child: Container(
+                                            width: 120,
+                                            height: 120,
+                                            decoration: BoxDecoration(
+                                              color: Colors.white
+                                                  .withValues(alpha: 0.1),
+                                              borderRadius:
+                                                  AppBorderRadius.allLG,
+                                            ),
+                                            child: CustomPlantWidget(
+                                              evolutionStage:
+                                                  widget.evolutionStage,
+                                              size: 120,
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -366,7 +403,8 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
                                       ),
                                       child: Text(
                                         mood.emoji,
-                                        style: GoogleFonts.nunito(fontSize: 16),
+                                        style: AppTypography.bodyLarge
+                                            .copyWith(fontSize: 16),
                                       ),
                                     ),
                                   ),
@@ -392,6 +430,7 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
                     const SizedBox(width: 16),
                     Expanded(
                       child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
@@ -434,7 +473,8 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
                                 const SizedBox(width: 6),
                                 Text(
                                   mood.emoji,
-                                  style: GoogleFonts.nunito(fontSize: 12),
+                                  style: AppTypography.labelMedium
+                                      .copyWith(fontSize: 12),
                                 ),
                               ],
                             ),
@@ -447,6 +487,7 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
                 const SizedBox(height: 24),
                 // Enhanced Growth Progress Bar
                 Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     AnimatedProgressBar(
@@ -548,7 +589,7 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
                         ),
                         decoration: BoxDecoration(
                           color: Colors.green.withValues(alpha: 0.9),
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: AppBorderRadius.allXL,
                           boxShadow: [
                             BoxShadow(
                               color: Colors.green.withValues(alpha: 0.5),
@@ -568,7 +609,7 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
                             const SizedBox(width: 4),
                             Text(
                               '+${widget.xpGained} XP',
-                              style: GoogleFonts.fredoka(
+                              style: AppTypography.labelMedium.copyWith(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,

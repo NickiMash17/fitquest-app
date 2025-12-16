@@ -6,7 +6,8 @@ import 'package:fitquest/shared/models/goal_model.dart';
 import 'package:fitquest/shared/repositories/goal_repository.dart';
 import 'package:fitquest/core/di/injection.dart';
 import 'package:fitquest/shared/widgets/premium_button.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:fitquest/core/constants/app_typography.dart';
+import 'package:fitquest/core/constants/app_border_radius.dart';
 
 class CreateGoalDialog extends StatefulWidget {
   const CreateGoalDialog({super.key});
@@ -163,7 +164,7 @@ class _CreateGoalDialogState extends State<CreateGoalDialog> {
   Widget build(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: AppBorderRadius.allXL,
       ),
       child: Container(
         constraints: const BoxConstraints(maxWidth: 500, maxHeight: 700),
@@ -193,7 +194,7 @@ class _CreateGoalDialogState extends State<CreateGoalDialog> {
                       Expanded(
                         child: Text(
                           'Create New Goal',
-                          style: GoogleFonts.fredoka(
+                          style: AppTypography.headlineSmall.copyWith(
                             fontSize: 24,
                             fontWeight: FontWeight.w600,
                             color: Theme.of(context).colorScheme.onSurface,
@@ -211,7 +212,7 @@ class _CreateGoalDialogState extends State<CreateGoalDialog> {
                   // Goal Type
                   Text(
                     'Goal Type',
-                    style: GoogleFonts.nunito(
+                    style: AppTypography.labelLarge.copyWith(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -233,7 +234,7 @@ class _CreateGoalDialogState extends State<CreateGoalDialog> {
                           });
                         },
                         selectedColor: AppColors.primaryGreen,
-                        labelStyle: GoogleFonts.nunito(
+                        labelStyle: AppTypography.labelMedium.copyWith(
                           color: isSelected ? Colors.white : null,
                           fontWeight: FontWeight.w600,
                         ),
@@ -249,11 +250,11 @@ class _CreateGoalDialogState extends State<CreateGoalDialog> {
                       labelText: 'Goal Title',
                       hintText: 'e.g., Run 5km daily',
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: AppBorderRadius.allMD,
                       ),
                       prefixIcon: const Icon(Icons.title_rounded),
                     ),
-                    style: GoogleFonts.nunito(),
+                    style: AppTypography.bodyMedium,
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
                         return 'Please enter a goal title';
@@ -274,7 +275,7 @@ class _CreateGoalDialogState extends State<CreateGoalDialog> {
                       ),
                       prefixIcon: const Icon(Icons.description_rounded),
                     ),
-                    style: GoogleFonts.nunito(),
+                    style: AppTypography.bodyMedium,
                     maxLines: 2,
                   ),
                   const SizedBox(height: 16),
@@ -290,11 +291,11 @@ class _CreateGoalDialogState extends State<CreateGoalDialog> {
                             labelText: 'Target Value',
                             hintText: '100',
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: AppBorderRadius.allMD,
                             ),
                             prefixIcon: const Icon(Icons.track_changes_rounded),
                           ),
-                          style: GoogleFonts.nunito(),
+                          style: AppTypography.bodyMedium,
                           keyboardType: TextInputType.number,
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
@@ -319,7 +320,7 @@ class _CreateGoalDialogState extends State<CreateGoalDialog> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          style: GoogleFonts.nunito(),
+                          style: AppTypography.bodyMedium,
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
                               return 'Required';
@@ -349,7 +350,7 @@ class _CreateGoalDialogState extends State<CreateGoalDialog> {
                             ),
                             child: Text(
                               '${_startDate.day}/${_startDate.month}/${_startDate.year}',
-                              style: GoogleFonts.nunito(),
+                              style: AppTypography.bodyMedium,
                             ),
                           ),
                         ),
@@ -368,7 +369,7 @@ class _CreateGoalDialogState extends State<CreateGoalDialog> {
                             ),
                             child: Text(
                               '${_endDate.day}/${_endDate.month}/${_endDate.year}',
-                              style: GoogleFonts.nunito(),
+                              style: AppTypography.bodyMedium,
                             ),
                           ),
                         ),
@@ -380,7 +381,7 @@ class _CreateGoalDialogState extends State<CreateGoalDialog> {
                   // XP Reward
                   Text(
                     'XP Reward: $_xpReward',
-                    style: GoogleFonts.nunito(
+                    style: AppTypography.labelLarge.copyWith(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -411,7 +412,7 @@ class _CreateGoalDialogState extends State<CreateGoalDialog> {
                               : () => Navigator.of(context).pop(),
                           child: Text(
                             'Cancel',
-                            style: GoogleFonts.nunito(
+                            style: AppTypography.labelMedium.copyWith(
                               fontWeight: FontWeight.w600,
                             ),
                           ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fitquest/core/constants/app_colors.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:fitquest/core/constants/app_typography.dart';
 import 'package:fitquest/core/constants/app_border_radius.dart';
 import 'package:fitquest/core/utils/haptic_feedback_service.dart';
 import 'package:fitquest/shared/widgets/live_region.dart';
@@ -37,7 +37,7 @@ class EnhancedSnackBar {
                 label: 'Success: $message',
                 child: Text(
                   message,
-                  style: GoogleFonts.nunito(
+                  style: AppTypography.labelMedium.copyWith(
                     color: Colors.white,
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -89,7 +89,7 @@ class EnhancedSnackBar {
                 label: 'Success: $message',
                 child: Text(
                   message,
-                  style: GoogleFonts.nunito(
+                  style: AppTypography.labelMedium.copyWith(
                     color: Colors.white,
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -148,7 +148,7 @@ class EnhancedSnackBar {
                 label: 'Success: $message',
                 child: Text(
                   message,
-                  style: GoogleFonts.nunito(
+                  style: AppTypography.labelMedium.copyWith(
                     color: Colors.white,
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -200,7 +200,7 @@ class EnhancedSnackBar {
                 label: 'Success: $message',
                 child: Text(
                   message,
-                  style: GoogleFonts.nunito(
+                  style: AppTypography.labelMedium.copyWith(
                     color: Colors.white,
                     fontSize: 14,
                     fontWeight: FontWeight.w600,

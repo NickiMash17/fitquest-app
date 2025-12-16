@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fitquest/features/onboarding/models/onboarding_item.dart';
+import 'package:fitquest/core/constants/app_border_radius.dart';
 
 class OnboardingContent extends StatelessWidget {
   final OnboardingItem item;
@@ -8,18 +9,24 @@ class OnboardingContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    final screenSize = MediaQuery.of(context).size;
+    final imageSize = screenSize.width * 0.7; // Responsive: 70% of screen width
+    const maxImageSize = 300.0; // Max size for larger screens
+    const minImageSize = 200.0; // Min size for very small screens
+    final finalImageSize = imageSize.clamp(minImageSize, maxImageSize);
+
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(24.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Illustration
+          // Illustration - responsive sizing
           Container(
-            width: 300,
-            height: 300,
+            width: finalImageSize,
+            height: finalImageSize,
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: AppBorderRadius.allXL,
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.1),
@@ -30,7 +37,7 @@ class OnboardingContent extends StatelessWidget {
             ),
             child: Image.asset(item.imagePath, fit: BoxFit.contain),
           ),
-          const SizedBox(height: 48),
+          SizedBox(height: screenSize.height * 0.04), // Responsive spacing
           Text(
             item.title,
             style: Theme.of(context).textTheme.displaySmall,

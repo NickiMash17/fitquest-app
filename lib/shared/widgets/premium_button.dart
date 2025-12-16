@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:fitquest/core/constants/app_colors.dart';
 import 'package:fitquest/core/constants/app_border_radius.dart';
+import 'package:fitquest/core/constants/app_typography.dart';
 
 /// Premium button with advanced animations and effects
 class PremiumButton extends StatefulWidget {
@@ -79,7 +80,7 @@ class _PremiumButtonState extends State<PremiumButton>
   @override
   Widget build(BuildContext context) {
     final gradient = widget.gradient ?? AppColors.primaryGradient;
-    final backgroundColor = widget.backgroundColor ?? AppColors.primaryGreen;
+    final backgroundColor = widget.backgroundColor ?? AppColors.primary;
 
     final button = GestureDetector(
       onTapDown: _handleTapDown,
@@ -124,7 +125,7 @@ class _PremiumButtonState extends State<PremiumButton>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   if (widget.isLoading)
-                    SizedBox(
+                    const SizedBox(
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
@@ -144,11 +145,10 @@ class _PremiumButtonState extends State<PremiumButton>
                   ],
                   Text(
                     widget.label,
-                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.5,
-                        ),
+                    style: AppTypography.labelLarge.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ],
               ),

@@ -27,7 +27,7 @@ class FirestoreCacheService {
       // This is a workaround - actual cache clearing happens automatically
       // when cache size limit is reached
       _logger.i('Firestore cache will be managed automatically by size limits');
-      _logger.i('Current cache size limit: ${cacheSizeLimitMB} MB');
+      _logger.i('Current cache size limit: $cacheSizeLimitMB MB');
       
       // Log cache configuration
       final settings = _firestore.settings;
@@ -47,7 +47,7 @@ class FirestoreCacheService {
     }
     if (sizeMB > AppConstants.firestoreMaxCacheSizeBytes ~/ (1024 * 1024)) {
       throw ArgumentError(
-          'Cache size cannot exceed ${AppConstants.firestoreMaxCacheSizeBytes ~/ (1024 * 1024)} MB');
+          'Cache size cannot exceed ${AppConstants.firestoreMaxCacheSizeBytes ~/ (1024 * 1024)} MB',);
     }
 
     try {
@@ -114,17 +114,17 @@ class FirestoreCacheService {
       
       // If cache is unlimited, set a limit
       if (currentCacheSize == Settings.CACHE_SIZE_UNLIMITED) {
-        _logger.w('Firestore cache is unlimited - setting limit to ${cacheSizeLimitMB} MB');
+        _logger.w('Firestore cache is unlimited - setting limit to $cacheSizeLimitMB MB');
         await updateCacheSizeLimit(cacheSizeLimitMB);
       } else if (currentCacheSize > AppConstants.firestoreMaxCacheSizeBytes) {
         // If cache exceeds max, cap it
         _logger.w(
-            'Firestore cache size (${currentCacheSize ~/ (1024 * 1024)} MB) exceeds maximum - capping at ${AppConstants.firestoreMaxCacheSizeBytes ~/ (1024 * 1024)} MB');
+            'Firestore cache size (${currentCacheSize ~/ (1024 * 1024)} MB) exceeds maximum - capping at ${AppConstants.firestoreMaxCacheSizeBytes ~/ (1024 * 1024)} MB',);
         await updateCacheSizeLimit(
-            AppConstants.firestoreMaxCacheSizeBytes ~/ (1024 * 1024));
+            AppConstants.firestoreMaxCacheSizeBytes ~/ (1024 * 1024),);
       } else {
         _logger.d(
-            'Firestore cache size is properly configured: ${currentCacheSize ~/ (1024 * 1024)} MB');
+            'Firestore cache size is properly configured: ${currentCacheSize ~/ (1024 * 1024)} MB',);
       }
     } catch (e, stackTrace) {
       _logger.e('Error ensuring cache size limit', error: e, stackTrace: stackTrace);

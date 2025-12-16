@@ -11,6 +11,7 @@ import 'package:fitquest/shared/services/xp_calculator_service.dart';
 import 'package:fitquest/shared/services/plant_service.dart';
 import 'package:fitquest/shared/services/local_storage_service.dart';
 import 'package:fitquest/core/services/cache_service.dart';
+import 'package:fitquest/core/services/performance_cache_service.dart';
 import 'package:fitquest/core/services/analytics_service.dart';
 import 'package:fitquest/core/services/connectivity_service.dart';
 import 'package:fitquest/core/services/theme_service.dart';
@@ -36,11 +37,11 @@ void configureDependencies() {
   // Register Firebase services
   getIt.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
   getIt.registerLazySingleton<FirebaseFirestore>(
-      () => FirebaseFirestore.instance);
+      () => FirebaseFirestore.instance,);
   getIt.registerLazySingleton<FirebaseAnalytics>(
-      () => FirebaseAnalytics.instance);
+      () => FirebaseAnalytics.instance,);
   getIt.registerLazySingleton<FirebaseCrashlytics>(
-      () => FirebaseCrashlytics.instance);
+      () => FirebaseCrashlytics.instance,);
 
   // Register repositories
   getIt.registerLazySingleton<UserRepository>(
@@ -66,8 +67,11 @@ void configureDependencies() {
     () => PlantService(getIt<XpCalculatorService>()),
   );
 
-  // Register cache service
+  // Register cache services
   getIt.registerLazySingleton<CacheService>(() => CacheService());
+  getIt.registerLazySingleton<PerformanceCacheService>(
+    () => PerformanceCacheService(getIt()),
+  );
 
   // Register analytics service
   getIt.registerLazySingleton<AnalyticsService>(

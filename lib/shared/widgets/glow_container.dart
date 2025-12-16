@@ -13,7 +13,7 @@ class GlowContainer extends StatefulWidget {
   final Gradient? gradient;
   final Color? backgroundColor;
 
-  GlowContainer({
+  const GlowContainer({
     super.key,
     required this.child,
     this.glowColor = const Color(0xFF288347), // AppColors.primaryGreen equivalent

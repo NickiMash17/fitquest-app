@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fitquest/core/constants/app_colors.dart';
 import 'package:fitquest/shared/models/user_model.dart';
-import 'package:google_fonts/google_fonts.dart';
+// custom_plant_widget moved to PlantAvatar usage
+import 'package:fitquest/shared/widgets/plant_avatar.dart';
+import 'package:fitquest/core/constants/app_typography.dart';
 
 /// Premium avatar widget with level-based styling and achievements
 class PremiumAvatar extends StatelessWidget {
@@ -11,6 +13,7 @@ class PremiumAvatar extends StatelessWidget {
   final double size;
   final bool showBadge;
   final bool showLevelRing;
+  final bool usePlantAvatar;
   final VoidCallback? onTap;
 
   const PremiumAvatar({
@@ -19,6 +22,7 @@ class PremiumAvatar extends StatelessWidget {
     this.size = 64,
     this.showBadge = true,
     this.showLevelRing = true,
+    this.usePlantAvatar = false,
     this.onTap,
   });
 
@@ -77,11 +81,17 @@ class PremiumAvatar extends StatelessWidget {
     final level = user.currentLevel;
 
     if (streak >= 30) {
-      return const Icon(Icons.local_fire_department_rounded,
-          color: Colors.white, size: 16);
+      return const Icon(
+        Icons.local_fire_department_rounded,
+        color: Colors.white,
+        size: 16,
+      );
     } else if (streak >= 7) {
-      return const Icon(Icons.emoji_events_rounded,
-          color: Colors.white, size: 16);
+      return const Icon(
+        Icons.emoji_events_rounded,
+        color: Colors.white,
+        size: 16,
+      );
     } else if (level >= 10) {
       return const Icon(Icons.star_rounded, color: Colors.white, size: 16);
     }
@@ -156,11 +166,11 @@ class PremiumAvatar extends StatelessWidget {
                   : null,
               gradient: user.photoUrl == null ? _getAvatarGradient() : null,
             ),
-            child: user.photoUrl == null
+            child: user.photoUrl == null && !usePlantAvatar
                 ? Center(
                     child: Text(
                       user.displayName?.substring(0, 1).toUpperCase() ?? 'U',
-                      style: GoogleFonts.fredoka(
+                      style: AppTypography.displaySmall.copyWith(
                         color: Colors.white,
                         fontSize: size * 0.4,
                         fontWeight: FontWeight.w800,
@@ -168,7 +178,21 @@ class PremiumAvatar extends StatelessWidget {
                       ),
                     ),
                   )
-                : null,
+                : user.photoUrl == null && usePlantAvatar
+                    ? Center(
+                        child: SizedBox(
+                          width: size * 0.9,
+                          height: size * 0.9,
+                          child: PlantAvatar(
+                            evolutionStage: user.plantEvolutionStage,
+                            size: size * 0.9,
+                            showRing: true,
+                            onTap: onTap,
+                            badge: _getBadgeIcon(),
+                          ),
+                        ),
+                      )
+                    : null,
           ),
           // Achievement badge
           if (showBadge && _getBadgeIcon() != null)
@@ -213,6 +237,7 @@ class AnimatedPremiumAvatar extends StatefulWidget {
   final double size;
   final bool showBadge;
   final bool showLevelRing;
+  final bool usePlantAvatar;
   final VoidCallback? onTap;
 
   const AnimatedPremiumAvatar({
@@ -222,6 +247,7 @@ class AnimatedPremiumAvatar extends StatefulWidget {
     this.showBadge = true,
     this.showLevelRing = true,
     this.onTap,
+    this.usePlantAvatar = false,
   });
 
   @override
@@ -268,6 +294,7 @@ class _AnimatedPremiumAvatarState extends State<AnimatedPremiumAvatar>
           size: widget.size,
           showBadge: widget.showBadge,
           showLevelRing: widget.showLevelRing,
+          usePlantAvatar: widget.usePlantAvatar,
           onTap: widget.onTap,
         ),
       ),

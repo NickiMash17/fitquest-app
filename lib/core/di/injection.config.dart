@@ -53,6 +53,8 @@ extension GetItInjectableX on _i174.GetIt {
         () => _i947.XpCalculatorService());
     gh.lazySingleton<_i959.PlantService>(
         () => _i959.PlantService(gh<_i947.XpCalculatorService>()));
+    gh.lazySingleton<_i53.FirestoreCacheService>(
+        () => _i53.FirestoreCacheService(gh<_i974.FirebaseFirestore>()));
     gh.lazySingleton<_i248.ActivityRepository>(
         () => _i248.ActivityRepository(gh<_i974.FirebaseFirestore>()));
     gh.lazySingleton<_i384.ChallengeRepository>(
@@ -61,8 +63,6 @@ extension GetItInjectableX on _i174.GetIt {
         () => _i398.GoalRepository(gh<_i974.FirebaseFirestore>()));
     gh.lazySingleton<_i601.LeaderboardRepository>(
         () => _i601.LeaderboardRepository(gh<_i974.FirebaseFirestore>()));
-    gh.lazySingleton<_i53.FirestoreCacheService>(
-        () => _i53.FirestoreCacheService(gh<_i974.FirebaseFirestore>()));
     gh.lazySingleton<_i241.AnalyticsService>(
         () => _i241.AnalyticsService(gh<_i398.FirebaseAnalytics>()));
     gh.lazySingleton<_i905.ErrorHandlerService>(() => _i905.ErrorHandlerService(

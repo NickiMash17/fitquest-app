@@ -22,7 +22,7 @@ class _SplashPageState extends State<SplashPage>
 
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 2),
+      duration: const Duration(milliseconds: 800), // Faster animation
     );
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
@@ -38,8 +38,11 @@ class _SplashPageState extends State<SplashPage>
 
   Future<void> _checkOnboardingStatus() async {
     try {
-      // Wait for animation
-      await Future.delayed(const Duration(seconds: 2));
+      // Start animation immediately
+      _animationController.forward();
+
+      // Reduced delay - minimum 500ms for smooth transition (was 2 seconds)
+      await Future.delayed(const Duration(milliseconds: 500));
 
       if (!mounted) return;
 
@@ -87,22 +90,22 @@ class _SplashPageState extends State<SplashPage>
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              const Color(0xFF4CAF50),
-              const Color(0xFF2E7D32),
-              const Color(0xFF4CAF50),
+              Color(0xFF4CAF50),
+              Color(0xFF2E7D32),
+              Color(0xFF4CAF50),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            stops: const [0.0, 0.5, 1.0],
+            stops: [0.0, 0.5, 1.0],
           ),
         ),
         child: Stack(
           children: [
-            // Animated background particles
-            ...List.generate(15, (index) {
+            // Animated background particles (reduced for performance)
+            ...List.generate(8, (index) {
               return Positioned(
                 left: (index * 30.0) % MediaQuery.of(context).size.width,
                 top: (index * 50.0) % MediaQuery.of(context).size.height,
@@ -111,8 +114,10 @@ class _SplashPageState extends State<SplashPage>
                   builder: (context, child) {
                     return Opacity(
                       opacity: 0.1 +
-                          (math.sin(_animationController.value * 2 * math.pi +
-                                  index) *
+                          (math.sin(
+                                _animationController.value * 2 * math.pi +
+                                    index,
+                              ) *
                               0.1),
                       child: Container(
                         width: 60,
@@ -147,9 +152,9 @@ class _SplashPageState extends State<SplashPage>
                       builder: (context, child) {
                         return Transform.scale(
                           scale: 1.0 +
-                              (math.sin(_animationController.value *
-                                      2 *
-                                      math.pi) *
+                              (math.sin(
+                                    _animationController.value * 2 * math.pi,
+                                  ) *
                                   0.1),
                           child: Transform.rotate(
                             angle:
@@ -208,7 +213,7 @@ class _SplashPageState extends State<SplashPage>
                           ),
                     ),
                     const SizedBox(height: 48),
-                    SizedBox(
+                    const SizedBox(
                       width: 40,
                       height: 40,
                       child: CircularProgressIndicator(

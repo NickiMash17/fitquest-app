@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
-import 'package:google_fonts/google_fonts.dart';
+import 'package:fitquest/core/constants/app_typography.dart';
+import 'package:fitquest/core/constants/app_border_radius.dart';
 
 /// Sparkle effect widget for XP gains and achievements
 class SparkleEffect extends StatefulWidget {
@@ -47,10 +48,12 @@ class _SparkleEffectState extends State<SparkleEffect>
           tween: Tween<double>(begin: 1.0, end: 0.0),
           weight: 0.7,
         ),
-      ]).animate(CurvedAnimation(
-        parent: controller,
-        curve: Curves.easeOut,
-      ));
+      ]).animate(
+        CurvedAnimation(
+          parent: controller,
+          curve: Curves.easeOut,
+        ),
+      );
     }).toList();
 
     if (widget.active) {
@@ -98,7 +101,7 @@ class _SparkleEffectState extends State<SparkleEffect>
         if (widget.active)
           ...List.generate(widget.sparkleCount, (index) {
             final angle = (2 * math.pi * index) / widget.sparkleCount;
-            final radius = 40.0;
+            const radius = 40.0;
             return AnimatedBuilder(
               animation: _animations[index],
               builder: (context, child) {
@@ -182,10 +185,12 @@ class _XpSparkleAnimationState extends State<XpSparkleAnimation>
         tween: Tween<double>(begin: 1.0, end: 0.0),
         weight: 0.5,
       ),
-    ]).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOut,
-    ));
+    ]).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeOut,
+      ),
+    );
 
     _opacityAnimation = TweenSequence<double>([
       TweenSequenceItem(
@@ -200,18 +205,22 @@ class _XpSparkleAnimationState extends State<XpSparkleAnimation>
         tween: Tween<double>(begin: 1.0, end: 0.0),
         weight: 0.3,
       ),
-    ]).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOut,
-    ));
+    ]).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeOut,
+      ),
+    );
 
     _positionAnimation = Tween<Offset>(
       begin: const Offset(0, 0),
       end: const Offset(0, -50),
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOut,
-    ));
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeOut,
+      ),
+    );
 
     _controller.forward().then((_) {
       widget.onComplete?.call();
@@ -244,7 +253,7 @@ class _XpSparkleAnimationState extends State<XpSparkleAnimation>
                   gradient: const LinearGradient(
                     colors: [Color(0xFFFBBF24), Color(0xFFF59E0B)],
                   ),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: AppBorderRadius.allXL,
                   boxShadow: [
                     BoxShadow(
                       color: const Color(0xFFFBBF24).withValues(alpha: 0.5),
@@ -255,7 +264,7 @@ class _XpSparkleAnimationState extends State<XpSparkleAnimation>
                 ),
                 child: Text(
                   '+${widget.xpAmount} XP',
-                  style: GoogleFonts.fredoka(
+                  style: AppTypography.xpNumber.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
@@ -269,4 +278,3 @@ class _XpSparkleAnimationState extends State<XpSparkleAnimation>
     );
   }
 }
-

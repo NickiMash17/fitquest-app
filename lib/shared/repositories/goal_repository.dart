@@ -20,7 +20,7 @@ class GoalRepository {
       'updatedAt',
       'startDate',
       'endDate',
-      'completedAt'
+      'completedAt',
     ]) {
       if (converted[key] is Timestamp) {
         converted[key] =
@@ -132,7 +132,7 @@ class GoalRepository {
       });
     } catch (e, stackTrace) {
       _logger.e('Error updating goal progress',
-          error: e, stackTrace: stackTrace);
+          error: e, stackTrace: stackTrace,);
       rethrow;
     }
   }

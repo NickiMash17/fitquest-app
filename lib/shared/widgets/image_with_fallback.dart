@@ -83,8 +83,8 @@ class ImageWithFallback extends StatelessWidget {
       debugPrint('ImageWithFallback error: $e');
       try {
         final safeIconColor =
-            this.iconColor ?? Theme.of(context).colorScheme.onSurface;
-        final safeBackgroundColor = this.backgroundColor ??
+            iconColor ?? Theme.of(context).colorScheme.onSurface;
+        final safeBackgroundColor = backgroundColor ??
             Theme.of(context).colorScheme.surfaceContainerHighest;
         return _buildIconFallback(
           context,

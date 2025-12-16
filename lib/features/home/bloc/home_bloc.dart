@@ -61,7 +61,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       UserModel? user;
       for (int i = 0; i < 3; i++) {
         try {
-          user = await _userRepository.getUser(userId);
+          user = await _userRepository.getUserCached(userId);
           if (user != null) break;
           if (i < 2) {
             SecureLogger.d('User not found, retrying... (attempt ${i + 1}/3)');
@@ -75,27 +75,35 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
       if (user == null) {
         SecureLogger.e('User not found after retries: $userId');
-        emit(const HomeError(
-            message: 'User not found. Please try signing in again.',),);
+        emit(
+          const HomeError(
+            message: 'User not found. Please try signing in again.',
+          ),
+        );
         return;
       }
 
       SecureLogger.d('User loaded successfully: ${user.displayName}');
 
       // PARALLEL FETCHING: Load challenge and activities concurrently
-      final results = await Future.wait([
-        // Load daily challenge
-        _challengeRepository.getDailyChallenge().catchError((e) {
-          SecureLogger.w('Error loading challenge, continuing without it: $e');
-          return null;
-        }),
-        // Load today's activities
-        _activityRepository.getTodayActivities(userId).catchError((e) {
-          SecureLogger.w(
-              'Error loading today activities, continuing with empty list: $e',);
-          return <ActivityModel>[];
-        }),
-      ], eagerError: false,);
+      final results = await Future.wait(
+        [
+          // Load daily challenge
+          _challengeRepository.getDailyChallenge().catchError((e) {
+            SecureLogger.w(
+                'Error loading challenge, continuing without it: $e');
+            return null;
+          }),
+          // Load today's activities
+          _activityRepository.getTodayActivities(userId).catchError((e) {
+            SecureLogger.w(
+              'Error loading today activities, continuing with empty list: $e',
+            );
+            return <ActivityModel>[];
+          }),
+        ],
+        eagerError: false,
+      );
 
       final challenge = results[0] as ChallengeModel?;
       final todayActivities = results[1] as List<ActivityModel>;
@@ -114,8 +122,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         ),
       );
     } catch (e, stackTrace) {
-      SecureLogger.e('Error loading home data',
-          error: e, stackTrace: stackTrace);
+      SecureLogger.e(
+        'Error loading home data',
+        error: e,
+        stackTrace: stackTrace,
+      );
       final message = _errorHandler.handleError(e, type: ErrorType.unknown);
       emit(HomeError(message: message));
     }

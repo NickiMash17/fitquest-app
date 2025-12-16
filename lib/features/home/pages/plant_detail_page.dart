@@ -62,7 +62,7 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
     try {
       final plantName = _nameController.text.trim();
       await _userRepository.updatePlantName(
-          userId, plantName.isEmpty ? null : plantName);
+          userId, plantName.isEmpty ? null : plantName,);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -279,7 +279,7 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
                   Text(
                     evolutionStage >= 5
                         ? 'Maximum evolution reached! 🌳'
-                        : '${nextStageXp} XP needed for next stage',
+                        : '$nextStageXp XP needed for next stage',
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],

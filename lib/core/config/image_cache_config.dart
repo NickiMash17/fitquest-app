@@ -5,9 +5,10 @@ import 'package:flutter/material.dart';
 class ImageCacheConfig {
   /// Configure image cache settings globally
   static void configure() {
-    // Configure Flutter's image cache
-    PaintingBinding.instance.imageCache.maximumSize = 100; // Max 100 images in memory
-    PaintingBinding.instance.imageCache.maximumSizeBytes = 50 * 1024 * 1024; // 50 MB
+    // Configure Flutter's image cache - optimized for mobile performance
+    // Reduced cache size for faster loading on mobile devices
+    PaintingBinding.instance.imageCache.maximumSize = 50; // Max 50 images in memory (reduced from 100)
+    PaintingBinding.instance.imageCache.maximumSizeBytes = 30 * 1024 * 1024; // 30 MB (reduced from 50 MB)
 
     // Configure CachedNetworkImage settings
     // These are set globally when the app starts

@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:fitquest/core/constants/app_colors.dart';
 import 'package:fitquest/core/constants/app_border_radius.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:fitquest/core/constants/app_typography.dart';
 
 class AppTheme {
   AppTheme._();
+
+  // Prefer AppTypography getters for consistent typographic scale
+  static final TextStyle _fredokaAppBar = AppTypography.headlineSmall.copyWith(
+    color: Colors.white,
+    fontSize: 22,
+    fontWeight: FontWeight.w700,
+  );
 
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
@@ -33,146 +40,45 @@ class AppTheme {
       foregroundColor: Colors.white,
       surfaceTintColor: Colors.transparent,
       shadowColor: Colors.transparent,
-      titleTextStyle: GoogleFonts.fredoka(
-        fontSize: 22,
-        fontWeight: FontWeight.w700,
-        color: Colors.white,
-        letterSpacing: -0.5,
-      ),
+      titleTextStyle: _fredokaAppBar,
       iconTheme: const IconThemeData(color: Colors.white, size: 24),
     ),
     textTheme: TextTheme(
-      displayLarge: GoogleFonts.fredoka(
-        fontSize: 36,
-        fontWeight: FontWeight.w800,
-        color: AppColors.textPrimary,
-        letterSpacing: -1.0,
-        height: 1.2,
-      ),
-      displayMedium: GoogleFonts.fredoka(
-        fontSize: 30,
-        fontWeight: FontWeight.w700,
-        color: AppColors.textPrimary,
-        letterSpacing: -0.5,
-        height: 1.3,
-      ),
-      displaySmall: GoogleFonts.fredoka(
-        fontSize: 26,
-        fontWeight: FontWeight.w700,
-        color: AppColors.textPrimary,
-        letterSpacing: -0.5,
-        height: 1.3,
-      ),
-      headlineLarge: GoogleFonts.fredoka(
-        fontSize: 24,
-        fontWeight: FontWeight.w700,
-        color: AppColors.textPrimary,
-        letterSpacing: -0.3,
-        height: 1.3,
-      ),
-      headlineMedium: GoogleFonts.fredoka(
-        fontSize: 20,
-        fontWeight: FontWeight.w600,
-        color: AppColors.textPrimary,
-        letterSpacing: -0.2,
-        height: 1.4,
-      ),
-      headlineSmall: GoogleFonts.fredoka(
-        fontSize: 18,
-        fontWeight: FontWeight.w600,
-        color: AppColors.textPrimary,
-        letterSpacing: 0,
-        height: 1.4,
-      ),
-      titleLarge: GoogleFonts.fredoka(
-        fontSize: 18,
-        fontWeight: FontWeight.w600,
-        color: AppColors.textPrimary,
-        letterSpacing: 0,
-        height: 1.4,
-      ),
-      titleMedium: GoogleFonts.nunito(
-        fontSize: 16,
-        fontWeight: FontWeight.w600,
-        color: AppColors.textPrimary,
-        letterSpacing: 0.1,
-        height: 1.5,
-      ),
-      titleSmall: GoogleFonts.nunito(
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        color: AppColors.textPrimary,
-        letterSpacing: 0.1,
-        height: 1.5,
-      ),
-      bodyLarge: GoogleFonts.nunito(
-        fontSize: 16,
-        fontWeight: FontWeight.w400,
-        color: AppColors.textPrimary,
-        letterSpacing: 0.15,
-        height: 1.6,
-      ),
-      bodyMedium: GoogleFonts.nunito(
-        fontSize: 14,
-        fontWeight: FontWeight.w400,
-        color: AppColors.textSecondary,
-        letterSpacing: 0.25,
-        height: 1.6,
-      ),
-      bodySmall: GoogleFonts.nunito(
-        fontSize: 12,
-        fontWeight: FontWeight.w400,
-        color: AppColors.textTertiary,
-        letterSpacing: 0.4,
-        height: 1.5,
-      ),
-      labelLarge: GoogleFonts.nunito(
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        color: AppColors.textPrimary,
-        letterSpacing: 0.1,
-        height: 1.4,
-      ),
-      labelMedium: GoogleFonts.nunito(
-        fontSize: 12,
-        fontWeight: FontWeight.w500,
-        color: AppColors.textSecondary,
-        letterSpacing: 0.5,
-        height: 1.4,
-      ),
-      labelSmall: GoogleFonts.nunito(
-        fontSize: 11,
-        fontWeight: FontWeight.w500,
-        color: AppColors.textTertiary,
-        letterSpacing: 0.5,
-        height: 1.4,
-      ),
+      displayLarge: AppTypography.displayLarge,
+      displayMedium: AppTypography.displayMedium,
+      displaySmall: AppTypography.displaySmall,
+      headlineLarge: AppTypography.headlineLarge,
+      headlineMedium: AppTypography.headlineMedium,
+      headlineSmall: AppTypography.headlineSmall,
+      titleLarge: AppTypography.headlineSmall.copyWith(fontSize: 18),
+      titleMedium: AppTypography.bodyLarge,
+      titleSmall: AppTypography.bodyMedium,
+      bodyLarge: AppTypography.bodyLarge,
+      bodyMedium: AppTypography.bodyMedium,
+      bodySmall: AppTypography.bodySmall,
+      labelLarge: AppTypography.labelLarge,
+      labelMedium: AppTypography.labelMedium,
+      labelSmall: AppTypography.bodySmall,
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
-        elevation: 2,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        textStyle: GoogleFonts.fredoka(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-        ),
+        elevation: 4,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+        shape: RoundedRectangleBorder(borderRadius: AppBorderRadius.allLG),
+        textStyle: AppTypography.labelLarge.copyWith(color: Colors.white),
       ),
     ),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
         foregroundColor: AppColors.primaryGreen,
-        textStyle: GoogleFonts.nunito(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-        ),
+        textStyle: AppTypography.labelLarge.copyWith(fontSize: 14),
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: AppColors.surface,
+      fillColor: AppColors.surface.withValues(alpha: 0.96),
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       border: OutlineInputBorder(
         borderRadius: AppBorderRadius.allMD,
@@ -194,24 +100,21 @@ class AppTheme {
         borderRadius: AppBorderRadius.allMD,
         borderSide: BorderSide(color: AppColors.error, width: 2),
       ),
-      labelStyle: GoogleFonts.nunito(
-        fontSize: 14,
+      labelStyle: AppTypography.labelLarge.copyWith(
         fontWeight: FontWeight.w500,
         color: AppColors.textSecondary,
       ),
-      hintStyle: GoogleFonts.nunito(
-        fontSize: 14,
+      hintStyle: AppTypography.labelMedium.copyWith(
         color: AppColors.textTertiary,
       ),
-      helperStyle: GoogleFonts.nunito(
-        fontSize: 12,
+      helperStyle: AppTypography.labelMedium.copyWith(
         color: AppColors.textTertiary,
       ),
     ),
     cardTheme: CardThemeData(
-      elevation: 0,
-      shadowColor: Colors.transparent,
-      shape: RoundedRectangleBorder(
+      elevation: 2,
+      shadowColor: AppColors.shadowLight,
+      shape: const RoundedRectangleBorder(
         borderRadius: AppBorderRadius.allLG,
         side: BorderSide.none,
       ),
@@ -220,23 +123,29 @@ class AppTheme {
       clipBehavior: Clip.antiAlias,
     ),
     bottomNavigationBarTheme: BottomNavigationBarThemeData(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surface,
       selectedItemColor: AppColors.primaryGreen,
       unselectedItemColor: const Color(0xFF616161),
       selectedIconTheme: const IconThemeData(size: 26),
       unselectedIconTheme: const IconThemeData(size: 24),
-      selectedLabelStyle: GoogleFonts.nunito(
-        fontSize: 12,
+      selectedLabelStyle: AppTypography.labelMedium.copyWith(
         fontWeight: FontWeight.w600,
       ),
-      unselectedLabelStyle: GoogleFonts.nunito(
-        fontSize: 12,
-        fontWeight: FontWeight.w500,
-      ),
+      unselectedLabelStyle: AppTypography.labelMedium,
       type: BottomNavigationBarType.fixed,
       elevation: 12,
       showSelectedLabels: true,
       showUnselectedLabels: true,
+    ),
+    navigationBarTheme: NavigationBarThemeData(
+      backgroundColor: AppColors.surface,
+      indicatorColor: AppColors.primaryLight,
+      labelTextStyle: MaterialStateProperty.all(
+        AppTypography.labelMedium.copyWith(fontWeight: FontWeight.w600),
+      ),
+      iconTheme: MaterialStateProperty.resolveWith((states) {
+        return IconThemeData(color: AppColors.primary);
+      }),
     ),
   );
 
@@ -267,120 +176,30 @@ class AppTheme {
       foregroundColor: Colors.white,
       surfaceTintColor: Colors.transparent,
       shadowColor: Colors.transparent,
-      titleTextStyle: GoogleFonts.fredoka(
-        fontSize: 22,
-        fontWeight: FontWeight.w700,
-        color: Colors.white,
-        letterSpacing: -0.5,
-      ),
+      titleTextStyle: _fredokaAppBar,
       iconTheme: const IconThemeData(color: Colors.white, size: 24),
     ),
     textTheme: TextTheme(
-      displayLarge: GoogleFonts.fredoka(
-        fontSize: 36,
-        fontWeight: FontWeight.w800,
-        color: Colors.white,
-        letterSpacing: -1.0,
-        height: 1.2,
-      ),
-      displayMedium: GoogleFonts.fredoka(
-        fontSize: 30,
-        fontWeight: FontWeight.w700,
-        color: Colors.white,
-        letterSpacing: -0.5,
-        height: 1.3,
-      ),
-      displaySmall: GoogleFonts.fredoka(
-        fontSize: 26,
-        fontWeight: FontWeight.w700,
-        color: Colors.white,
-        letterSpacing: -0.5,
-        height: 1.3,
-      ),
-      headlineLarge: GoogleFonts.fredoka(
-        fontSize: 24,
-        fontWeight: FontWeight.w700,
-        color: Colors.white,
-        letterSpacing: -0.3,
-        height: 1.3,
-      ),
-      headlineMedium: GoogleFonts.fredoka(
-        fontSize: 20,
-        fontWeight: FontWeight.w600,
-        color: Colors.white,
-        letterSpacing: -0.2,
-        height: 1.4,
-      ),
-      headlineSmall: GoogleFonts.fredoka(
-        fontSize: 18,
-        fontWeight: FontWeight.w600,
-        color: Colors.white,
-        letterSpacing: 0,
-        height: 1.4,
-      ),
-      titleLarge: GoogleFonts.fredoka(
-        fontSize: 18,
-        fontWeight: FontWeight.w600,
-        color: Colors.white,
-        letterSpacing: 0,
-        height: 1.4,
-      ),
-      titleMedium: GoogleFonts.nunito(
-        fontSize: 16,
-        fontWeight: FontWeight.w600,
-        color: Colors.white,
-        letterSpacing: 0.1,
-        height: 1.5,
-      ),
-      titleSmall: GoogleFonts.nunito(
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        color: Colors.white,
-        letterSpacing: 0.1,
-        height: 1.5,
-      ),
-      bodyLarge: GoogleFonts.nunito(
-        fontSize: 16,
-        fontWeight: FontWeight.w400,
-        color: Colors.white,
-        letterSpacing: 0.15,
-        height: 1.6,
-      ),
-      bodyMedium: GoogleFonts.nunito(
-        fontSize: 14,
-        fontWeight: FontWeight.w400,
-        color: AppColors.textSecondaryDark,
-        letterSpacing: 0.25,
-        height: 1.6,
-      ),
-      bodySmall: GoogleFonts.nunito(
-        fontSize: 12,
-        fontWeight: FontWeight.w400,
-        color: AppColors.textTertiaryDark,
-        letterSpacing: 0.4,
-        height: 1.5,
-      ),
-      labelLarge: GoogleFonts.nunito(
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        color: Colors.white,
-        letterSpacing: 0.1,
-        height: 1.4,
-      ),
-      labelMedium: GoogleFonts.nunito(
-        fontSize: 12,
-        fontWeight: FontWeight.w500,
-        color: AppColors.textSecondaryDark,
-        letterSpacing: 0.5,
-        height: 1.4,
-      ),
-      labelSmall: GoogleFonts.nunito(
-        fontSize: 11,
-        fontWeight: FontWeight.w500,
-        color: AppColors.textTertiaryDark,
-        letterSpacing: 0.5,
-        height: 1.4,
-      ),
+      displayLarge: AppTypography.displayLarge.copyWith(color: Colors.white),
+      displayMedium: AppTypography.displayMedium.copyWith(color: Colors.white),
+      displaySmall: AppTypography.displaySmall.copyWith(color: Colors.white),
+      headlineLarge: AppTypography.headlineLarge.copyWith(color: Colors.white),
+      headlineMedium:
+          AppTypography.headlineMedium.copyWith(color: Colors.white),
+      headlineSmall: AppTypography.headlineSmall.copyWith(color: Colors.white),
+      titleLarge: AppTypography.headlineSmall.copyWith(color: Colors.white),
+      titleMedium: AppTypography.bodyLarge.copyWith(color: Colors.white),
+      titleSmall: AppTypography.bodyMedium.copyWith(color: Colors.white),
+      bodyLarge: AppTypography.bodyLarge.copyWith(color: Colors.white),
+      bodyMedium:
+          AppTypography.bodyMedium.copyWith(color: AppColors.textSecondaryDark),
+      bodySmall:
+          AppTypography.bodySmall.copyWith(color: AppColors.textTertiaryDark),
+      labelLarge: AppTypography.labelLarge.copyWith(color: Colors.white),
+      labelMedium: AppTypography.labelMedium
+          .copyWith(color: AppColors.textSecondaryDark),
+      labelSmall:
+          AppTypography.bodySmall.copyWith(color: AppColors.textTertiaryDark),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
@@ -393,11 +212,7 @@ class AppTheme {
         shape: const RoundedRectangleBorder(
           borderRadius: AppBorderRadius.allMD,
         ),
-        textStyle: GoogleFonts.nunito(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          letterSpacing: 0.5,
-        ),
+        textStyle: AppTypography.bodyLarge.copyWith(letterSpacing: 0.5),
       ).copyWith(
         elevation: WidgetStateProperty.resolveWith<double>(
           (Set<WidgetState> states) {
@@ -416,7 +231,7 @@ class AppTheme {
         shape: const RoundedRectangleBorder(
           borderRadius: AppBorderRadius.allSM,
         ),
-        textStyle: GoogleFonts.nunito(
+        textStyle: AppTypography.labelLarge.copyWith(
           fontSize: 14,
           fontWeight: FontWeight.w600,
           letterSpacing: 0.25,
@@ -447,16 +262,16 @@ class AppTheme {
         borderRadius: AppBorderRadius.allMD,
         borderSide: BorderSide(color: AppColors.error, width: 2),
       ),
-      labelStyle: GoogleFonts.nunito(
+      labelStyle: AppTypography.labelLarge.copyWith(
         fontSize: 14,
         fontWeight: FontWeight.w500,
         color: Colors.white.withValues(alpha: 0.7),
       ),
-      hintStyle: GoogleFonts.nunito(
+      hintStyle: AppTypography.labelLarge.copyWith(
         fontSize: 14,
         color: Colors.white.withValues(alpha: 0.5),
       ),
-      helperStyle: GoogleFonts.nunito(
+      helperStyle: AppTypography.labelMedium.copyWith(
         fontSize: 12,
         color: Colors.white.withValues(alpha: 0.6),
       ),
@@ -478,14 +293,10 @@ class AppTheme {
       unselectedItemColor: const Color(0xFF9E9E9E),
       selectedIconTheme: const IconThemeData(size: 26),
       unselectedIconTheme: const IconThemeData(size: 24),
-      selectedLabelStyle: GoogleFonts.nunito(
-        fontSize: 12,
+      selectedLabelStyle: AppTypography.labelMedium.copyWith(
         fontWeight: FontWeight.w600,
       ),
-      unselectedLabelStyle: GoogleFonts.nunito(
-        fontSize: 12,
-        fontWeight: FontWeight.w500,
-      ),
+      unselectedLabelStyle: AppTypography.labelMedium,
       type: BottomNavigationBarType.fixed,
       elevation: 12,
       showSelectedLabels: true,

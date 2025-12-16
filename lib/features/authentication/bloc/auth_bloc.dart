@@ -7,7 +7,6 @@ import 'package:fitquest/shared/repositories/user_repository.dart';
 import 'package:fitquest/shared/models/user_model.dart';
 import 'package:fitquest/core/services/error_handler_service.dart';
 import 'package:fitquest/core/utils/secure_logger.dart';
-import 'package:fitquest/core/services/error_handler_service.dart' show ErrorType;
 
 /// Authentication BLoC
 @injectable
@@ -41,7 +40,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       },
       onError: (error) {
         SecureLogger.w(
-            'Auth state change error (likely expired token), signing out: $error',);
+          'Auth state change error (likely expired token), signing out: $error',
+        );
         // If there's an error (like invalid credentials), sign out gracefully
         if (state is! AuthUnauthenticated) {
           add(const AuthSignOutRequested());
@@ -63,7 +63,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         try {
           await user.reload();
           // If reload succeeds, the token is valid - load user data directly
-          final userData = await _userRepository.getUser(user.uid);
+          final userData = await _userRepository.getUserCached(user.uid);
           if (userData != null) {
             emit(AuthAuthenticated(user: userData));
           } else {
@@ -84,8 +84,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(const AuthUnauthenticated());
       }
     } catch (e, stackTrace) {
-      SecureLogger.e('Error checking auth status',
-          error: e, stackTrace: stackTrace);
+      SecureLogger.e(
+        'Error checking auth status',
+        error: e,
+        stackTrace: stackTrace,
+      );
       // On any error, treat as unauthenticated
       emit(const AuthUnauthenticated());
     }
@@ -103,7 +106,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
       if (credential.user != null) {
         // Load user data directly instead of dispatching event
-        final user = await _userRepository.getUser(credential.user!.uid);
+        final user = await _userRepository.getUserCached(credential.user!.uid);
         if (user != null) {
           emit(AuthAuthenticated(user: user));
         } else {
@@ -123,9 +126,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final message = _errorHandler.handleFirebaseException(e);
       emit(AuthError(message: message));
     } catch (e, stackTrace) {
-      SecureLogger.e('Unexpected sign in error',
-          error: e, stackTrace: stackTrace);
-      final message = _errorHandler.handleError(e, type: ErrorType.authentication);
+      SecureLogger.e(
+        'Unexpected sign in error',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      final message =
+          _errorHandler.handleError(e, type: ErrorType.authentication);
       emit(AuthError(message: message));
     }
   }
@@ -159,9 +166,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final message = _errorHandler.handleFirebaseException(e);
       emit(AuthError(message: message));
     } catch (e, stackTrace) {
-      SecureLogger.e('Unexpected sign up error',
-          error: e, stackTrace: stackTrace);
-      final message = _errorHandler.handleError(e, type: ErrorType.authentication);
+      SecureLogger.e(
+        'Unexpected sign up error',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      final message =
+          _errorHandler.handleError(e, type: ErrorType.authentication);
       emit(AuthError(message: message));
     }
   }
@@ -189,7 +200,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       SecureLogger.i('Password reset email sent');
     } catch (e, stackTrace) {
       SecureLogger.e('Password reset error', error: e, stackTrace: stackTrace);
-      final message = _errorHandler.handleError(e, type: ErrorType.authentication);
+      final message =
+          _errorHandler.handleError(e, type: ErrorType.authentication);
       emit(AuthError(message: message));
     }
   }
@@ -199,15 +211,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     try {
-      final user = await _userRepository.getUser(event.userId);
+      final user = await _userRepository.getUserCached(event.userId);
       if (user != null) {
         emit(AuthAuthenticated(user: user));
       } else {
         emit(const AuthUnauthenticated());
       }
     } catch (e, stackTrace) {
-      SecureLogger.e('Error loading user data',
-          error: e, stackTrace: stackTrace);
+      SecureLogger.e(
+        'Error loading user data',
+        error: e,
+        stackTrace: stackTrace,
+      );
       emit(const AuthUnauthenticated());
     }
   }
@@ -216,5 +231,4 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     // Helper method that dispatches an event (for use in event handlers)
     add(AuthLoadUserDataRequested(userId: userId));
   }
-
 }

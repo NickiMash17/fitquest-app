@@ -9,7 +9,7 @@ import 'package:fitquest/shared/widgets/theme_toggle_button.dart';
 import 'package:fitquest/features/authentication/bloc/auth_bloc.dart';
 import 'package:fitquest/features/authentication/bloc/auth_event.dart';
 import 'package:fitquest/features/authentication/bloc/auth_state.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:fitquest/core/constants/app_typography.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -64,6 +64,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: Form(
                     key: _formKey,
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         const SizedBox(height: 60),
@@ -187,8 +188,8 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             child: Text(
                               'Forgot Password?',
-                              style: GoogleFonts.nunito(
-                                color: AppColors.primaryGreen,
+                              style: AppTypography.labelMedium.copyWith(
+                                color: AppColors.primary,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -203,7 +204,9 @@ class _LoginPageState extends State<LoginPage> {
                           gradient: AppColors.primaryGradient,
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 24, vertical: 18),
+                            horizontal: 24,
+                            vertical: 18,
+                          ),
                         ),
                         if (state is AuthLoading)
                           const Padding(
@@ -243,8 +246,8 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               child: Text(
                                 'Sign Up',
-                                style: GoogleFonts.nunito(
-                                  color: AppColors.primaryGreen,
+                                style: AppTypography.labelMedium.copyWith(
+                                  color: AppColors.primary,
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),

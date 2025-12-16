@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:fitquest/shared/models/user_model.dart';
 import 'package:fitquest/shared/widgets/premium_avatar.dart';
+import 'package:fitquest/core/constants/app_border_radius.dart';
 
 class WelcomeHeader extends StatefulWidget {
   final UserModel user;
@@ -29,15 +30,15 @@ class _WelcomeHeaderState extends State<WelcomeHeader> {
     final level = widget.user.currentLevel;
 
     if (streak >= 30) {
-      return '🔥 ${streak}-day streak! You\'re unstoppable!';
+      return '🔥 $streak-day streak! You\'re unstoppable!';
     } else if (streak >= 7) {
-      return '💪 ${streak}-day streak! Keep it going!';
+      return '💪 $streak-day streak! Keep it going!';
     } else if (streak >= 3) {
-      return '✨ ${streak}-day streak! Building momentum!';
+      return '✨ $streak-day streak! Building momentum!';
     } else if (level >= 10) {
-      return '🌟 Level ${level}! You\'re a wellness champion!';
+      return '🌟 Level $level! You\'re a wellness champion!';
     } else if (level >= 5) {
-      return '🌱 Level ${level}! Growing stronger every day!';
+      return '🌱 Level $level! Growing stronger every day!';
     } else {
       return 'Let\'s make today amazing!';
     }
@@ -50,12 +51,13 @@ class _WelcomeHeaderState extends State<WelcomeHeader> {
       children: [
         Row(
           children: [
-            // Premium Avatar with level-based styling
+            // Premium Avatar with level-based styling (plant avatar gamification)
             AnimatedPremiumAvatar(
               user: widget.user,
               size: 64,
               showBadge: true,
               showLevelRing: true,
+              usePlantAvatar: true,
             ),
             const SizedBox(width: 16),
             // Enhanced Greeting with motivational message
@@ -94,7 +96,7 @@ class _WelcomeHeaderState extends State<WelcomeHeader> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           decoration: BoxDecoration(
             color: Colors.white.withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: AppBorderRadius.allXL,
             border: Border.all(
               color: Colors.white.withValues(alpha: 0.25),
               width: 1,
@@ -110,13 +112,17 @@ class _WelcomeHeaderState extends State<WelcomeHeader> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                _getMotivationalMessage(),
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.2,
-                    ),
+              Flexible(
+                child: Text(
+                  _getMotivationalMessage(),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.2,
+                      ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ],
           ),

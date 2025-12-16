@@ -37,7 +37,7 @@ class _TreeSwayAnimationState extends State<TreeSwayAnimation>
     ).animate(CurvedAnimation(
       parent: _controller,
       curve: Curves.easeInOut,
-    ));
+    ),);
   }
 
   @override
@@ -103,7 +103,7 @@ class _FloatingLeafState extends State<FloatingLeaf>
     ).animate(CurvedAnimation(
       parent: _controller,
       curve: Curves.easeInOut,
-    ));
+    ),);
 
     _rotationAnimation = Tween<double>(
       begin: 0,
@@ -111,7 +111,7 @@ class _FloatingLeafState extends State<FloatingLeaf>
     ).animate(CurvedAnimation(
       parent: _controller,
       curve: Curves.linear,
-    ));
+    ),);
 
     _opacityAnimation = TweenSequence<double>([
       TweenSequenceItem(
@@ -129,7 +129,7 @@ class _FloatingLeafState extends State<FloatingLeaf>
     ]).animate(CurvedAnimation(
       parent: _controller,
       curve: Curves.easeInOut,
-    ));
+    ),);
   }
 
   @override

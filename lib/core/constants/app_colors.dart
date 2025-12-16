@@ -2,8 +2,59 @@
 import 'package:flutter/material.dart';
 import 'package:fitquest/core/utils/color_utils.dart';
 
+/// Premium, sophisticated color palette for production-grade wellness app
 class AppColors {
   AppColors._();
+
+  // === SOPHISTICATED GREEN PALETTE ===
+  // Not bright/toy colors - deep, rich, premium greens
+
+  static const MaterialColor primaryGreen = MaterialColor(
+    0xFF1E5631, // Deeper, more sophisticated forest green
+    <int, Color>{
+      50: Color(0xFFE8F5E9),
+      100: Color(0xFFC8E6C9),
+      200: Color(0xFFA5D6A7),
+      300: Color(0xFF81C784),
+      400: Color(0xFF66BB6A),
+      500: Color(0xFF1E5631), // Base - Premium forest green
+      600: Color(0xFF1B4D2C),
+      700: Color(0xFF184327),
+      800: Color(0xFF143921),
+      900: Color(0xFF0F2A17),
+    },
+  );
+
+  // Accent green - for highlights (not lime, sophisticated sage)
+  static const accentGreen = Color(0xFF7CB342); // Muted, professional
+
+  // Surface colors with proper elevation
+  static const surface0 = Color(0xFFFFFFFF);
+  static const surface1 = Color(0xFFF5F7F4);
+  static const surface2 = Color(0xFFEBEFE8);
+  static const surface3 = Color(0xFFE1E7DC);
+
+  // Premium gold for XP/achievements - refined, not tacky
+  static const premiumGold = Color(0xFFD4AF37); // True gold
+  static const premiumGoldLight = Color(0xFFFFE082);
+
+  // Premium gold gradient
+  static const premiumGoldGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Color(0xFFD4AF37),
+      Color(0xFFFFD700),
+      Color(0xFFD4AF37),
+    ],
+    stops: [0.0, 0.5, 1.0],
+  );
+
+  // Pillar accents - MUTED, sophisticated versions
+  static const exerciseAccent = Color(0xFFD84315); // Deep burnt orange
+  static const meditationAccent = Color(0xFF6A1B9A); // Deep royal purple
+  static const hydrationAccent = Color(0xFF0277BD); // Deep ocean blue
+  static const sleepAccent = Color(0xFF283593); // Deep navy indigo
 
   // ========== LIGHT THEME COLORS (from HSL spec) ==========
 
@@ -76,7 +127,7 @@ class AppColors {
       ColorUtils.hslToColor(120, 15, 60); // #7FA389
 
   // Legacy compatibility aliases
-  static Color get primaryGreen => primary;
+  // Note: primary getter is defined below in LIGHT THEME COLORS section
   static Color get primaryGreenDark => primaryDarkTheme;
 
   // Legacy compatibility - Text colors
@@ -94,7 +145,6 @@ class AppColors {
   static Color get textOnDarkBackground => foregroundDark;
 
   // Legacy compatibility - Background colors
-  static Color get backgroundLight => Colors.white;
   static Color get surface => Colors.white;
   static Color get surfaceVariant => muted;
   static Color get divider => border;
