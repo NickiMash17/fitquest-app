@@ -95,7 +95,7 @@ Watch your companion grow through 5 unique stages:
 - **Code Generation:** Freezed, Json Serializable, Injectable
 - **Testing:** Unit tests (mockito), Widget tests, Integration tests
 
-📖 **Demo Guides**: See the [docs/](docs/) folder for demo strategy and practice guides.
+📖 **Documentation**: See the [docs/](docs/) folder for technical documentation.
 
 ---
 
@@ -294,9 +294,7 @@ flutter test test/features/authentication/bloc/auth_bloc_test.dart
 
 ## 📚 Documentation
 
-- **[Demo Strategy](docs/DEMO_STRATEGY.md)** - Complete demo script and strategy
-- **[Pre-Demo Checklist](docs/PRE_DEMO_CHECKLIST.md)** - Pre-demo action plan
-- **[Quick Demo Practice](docs/QUICK_DEMO_PRACTICE.md)** - Quick practice guide
+- **[Technical Deep Dive](docs/TECHNICAL_DEEP_DIVE.md)** - Architecture, design decisions, and implementation details
 
 ---
 
