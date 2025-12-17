@@ -1,6 +1,5 @@
 // lib/shared/widgets/tree_shake_interaction.dart
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:fitquest/core/utils/haptic_feedback_service.dart';
 import 'dart:math' as math;
 

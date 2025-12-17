@@ -157,7 +157,7 @@ class _PremiumTextFieldState extends State<PremiumTextField>
                   width: 1.5,
                 ),
               ),
-              focusedBorder: OutlineInputBorder(
+              focusedBorder: const OutlineInputBorder(
                 borderRadius: AppBorderRadius.allLG,
                 borderSide: BorderSide(
                   color: AppColors.primaryGreen,

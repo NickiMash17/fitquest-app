@@ -160,7 +160,7 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.edit_rounded, color: AppColors.primaryGreen),
+                      const Icon(Icons.edit_rounded, color: AppColors.primaryGreen),
                       const SizedBox(width: 8),
                       Text(
                         'Plant Name',
@@ -269,7 +269,7 @@ class _PlantDetailPageState extends State<PlantDetailPage> {
                   LinearProgressIndicator(
                     value: growthProgress,
                     backgroundColor: Colors.grey[200],
-                    valueColor: AlwaysStoppedAnimation<Color>(
+                    valueColor: const AlwaysStoppedAnimation<Color>(
                       AppColors.primaryGreen,
                     ),
                     minHeight: 12,

@@ -168,21 +168,21 @@ class EnhancedSkeletonStatsRow extends StatelessWidget {
               left: index == 0 ? 0 : 8,
               right: index == itemCount - 1 ? 0 : 8,
             ),
-            child: Column(
+            child: const Column(
               children: [
-                const EnhancedShimmerLoader(
+                EnhancedShimmerLoader(
                   width: double.infinity,
                   height: 60,
                   borderRadius: BorderRadius.all(Radius.circular(12)),
                 ),
-                const SizedBox(height: 8),
-                const EnhancedShimmerLoader(
+                SizedBox(height: 8),
+                EnhancedShimmerLoader(
                   width: 80,
                   height: 14,
                   borderRadius: BorderRadius.all(Radius.circular(4)),
                 ),
-                const SizedBox(height: 4),
-                const EnhancedShimmerLoader(
+                SizedBox(height: 4),
+                EnhancedShimmerLoader(
                   width: 60,
                   height: 12,
                   borderRadius: BorderRadius.all(Radius.circular(4)),

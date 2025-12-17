@@ -140,7 +140,7 @@ class _GlassCardState extends State<GlassCard>
 
     final borderRadius = widget.borderRadius ?? AppBorderRadius.allLG;
 
-    Widget card = Container(
+    final Widget card = Container(
       width: widget.width,
       height: widget.height,
       margin: widget.margin ?? EdgeInsets.zero,

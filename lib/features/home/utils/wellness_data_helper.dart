@@ -50,7 +50,7 @@ class WellnessDataHelper {
 
     // Calculate calories (from exercise)
     final caloriesBurned = exerciseActivities.fold<double>(
-        0.0, (sum, a) => sum + (a.calories ?? 0.0));
+        0.0, (sum, a) => sum + (a.calories ?? 0.0),);
 
     return WellnessData(
       date: today,

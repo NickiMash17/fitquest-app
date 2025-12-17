@@ -107,7 +107,7 @@ class _CalendarPageState extends State<CalendarPage> {
                     width: 2,
                   ),
                 ),
-                markerDecoration: BoxDecoration(
+                markerDecoration: const BoxDecoration(
                   color: AppColors.primaryGreen,
                   shape: BoxShape.circle,
                 ),

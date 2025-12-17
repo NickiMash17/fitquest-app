@@ -344,7 +344,7 @@ class _ConfettiPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final random = math.Random(42); // Fixed seed for consistent pattern
-    final particleCount = 50;
+    const particleCount = 50;
 
     for (int i = 0; i < particleCount; i++) {
       final x = random.nextDouble() * size.width;

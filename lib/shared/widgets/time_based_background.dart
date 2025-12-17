@@ -67,12 +67,12 @@ class TimeBasedBackground extends StatelessWidget {
     }
 
     // Night: 21:00 - 5:00 (dark with stars)
-    return LinearGradient(
+    return const LinearGradient(
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
       colors: [
-        const Color(0xFF1A1A2E), // Deep blue
-        const Color(0xFF16213E), // Darker blue
+        Color(0xFF1A1A2E), // Deep blue
+        Color(0xFF16213E), // Darker blue
       ],
     );
   }
@@ -137,7 +137,7 @@ class _StarsPainter extends CustomPainter {
         // Draw twinkling star
         canvas.drawCircle(star, 1.5, paint);
         canvas.drawCircle(
-            star, 3, paint..color = Colors.white.withValues(alpha: 0.3));
+            star, 3, paint..color = Colors.white.withValues(alpha: 0.3),);
       }
     }
   }
