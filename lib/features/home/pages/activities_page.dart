@@ -502,6 +502,9 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
       end: Alignment.bottomRight,
       colors: [activityColor, activityColor.withValues(alpha: 0.7)],
     );
+    final isSmallScreen = MediaQuery.of(context).size.width < 400;
+    final imageSize = isSmallScreen ? 60.0 : 72.0;
+    final horizontalSpacing = isSmallScreen ? 10.0 : 12.0;
 
     return SwipeableCard(
       leftAction: const Icon(
@@ -535,11 +538,12 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
           width: 1,
         ),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Enhanced Activity image with gradient background
+            // Enhanced Activity image with gradient background - responsive size
             Container(
-              width: 72,
-              height: 72,
+              width: imageSize,
+              height: imageSize,
               decoration: BoxDecoration(
                 gradient: activityGradient,
                 borderRadius: AppBorderRadius.allLG,
@@ -566,8 +570,8 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                     fallbackIcon: ActivityImageHelper.getActivityIcon(
                       activity.type,
                     ),
-                    width: 72,
-                    height: 72,
+                    width: imageSize,
+                    height: imageSize,
                     fit: BoxFit.cover,
                     backgroundGradient: activityGradient,
                     iconColor: Colors.white,
@@ -575,25 +579,32 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                 ),
               ),
             ),
-            const SizedBox(width: 16),
-            // Enhanced Activity details
-            Expanded(
+            SizedBox(width: horizontalSpacing),
+            // Enhanced Activity details - Flexible to prevent overflow
+            Flexible(
+              flex: 2,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     _getActivityTypeName(activity.type),
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w700,
                           letterSpacing: -0.3,
+                          fontSize: 15,
                         ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 8),
-                  Row(
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 4,
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
+                          horizontal: 6,
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
@@ -605,28 +616,34 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                           children: [
                             Icon(
                               Icons.access_time_rounded,
-                              size: 14,
+                              size: 12,
                               color: activityColor,
                             ),
                             const SizedBox(width: 4),
-                            Text(
-                              app_date_utils.DateUtils.formatDateTime(
-                                activity.date,
+                            Flexible(
+                              child: Text(
+                                app_date_utils.DateUtils.formatDateTime(
+                                  activity.date,
+                                ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelSmall
+                                    ?.copyWith(
+                                      color: activityColor,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 11,
+                                    ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              style: Theme.of(context).textTheme.labelSmall
-                                  ?.copyWith(
-                                    color: activityColor,
-                                    fontWeight: FontWeight.w600,
-                                  ),
                             ),
                           ],
                         ),
                       ),
-                      if (activity.duration > 0) ...[
-                        const SizedBox(width: 8),
+                      if (activity.duration > 0)
                         Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
+                            horizontal: 6,
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
@@ -640,31 +657,34 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                             children: [
                               const Icon(
                                 Icons.timer_rounded,
-                                size: 14,
+                                size: 12,
                                 color: AppColors.primaryGreen,
                               ),
                               const SizedBox(width: 4),
                               Text(
                                 '${activity.duration}min',
-                                style: Theme.of(context).textTheme.labelSmall
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelSmall
                                     ?.copyWith(
                                       color: AppColors.primaryGreen,
                                       fontWeight: FontWeight.w600,
+                                      fontSize: 11,
                                     ),
                               ),
                             ],
                           ),
                         ),
-                      ],
                     ],
                   ),
                   if (activity.notes != null && activity.notes!.isNotEmpty) ...[
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 6),
                     Text(
                       activity.notes!,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                         height: 1.4,
+                        fontSize: 12,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -673,47 +693,63 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                 ],
               ),
             ),
-            // XP and duration
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    gradient: AppColors.primaryGradient,
-                    borderRadius: AppBorderRadius.allSM,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.star_rounded,
-                        color: Colors.white,
-                        size: 14,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        '+${activity.xpEarned}',
-                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+            SizedBox(width: horizontalSpacing * 0.7),
+            // XP and duration - Flexible to prevent overflow
+            Flexible(
+              flex: 1,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: AppColors.primaryGradient,
+                      borderRadius: AppBorderRadius.allSM,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.star_rounded,
                           color: Colors.white,
-                          fontWeight: FontWeight.w700,
+                          size: 12,
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 3),
+                        Flexible(
+                          child: Text(
+                            '+${activity.xpEarned}',
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelMedium
+                                ?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 12,
+                                ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  '${activity.duration} min',
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    fontWeight: FontWeight.w500,
+                  const SizedBox(height: 6),
+                  Text(
+                    '${activity.duration} min',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 11,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),

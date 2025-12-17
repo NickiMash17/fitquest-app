@@ -82,19 +82,19 @@ class _StreakCelebrationWidgetState extends State<StreakCelebrationWidget>
 
   String _getMilestoneMessage() {
     if (widget.streak >= 100) {
-      return '🏆 LEGENDARY! ${widget.streak} days of dedication!';
+      return 'LEGENDARY! ${widget.streak} days of dedication!';
     } else if (widget.streak >= 50) {
-      return '🌟 INCREDIBLE! ${widget.streak} days strong!';
+      return 'INCREDIBLE! ${widget.streak} days strong!';
     } else if (widget.streak >= 30) {
-      return '🔥 AMAZING! ${widget.streak}-day streak!';
+      return 'AMAZING! ${widget.streak}-day streak!';
     } else if (widget.streak >= 14) {
-      return '💪 TWO WEEKS! ${widget.streak} days of consistency!';
+      return 'TWO WEEKS! ${widget.streak} days of consistency!';
     } else if (widget.streak >= 7) {
-      return '✨ ONE WEEK! ${widget.streak} days strong!';
+      return 'ONE WEEK! ${widget.streak} days strong!';
     } else if (widget.streak >= 3) {
-      return '🌱 BUILDING! ${widget.streak}-day streak!';
+      return 'BUILDING! ${widget.streak}-day streak!';
     }
-    return '🎉 ${widget.streak}-day streak!';
+    return '${widget.streak}-day streak!';
   }
 
   Gradient _getMilestoneGradient() {

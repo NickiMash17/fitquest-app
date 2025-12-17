@@ -30,15 +30,15 @@ class _WelcomeHeaderState extends State<WelcomeHeader> {
     final level = widget.user.currentLevel;
 
     if (streak >= 30) {
-      return '🔥 $streak-day streak! You\'re unstoppable!';
+      return '$streak-day streak! You\'re unstoppable!';
     } else if (streak >= 7) {
-      return '💪 $streak-day streak! Keep it going!';
+      return '$streak-day streak! Keep it going!';
     } else if (streak >= 3) {
-      return '✨ $streak-day streak! Building momentum!';
+      return '$streak-day streak! Building momentum!';
     } else if (level >= 10) {
-      return '🌟 Level $level! You\'re a wellness champion!';
+      return 'Level $level! You\'re a wellness champion!';
     } else if (level >= 5) {
-      return '🌱 Level $level! Growing stronger every day!';
+      return 'Level $level! Growing stronger every day!';
     } else {
       return 'Let\'s make today amazing!';
     }
@@ -51,7 +51,6 @@ class _WelcomeHeaderState extends State<WelcomeHeader> {
       children: [
         Row(
           children: [
-            // Premium Avatar with level-based styling (plant avatar gamification)
             AnimatedPremiumAvatar(
               user: widget.user,
               size: 64,
@@ -60,7 +59,6 @@ class _WelcomeHeaderState extends State<WelcomeHeader> {
               usePlantAvatar: true,
             ),
             const SizedBox(width: 16),
-            // Enhanced Greeting with motivational message
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -91,7 +89,6 @@ class _WelcomeHeaderState extends State<WelcomeHeader> {
           ],
         ),
         const SizedBox(height: 12),
-        // Motivational message badge with glassmorphic effect
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           decoration: BoxDecoration(
