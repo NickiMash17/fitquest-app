@@ -16,10 +16,7 @@ import 'package:fitquest/shared/widgets/tree_sparkle_particles.dart';
 import 'package:fitquest/shared/widgets/tree_shake_interaction.dart';
 import 'package:fitquest/shared/widgets/leaf_fall_particles.dart';
 import 'package:fitquest/shared/widgets/enhanced_tree_sway.dart';
-import 'package:fitquest/core/constants/app_typography.dart';
-
-// Import FloatingLeavesBackground from tree_sway_animation.dart
-// (it's in the same file)
+import 'package:google_fonts/google_fonts.dart';
 
 class EnhancedPlantCard extends StatefulWidget {
   final String plantName;
@@ -75,25 +72,21 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
     super.initState();
     _previousStage = widget.evolutionStage;
 
-    // Scale animation for plant appearance
     _scaleController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     );
 
-    // Pulse animation for plant breathing effect - more visible
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2000),
     )..repeat(reverse: true);
 
-    // XP gain animation
     _xpAnimationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2000),
     );
 
-    // Celebration animation for evolution
     _celebrationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 3000),
@@ -109,7 +102,6 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
       ),
     );
 
-    // More visible pulse animation (1.0 to 1.08 = 8% scale change)
     _pulseAnimation = Tween<double>(begin: 1.0, end: 1.08).animate(
       CurvedAnimation(
         parent: _pulseController,
@@ -152,12 +144,10 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
 
     _scaleController.forward();
 
-    // Check for evolution
     if (widget.evolutionStage > _previousStage) {
       _triggerEvolutionCelebration();
     }
 
-    // Trigger XP gain animation if XP was gained
     if (widget.xpGained != null && widget.xpGained! > 0) {
       _triggerXpGainAnimation();
     }
@@ -167,19 +157,16 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
   void didUpdateWidget(EnhancedPlantCard oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    // Check for evolution
     if (widget.evolutionStage > oldWidget.evolutionStage) {
       _triggerEvolutionCelebration();
     }
 
-    // Trigger XP gain animation if XP was gained
     if (widget.xpGained != null &&
         widget.xpGained! > 0 &&
         (oldWidget.xpGained == null || oldWidget.xpGained == 0)) {
       _triggerXpGainAnimation();
     }
 
-    // Update progress animation
     final progress = widget.requiredXp > 0
         ? (widget.currentXp / widget.requiredXp).clamp(0.0, 1.0)
         : 0.0;
@@ -226,17 +213,14 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
     super.dispose();
   }
 
-  // Cache PlantService to avoid repeated lookups
   static PlantService? _cachedPlantService;
 
   @override
   Widget build(BuildContext context) {
-    // Get PlantService from dependency injection (cached)
     PlantService plantService;
     try {
       plantService = _cachedPlantService ??= getIt<PlantService>();
     } catch (e) {
-      // Return a simple error widget without debugPrint in production
       return Container(
         padding: const EdgeInsets.all(24.0),
         margin: const EdgeInsets.all(16.0),
@@ -244,11 +228,11 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
           color: Colors.red.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Column(
+        child: const Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error, color: Colors.red),
-            const SizedBox(height: 8),
+            Icon(Icons.error, color: Colors.red),
+            SizedBox(height: 8),
             Text('Plant Card Error'),
           ],
         ),
@@ -288,7 +272,6 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
               children: [
                 Row(
                   children: [
-                    // Plant Avatar with pulse animation
                     AnimatedBuilder(
                       animation: _pulseAnimation,
                       builder: (context, child) {
@@ -297,8 +280,6 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
                           child: GestureDetector(
                             onTap: () {
                               widget.onTap?.call();
-                              // Navigate to plant detail page
-                              // This will be handled by the parent widget
                             },
                             onDoubleTap: widget.onDoubleTap,
                             child: Container(
@@ -322,7 +303,6 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
                               child: Stack(
                                 alignment: Alignment.center,
                                 children: [
-                                  // Sparkle particles around tree
                                   Positioned.fill(
                                     child: TreeSparkleParticles(
                                       treeSize: 120,
@@ -330,10 +310,8 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
                                       active: widget.evolutionStage >= 3,
                                     ),
                                   ),
-                                  // Enhanced tree sway with wind strength
                                   TreeShakeInteraction(
                                     onShake: () {
-                                      // Trigger leaf fall particles
                                       final RenderBox? renderBox = context
                                           .findRenderObject() as RenderBox?;
                                       if (renderBox != null) {
@@ -390,7 +368,6 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
                                       ),
                                     ),
                                   ),
-                                  // Mood indicator
                                   Positioned(
                                     top: 4,
                                     right: 4,
@@ -403,12 +380,10 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
                                       ),
                                       child: Text(
                                         mood.emoji,
-                                        style: AppTypography.bodyLarge
-                                            .copyWith(fontSize: 16),
+                                        style: GoogleFonts.nunito(fontSize: 16),
                                       ),
                                     ),
                                   ),
-                                  // Golden fruit for majestic trees (level 36+)
                                   if (widget.userLevel != null &&
                                       widget.userLevel! >= 36)
                                     Positioned(
@@ -473,8 +448,7 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
                                 const SizedBox(width: 6),
                                 Text(
                                   mood.emoji,
-                                  style: AppTypography.labelMedium
-                                      .copyWith(fontSize: 12),
+                                  style: GoogleFonts.nunito(fontSize: 12),
                                 ),
                               ],
                             ),
@@ -485,7 +459,6 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
                   ],
                 ),
                 const SizedBox(height: 24),
-                // Enhanced Growth Progress Bar
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -566,7 +539,6 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
       ),
     ];
 
-    // Add XP Gain Animation Overlay if needed
     if (widget.xpGained != null && widget.xpGained! > 0) {
       stackChildren.add(
         Positioned.fill(
@@ -589,7 +561,7 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
                         ),
                         decoration: BoxDecoration(
                           color: Colors.green.withValues(alpha: 0.9),
-                          borderRadius: AppBorderRadius.allXL,
+                          borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.green.withValues(alpha: 0.5),
@@ -609,7 +581,7 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
                             const SizedBox(width: 4),
                             Text(
                               '+${widget.xpGained} XP',
-                              style: AppTypography.labelMedium.copyWith(
+                              style: GoogleFonts.fredoka(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,
@@ -628,7 +600,6 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
       );
     }
 
-    // Add confetti for evolution celebration
     if (_showEvolutionCelebration) {
       stackChildren.add(
         Positioned.fill(
@@ -654,9 +625,8 @@ class _EnhancedPlantCardState extends State<EnhancedPlantCard>
       );
     }
 
-    // Wrap in FloatingLeavesBackground for ambient effect - more visible
     return FloatingLeavesBackground(
-      leafCount: 10, // More leaves for better visibility
+      leafCount: 10,
       child: Stack(
         clipBehavior: Clip.none,
         children: stackChildren,

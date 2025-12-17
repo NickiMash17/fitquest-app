@@ -100,25 +100,12 @@ class _AddActivityPageState extends State<AddActivityPage> {
 
       _lastXp = _xpCalculator.calculateXp(activity);
 
-      // Dispatch create event
-      debugPrint('AddActivityPage: Dispatching ActivityCreateRequested event');
-      debugPrint(
-        'AddActivityPage: Activity type: ${activity.type}, duration: ${activity.duration}',
-      );
       final bloc = context.read<ActivityBloc>();
-      debugPrint(
-        'AddActivityPage: Current bloc state: ${bloc.state.runtimeType}',
-      );
       bloc.add(ActivityCreateRequested(activity: activity));
-      debugPrint(
-        'AddActivityPage: Event dispatched, waiting for state change...',
-      );
 
-      // Set a timeout - if we don't get a response in 10 seconds, show error
       _timeoutTimer?.cancel();
       _timeoutTimer = Timer(const Duration(seconds: 10), () {
         if (mounted && _isSubmitting) {
-          debugPrint('AddActivityPage: TIMEOUT - No response after 10 seconds');
           _handleActivityError(
             'Request timed out. Please check your connection and try again.',
           );
@@ -131,14 +118,10 @@ class _AddActivityPageState extends State<AddActivityPage> {
     if (!mounted || !_isSubmitting) return;
 
     _timeoutTimer?.cancel();
-    debugPrint(
-      'AddActivityPage: Activity created successfully, showing celebration',
-    );
 
     final xp = _lastXp ?? 0;
     final duration = int.tryParse(_durationController.text) ?? 0;
 
-    // Calculate points earned BEFORE navigation
     final points = _xpCalculator.calculatePoints(
       ActivityModel(
         id: '',
@@ -153,27 +136,19 @@ class _AddActivityPageState extends State<AddActivityPage> {
       _isSubmitting = false;
     });
 
-    // Show celebration BEFORE navigation (context is still valid)
-    debugPrint('AddActivityPage: Showing celebration - XP: $xp, Points: $points');
     EnhancedActivityCelebration.show(
       context,
       xp,
       points,
       onComplete: () {
-        debugPrint('AddActivityPage: Celebration complete, navigating back');
-        // Navigate back after celebration
         if (mounted) {
           Navigator.of(context).pop();
           
-          // Trigger a reload on the activities page
           Future.delayed(const Duration(milliseconds: 200), () {
-            // Get context from navigator
             final navigatorContext = Navigator.of(context, rootNavigator: false).context;
             if (navigatorContext.mounted) {
-              debugPrint('AddActivityPage: Triggering reload on activities page');
               navigatorContext.read<ActivityBloc>().add(const ActivitiesLoadRequested());
               
-              // Show snackbar
               ScaffoldMessenger.of(navigatorContext).showSnackBar(
                 SnackBar(
                   content: Text('Activity logged successfully! +$xp XP'),
@@ -198,7 +173,6 @@ class _AddActivityPageState extends State<AddActivityPage> {
       _isSubmitting = false;
     });
 
-    debugPrint('AddActivityPage: Showing error to user: $message');
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Error: $message'),
@@ -217,62 +191,33 @@ class _AddActivityPageState extends State<AddActivityPage> {
   Widget build(BuildContext context) {
     return BlocListener<ActivityBloc, ActivityState>(
       listenWhen: (previous, current) {
-        debugPrint(
-          'AddActivityPage: listenWhen - previous: ${previous.runtimeType}, current: ${current.runtimeType}, submitting: $_isSubmitting',
-        );
-
-        // Only listen when we're submitting
         if (!_isSubmitting) {
-          debugPrint('AddActivityPage: Not submitting, ignoring state change');
           return false;
         }
 
-        // Handle any error state
         if (current is ActivityError) {
-          debugPrint('AddActivityPage: Error state detected, will handle');
           return true;
         }
 
-        // Handle ActivityLoading - log it
         if (current is ActivityLoading) {
-          debugPrint('AddActivityPage: Loading state detected');
-          return false; // Don't navigate on loading, just log
+          return false;
         }
 
-        // Handle ActivityLoaded - always trigger when we see it after submitting
         if (current is ActivityLoaded) {
-          debugPrint(
-            'AddActivityPage: ActivityLoaded detected with ${current.activities.length} activities',
-          );
-          // Always trigger if we're submitting - this means creation completed
           return true;
         }
 
-        debugPrint(
-          'AddActivityPage: State change not handled: ${current.runtimeType}',
-        );
         return false;
       },
       listener: (context, state) {
         if (!_isSubmitting) return;
 
-        debugPrint('AddActivityPage: State changed to ${state.runtimeType}');
-
         if (state is ActivityError) {
-          debugPrint('AddActivityPage: Error - ${state.message}');
           _handleActivityError(state.message);
         } else if (state is ActivityLoaded) {
-          debugPrint(
-            'AddActivityPage: Activities loaded - ${state.activities.length} activities',
-          );
-          // Activity was created and activities reloaded
-          // Navigate back immediately - the activities page will show the updated list
           if (mounted && _isSubmitting) {
             _handleActivityCreated();
           }
-        } else if (state is ActivityLoading) {
-          debugPrint('AddActivityPage: Activity creation in progress...');
-          // Keep showing loading state
         }
       },
       child: Scaffold(
@@ -287,7 +232,6 @@ class _AddActivityPageState extends State<AddActivityPage> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Enhanced Activity type selector
                 Row(
                   children: [
                     Container(
@@ -402,7 +346,6 @@ class _AddActivityPageState extends State<AddActivityPage> {
                   }).toList(),
                 ),
                 const SizedBox(height: 24),
-                // Enhanced Date picker
                 Row(
                   children: [
                     Container(
@@ -491,7 +434,6 @@ class _AddActivityPageState extends State<AddActivityPage> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                // Enhanced Duration field
                 Row(
                   children: [
                     Container(
@@ -542,7 +484,6 @@ class _AddActivityPageState extends State<AddActivityPage> {
                   },
                 ),
                 const SizedBox(height: 24),
-                // Enhanced Notes field
                 Row(
                   children: [
                     Container(
@@ -583,7 +524,6 @@ class _AddActivityPageState extends State<AddActivityPage> {
                   maxLines: 3,
                 ),
                 const SizedBox(height: 32),
-                // Premium Submit button
                 PremiumButton(
                   label: 'Log Activity',
                   icon: Icons.add_rounded,

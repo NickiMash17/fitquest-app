@@ -22,7 +22,7 @@ class _SplashPageState extends State<SplashPage>
 
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 800), // Faster animation
+      duration: const Duration(milliseconds: 1200), // Smooth fade-in animation
     );
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
@@ -41,8 +41,8 @@ class _SplashPageState extends State<SplashPage>
       // Start animation immediately
       _animationController.forward();
 
-      // Reduced delay - minimum 500ms for smooth transition (was 2 seconds)
-      await Future.delayed(const Duration(milliseconds: 500));
+      // Minimum 2 seconds for smooth transition and better visibility
+      await Future.delayed(const Duration(milliseconds: 2000));
 
       if (!mounted) return;
 

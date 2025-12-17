@@ -7,10 +7,7 @@ import 'package:fitquest/core/constants/app_colors.dart';
 import 'package:fitquest/core/services/haptic_service.dart';
 import 'package:fitquest/shared/widgets/floating_xp_number.dart';
 
-/// Enhanced celebration system for activity logging
-/// Combines multiple animations for maximum impact
 class EnhancedActivityCelebration {
-  /// Show full celebration sequence when activity is logged
   static void show(
     BuildContext context,
     int xpEarned,
@@ -18,52 +15,41 @@ class EnhancedActivityCelebration {
     Offset? startPosition,
     VoidCallback? onComplete,
   }) {
-    debugPrint('🎉 EnhancedActivityCelebration.show called - XP: $xpEarned, Points: $pointsEarned');
-    
-    // Haptic feedback
-    try {
-      HapticService.success();
-      debugPrint('✅ Haptic feedback triggered');
-    } catch (e) {
-      debugPrint('⚠️ Haptic feedback error: $e');
+    if (kDebugMode) {
+      debugPrint('EnhancedActivityCelebration.show - XP: $xpEarned, Points: $pointsEarned');
     }
     
-    // Get screen center if no position provided
+    try {
+      HapticService.success();
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('Haptic feedback error: $e');
+      }
+    }
+    
     final position = startPosition ?? 
         Offset(
           MediaQuery.of(context).size.width / 2,
           MediaQuery.of(context).size.height / 2,
         );
 
-    debugPrint('📍 Celebration position: $position');
-
-    // Show celebration overlay with confetti
     _showCelebrationOverlay(context, xpEarned, pointsEarned, onComplete);
-    
-    // Show floating XP numbers (multiple for visual impact)
     _showFloatingNumbers(context, xpEarned, pointsEarned, position);
-    
-    // Trigger confetti burst
     _showConfettiBurst(context);
-    
-    debugPrint('✅ All celebration animations triggered');
   }
 
-  /// Show celebration overlay dialog
   static void _showCelebrationOverlay(
     BuildContext context,
     int xpEarned,
     int pointsEarned,
     VoidCallback? onComplete,
   ) {
-    debugPrint('🎊 Showing celebration overlay dialog');
     try {
       showDialog(
         context: context,
         barrierColor: Colors.black.withValues(alpha: 0.5),
         barrierDismissible: false,
         builder: (context) {
-          debugPrint('🎊 Building celebration dialog');
           return _CelebrationDialog(
             xpEarned: xpEarned,
             pointsEarned: pointsEarned,
@@ -71,14 +57,14 @@ class EnhancedActivityCelebration {
           );
         },
       );
-      debugPrint('✅ Celebration dialog shown');
     } catch (e, stackTrace) {
-      debugPrint('❌ Error showing celebration dialog: $e');
-      debugPrint('Stack trace: $stackTrace');
-      // Fallback to snackbar if dialog fails
+      if (kDebugMode) {
+        debugPrint('Error showing celebration dialog: $e');
+        debugPrint('Stack trace: $stackTrace');
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('+$xpEarned XP earned! 🎉'),
+          content: Text('+$xpEarned XP earned!'),
           backgroundColor: AppColors.success,
         ),
       );
@@ -86,16 +72,13 @@ class EnhancedActivityCelebration {
     }
   }
 
-  /// Show multiple floating XP numbers for visual impact
   static void _showFloatingNumbers(
     BuildContext context,
     int xpEarned,
     int pointsEarned,
     Offset center,
   ) {
-    debugPrint('💫 Showing floating numbers at $center');
     try {
-      // Show XP number (left side)
       FloatingXpNumber.show(
         context,
         xpEarned,
@@ -103,9 +86,7 @@ class EnhancedActivityCelebration {
         label: 'XP',
         color: AppColors.xp,
       );
-      debugPrint('✅ Floating XP number shown');
 
-      // Show points number (right side) with slight delay
       Future.delayed(const Duration(milliseconds: 150), () {
         if (context.mounted) {
           FloatingXpNumber.show(
@@ -115,11 +96,9 @@ class EnhancedActivityCelebration {
             label: 'Points',
             color: AppColors.accentOrange,
           );
-          debugPrint('✅ Floating Points number shown');
         }
       });
 
-      // Show additional sparkle effect numbers (smaller, faster)
       for (int i = 0; i < 3; i++) {
         Future.delayed(Duration(milliseconds: 100 + (i * 100)), () {
           if (context.mounted) {
@@ -129,22 +108,22 @@ class EnhancedActivityCelebration {
             );
             FloatingXpNumber.show(
               context,
-              xpEarned ~/ 10, // Smaller number for sparkles
+              xpEarned ~/ 10,
               offset,
-              label: '✨',
+              label: '',
               color: Colors.white,
             );
           }
         });
       }
     } catch (e) {
-      debugPrint('❌ Error showing floating numbers: $e');
+      if (kDebugMode) {
+        debugPrint('Error showing floating numbers: $e');
+      }
     }
   }
 
-  /// Show confetti burst animation
   static void _showConfettiBurst(BuildContext context) {
-    debugPrint('🎊 Showing confetti burst');
     try {
       final overlay = Overlay.of(context);
       late OverlayEntry entry;
@@ -152,21 +131,20 @@ class EnhancedActivityCelebration {
       entry = OverlayEntry(
         builder: (context) => _ConfettiBurst(
           onComplete: () {
-            debugPrint('✅ Confetti burst complete');
             entry.remove();
           },
         ),
       );
       
       overlay.insert(entry);
-      debugPrint('✅ Confetti burst overlay inserted');
     } catch (e) {
-      debugPrint('❌ Error showing confetti: $e');
+      if (kDebugMode) {
+        debugPrint('Error showing confetti: $e');
+      }
     }
   }
 }
 
-/// Celebration dialog with animations
 class _CelebrationDialog extends StatefulWidget {
   final int xpEarned;
   final int pointsEarned;
@@ -195,26 +173,21 @@ class _CelebrationDialogState extends State<_CelebrationDialog>
   @override
   void initState() {
     super.initState();
-    debugPrint('🎊 _CelebrationDialog initState - Starting animations');
 
-    // Confetti controller
     _confettiController = ConfettiController(
       duration: const Duration(seconds: 3),
     );
 
-    // Scale animation for main card
     _scaleController = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
 
-    // Rotation animation for icon
     _rotationController = AnimationController(
       duration: const Duration(milliseconds: 2000),
       vsync: this,
     )..repeat();
 
-    // Sparkle animation
     _sparkleController = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
@@ -241,26 +214,20 @@ class _CelebrationDialogState extends State<_CelebrationDialog>
       ),
     );
 
-    // Start animations
-    debugPrint('🎊 _CelebrationDialog initState - Starting animations');
     try {
       _confettiController.play();
-      debugPrint('✅ Confetti controller played');
     } catch (e) {
-      debugPrint('❌ Confetti controller error: $e');
+      if (kDebugMode) {
+        debugPrint('Confetti controller error: $e');
+      }
     }
     
     _scaleController.forward();
-    debugPrint('✅ Scale controller forwarded');
 
-    // Auto-close after 2.5 seconds
     Future.delayed(const Duration(milliseconds: 2500), () {
       if (mounted) {
-        debugPrint('🎊 Auto-closing celebration dialog');
         Navigator.of(context).pop();
         widget.onComplete?.call();
-      } else {
-        debugPrint('⚠️ Widget not mounted, skipping auto-close');
       }
     });
   }
@@ -276,7 +243,6 @@ class _CelebrationDialogState extends State<_CelebrationDialog>
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('🎊 _CelebrationDialog build() called');
     return Material(
       color: Colors.transparent,
       child: Stack(
@@ -305,7 +271,6 @@ class _CelebrationDialogState extends State<_CelebrationDialog>
               ),
             )
           else
-            // Fallback: Animated particles for web
             Positioned.fill(
               child: IgnorePointer(
                 child: AnimatedBuilder(
@@ -474,7 +439,6 @@ class _CelebrationDialogState extends State<_CelebrationDialog>
   }
 }
 
-/// Confetti burst overlay
 class _ConfettiBurst extends StatefulWidget {
   final VoidCallback onComplete;
 
@@ -561,7 +525,6 @@ class _ConfettiBurstState extends State<_ConfettiBurst> {
   }
 }
 
-/// Custom particle painter for web fallback
 class _ParticlePainter extends CustomPainter {
   final double progress;
   final List<Color> colors;

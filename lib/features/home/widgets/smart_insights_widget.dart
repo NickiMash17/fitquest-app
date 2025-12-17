@@ -5,7 +5,6 @@ import 'package:fitquest/core/constants/app_border_radius.dart';
 import 'package:fitquest/shared/widgets/premium_card.dart';
 import 'package:fitquest/shared/models/user_model.dart';
 
-/// Smart insights widget that provides personalized tips and motivation
 class SmartInsightsWidget extends StatelessWidget {
   final UserModel user;
 
@@ -19,20 +18,19 @@ class SmartInsightsWidget extends StatelessWidget {
     final now = DateTime.now();
     final hour = now.hour;
 
-    // Time-based insights
     if (hour >= 6 && hour < 10) {
       if (streak == 0) {
-        return '🌅 Start your day right! Log your first activity to begin your wellness journey.';
+        return 'Start your day right! Log your first activity to begin your wellness journey.';
       }
-      return '🌅 Morning is perfect for a quick workout or meditation to energize your day!';
+      return 'Morning is perfect for a quick workout or meditation to energize your day!';
     } else if (hour >= 10 && hour < 14) {
-      return '☀️ Midday break? A 10-minute walk or hydration check keeps you refreshed!';
+      return 'Midday break? A 10-minute walk or hydration check keeps you refreshed!';
     } else if (hour >= 14 && hour < 18) {
-      return '💪 Afternoon energy dip? A quick activity can boost your focus and mood!';
+      return 'Afternoon energy dip? A quick activity can boost your focus and mood!';
     } else if (hour >= 18 && hour < 22) {
-      return '🌙 Evening is great for reflection. Log your activities and prepare for tomorrow!';
+      return 'Evening is great for reflection. Log your activities and prepare for tomorrow!';
     } else {
-      return '🌙 Time to wind down. Track your sleep for better recovery and wellness!';
+      return 'Time to wind down. Track your sleep for better recovery and wellness!';
     }
   }
 
@@ -41,15 +39,15 @@ class SmartInsightsWidget extends StatelessWidget {
     final streak = user.currentStreak;
 
     if (health < 50) {
-      return '💧 Your plant needs attention! Log activities today to restore its health.';
+      return 'Your plant needs attention! Log activities today to restore its health.';
     } else if (health < 75) {
-      return '🌱 Your plant is doing well! Keep up the consistency to see it thrive.';
+      return 'Your plant is doing well! Keep up the consistency to see it thrive.';
     } else if (streak >= 7) {
-      return '🔥 Amazing $streak-day streak! Your dedication is inspiring your plant to grow!';
+      return 'Amazing $streak-day streak! Your dedication is inspiring your plant to grow!';
     } else if (streak >= 3) {
-      return '✨ Great momentum! Your $streak-day streak is helping your plant flourish!';
+      return 'Great momentum! Your $streak-day streak is helping your plant flourish!';
     } else {
-      return '🌿 Every activity counts! Your plant grows stronger with each logged session.';
+      return 'Every activity counts! Your plant grows stronger with each logged session.';
     }
   }
 

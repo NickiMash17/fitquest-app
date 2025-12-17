@@ -18,14 +18,9 @@ class FirestoreCacheService {
   /// Get cache size limit in MB
   int get cacheSizeLimitMB => cacheSizeLimit ~/ (1024 * 1024);
 
-  /// Clear Firestore cache (useful for troubleshooting or freeing space)
-  /// Note: This clears the local cache but keeps persistence enabled
+  /// Clear Firestore cache
   Future<void> clearCache() async {
     try {
-      // Firestore doesn't provide a direct API to clear cache,
-      // but we can disable and re-enable persistence
-      // This is a workaround - actual cache clearing happens automatically
-      // when cache size limit is reached
       _logger.i('Firestore cache will be managed automatically by size limits');
       _logger.i('Current cache size limit: $cacheSizeLimitMB MB');
       
@@ -63,9 +58,7 @@ class FirestoreCacheService {
     }
   }
 
-  /// Get cache statistics (if available)
-  /// Note: Firestore doesn't expose detailed cache statistics,
-  /// but we can log the current configuration
+  /// Get cache statistics
   void logCacheStats() {
     try {
       final settings = _firestore.settings;
@@ -78,9 +71,9 @@ class FirestoreCacheService {
         _logger.i('Cache size limit (bytes): $cacheSizeBytes');
         
         if (cacheSizeBytes == Settings.CACHE_SIZE_UNLIMITED) {
-          _logger.w('⚠️ Cache size is UNLIMITED - this may lead to excessive disk usage');
+          _logger.w('Cache size is UNLIMITED - this may lead to excessive disk usage');
         } else {
-          _logger.i('✓ Cache size is limited - automatic cleanup enabled');
+          _logger.i('Cache size is limited - automatic cleanup enabled');
         }
       } else {
         _logger.w('Cache size limit not available (may be platform-specific)');

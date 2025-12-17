@@ -53,13 +53,18 @@ class QuickActionsSection extends StatelessWidget {
       ),
     ];
 
+    // Make responsive for mobile screens
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 400;
+    
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       crossAxisCount: 4,
-      mainAxisSpacing: 14,
-      crossAxisSpacing: 14,
-      childAspectRatio: 0.88,
+      mainAxisSpacing: isSmallScreen ? 8 : 12,
+      crossAxisSpacing: isSmallScreen ? 8 : 12,
+      childAspectRatio: isSmallScreen ? 1.05 : 1.0, // Much more vertical space to prevent overflow
+      padding: EdgeInsets.zero,
       children: actions.asMap().entries.map((entry) {
         return StaggeredAnimationWrapper(
           index: entry.key,
@@ -86,61 +91,83 @@ class QuickActionsSection extends StatelessWidget {
           arguments: activityType,
         );
       },
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.25),
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.3),
-                width: 1.5,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isSmallScreen = MediaQuery.of(context).size.width < 400;
+          final imageSize = isSmallScreen ? 48.0 : 52.0;
+          final spacing = isSmallScreen ? 6.0 : 8.0;
+          
+          return ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: constraints.maxHeight,
+              maxWidth: constraints.maxWidth,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Flexible(
+                  flex: 3,
+                  child: Container(
+                    width: imageSize,
+                    height: imageSize,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.25),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.3),
+                        width: 1.5,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: ClipOval(
+                      child: activityType != null
+                          ? ImageWithFallback(
+                              imageUrl: ActivityImageHelper.getQuickActionImageUrl(
+                                activityType,
+                              ),
+                              assetPath: ActivityImageHelper.getQuickActionImagePath(
+                                activityType,
+                              ),
+                              fallbackIcon:
+                                  ActivityImageHelper.getActivityIcon(activityType),
+                              width: imageSize,
+                              height: imageSize,
+                              fit: BoxFit.cover,
+                              backgroundColor: Colors.white.withValues(alpha: 0.2),
+                              iconColor: Colors.white,
+                            )
+                          : Icon(icon, color: Colors.white, size: imageSize * 0.5),
+                    ),
+                  ),
+                ),
+                SizedBox(height: spacing),
+                Flexible(
+                  flex: 2,
+                  child: Text(
+                    label,
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.2,
+                          fontSize: isSmallScreen ? 10 : 11,
+                        ),
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ],
             ),
-            child: ClipOval(
-              child: activityType != null
-                  ? ImageWithFallback(
-                      imageUrl: ActivityImageHelper.getQuickActionImageUrl(
-                        activityType,
-                      ),
-                      assetPath: ActivityImageHelper.getQuickActionImagePath(
-                        activityType,
-                      ),
-                      fallbackIcon:
-                          ActivityImageHelper.getActivityIcon(activityType),
-                      width: 56,
-                      height: 56,
-                      fit: BoxFit.cover,
-                      backgroundColor: Colors.white.withValues(alpha: 0.2),
-                      iconColor: Colors.white,
-                    )
-                  : Icon(icon, color: Colors.white, size: 28),
-            ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            label,
-            style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.2,
-                ),
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+          );
+        },
       ),
     );
   }
@@ -234,12 +261,17 @@ class _AnimatedActionButtonState extends State<_AnimatedActionButton>
                 borderRadius: AppBorderRadius.allLG,
                 splashColor: Colors.white.withValues(alpha: 0.2),
                 highlightColor: Colors.transparent,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 16,
-                  ),
-                  child: widget.child,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isSmallScreen = MediaQuery.of(context).size.width < 400;
+                    return Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isSmallScreen ? 6 : 10,
+                        vertical: isSmallScreen ? 8 : 12,
+                      ),
+                      child: widget.child,
+                    );
+                  },
                 ),
               ),
             ),
